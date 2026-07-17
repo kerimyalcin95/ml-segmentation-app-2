@@ -14,7 +14,11 @@
     "declaration": true,
     "noEmitOnError": true,
     "noImplicitReturns": true,
-    "strict": true
+    "strict": true,
+    "paths": {
+      "$lib": ["./src/lib"],
+      "$lib/*": ["./src/lib/*"]
+    }
   },
   "include": ["src/**/*.ts", "src/**/*.js", "src/**/*.svelte"]
 }

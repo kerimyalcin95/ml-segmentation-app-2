@@ -23,7 +23,6 @@
     "include": [
         "src/**/*",
         "eslint.config.mts",
-        "forge.config.ts",
         "vitest.config.ts"
     ]
 }

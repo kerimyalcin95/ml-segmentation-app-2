@@ -2,21 +2,21 @@ import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
 import path from 'node:path';
 import { spawn, ChildProcessWithoutNullStreams } from 'node:child_process';
 import WebSocket from 'ws';
-import squirrelStartup from 'electron-squirrel-startup';
 
 let webSocket: WebSocket | undefined;
 let pythonProcess: ChildProcessWithoutNullStreams | undefined;
 
 // distinguish between development and production environment
 const pythonPath: string = app.isPackaged
-    ? path.join(__dirname, '..', '..', '..', 'app.asar.unpacked', 'python', 'server.py')
+    ? path.join(
+          process.resourcesPath,
+          'app.asar.unpacked',
+          'python',
+          'server.py'
+      )
     : path.join(__dirname, '..', '..', 'python', 'server.py');
 
 const createWindow = (): void => {
-    if (squirrelStartup) {
-        app.quit();
-        return;
-    }
     
     const window = new BrowserWindow({
         width: 800,
