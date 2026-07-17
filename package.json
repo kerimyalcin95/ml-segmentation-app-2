@@ -74,9 +74,7 @@
             "**/*.py"
         ],
         "files": [
-            "!**/.gitignore",
-            "!**/requirements.txt",
-            "dist/**/*",
+            "dist/src/**/*",
             "svelte-frontend/dist/**/*",
             "python/**/*"
         ],
