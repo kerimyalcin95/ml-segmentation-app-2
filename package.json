@@ -73,6 +73,7 @@
         "asarUnpack": [
             "**/*.py"
         ],
+        "icon": "assets/icon.ico",
         "files": [
             "dist/src/**/*",
             "svelte-frontend/dist/**/*",
@@ -90,8 +91,11 @@
         },
         "nsis": {
             "artifactName": "ml-segmentation-2-setup.exe",
+            "perMachine": true,
             "createDesktopShortcut": true,
-            "shortcutName": "ML-Segmentation-2"
+            "shortcutName": "ML-Segmentation-2",
+            "allowToChangeInstallationDirectory": true,
+            "oneClick": false
         },
         "linux": {
             "target": [
