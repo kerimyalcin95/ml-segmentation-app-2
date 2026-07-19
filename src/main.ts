@@ -29,6 +29,7 @@ const createWindow = (): void => {
             contextIsolation: true,
             nodeIntegration: false
         },
+        title: "ML-Segmentation",
         minHeight: 500,
         minWidth: 500
     });

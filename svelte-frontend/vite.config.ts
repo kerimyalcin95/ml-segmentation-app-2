@@ -2,6 +2,11 @@ import { defineConfig } from 'vite';
 import { svelte } from '@sveltejs/vite-plugin-svelte';
 import tailwindcss from "@tailwindcss/vite";
 import path from "path";
+import { readFileSync } from 'fs';
+
+const packageJson = JSON.parse(
+    readFileSync('./../package.json', 'utf-8')
+);  
 
 // https://vite.dev/config/
 export default defineConfig({
@@ -20,7 +25,8 @@ export default defineConfig({
         },
     },
     define: {
-        __BUILD_TIME__: JSON.stringify(new Date().toLocaleString())
+        __BUILD_TIME__: JSON.stringify(new Date().toLocaleString()),
+        __APP_VERSION__: JSON.stringify(packageJson.version),
     },
     server: {
         // OneDrive/Windows setups can miss fs events without polling.

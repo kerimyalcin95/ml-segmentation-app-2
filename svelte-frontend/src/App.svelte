@@ -1,5 +1,6 @@
 <script context="module" lang="ts">
     declare const __BUILD_TIME__: string;
+    declare const __APP_VERSION__: string;
 </script>
 
 <script lang="ts">
@@ -13,8 +14,6 @@
     import { Card } from '$lib/components/ui/card';
 
     import { CanvasManager } from '$lib/canvas/canvas';
-
-    const buildTime = __BUILD_TIME__;
 
     let viewport: HTMLDivElement;
     let container: HTMLDivElement;
@@ -91,7 +90,7 @@
         </span>
 
         <span>
-            Build {buildTime}
+            v{__APP_VERSION__} | Build {__BUILD_TIME__}
         </span>
     </div>
 </div>

@@ -70,7 +70,7 @@
     },
     "build": {
         "appId": "com.kerimyalcin.mlsegmentation2",
-        "productName": "ML-Segmentation-2",
+        "productName": "ML-Segmentation",
         "directories": {
             "output": "make"
         },
