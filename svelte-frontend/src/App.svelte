@@ -6,7 +6,7 @@
     import { onMount } from 'svelte';
     import { writable } from 'svelte/store';
     import { ModeWatcher } from 'mode-watcher';
-    import { Separator } from 'bits-ui';
+    import { Separator } from '$lib/components/ui/separator';
     import { Button } from '$lib/components/ui/button/index.js';
 
     onMount(() => {
@@ -24,9 +24,7 @@
             query.removeEventListener('change', updateTheme);
         };
     });
-
-    const count = writable(0);
-    const message = writable(0);
+    
     const isOnline = writable(0);
 
     const buildTime = __BUILD_TIME__;
@@ -56,11 +54,16 @@
     });
 </script>
 
-<div class="min-h-screen flex items-center justify-center">
-    <div class="w-50 flex flex-col gap-6 items-center justify-center">
-        <p class="w-full text-center font-bold font-mono rounded-lg bg-secondary p-4 text-secondary-foreground">
-            Build {buildTime}<br />
-            Python server: {$isOnline}
-        </p>
+<div class="fixed bottom-0 left-0 w-full bg-background border-t">
+    <Separator />
+
+    <div class="h-min px-4 flex items-center justify-between text-sm text-muted-foreground">
+        <span>
+            Python server: {$isOnline ? "Online" : "Offline"}
+        </span>
+
+        <span>
+            Build {buildTime}
+        </span>
     </div>
 </div>

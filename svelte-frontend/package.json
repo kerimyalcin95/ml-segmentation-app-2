@@ -12,6 +12,7 @@
     },
     "devDependencies": {
         "@fontsource-variable/roboto": "^5.2.10",
+        "@internationalized/date": "^3.12.2",
         "@sveltejs/vite-plugin-svelte": "^7.2.0",
         "@tailwindcss/vite": "^4.3.2",
         "@tsconfig/svelte": "^5.0.8",
