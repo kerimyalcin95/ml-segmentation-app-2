@@ -10,50 +10,57 @@
     import { Button } from '$lib/components/ui/button/index.js';
 
     onMount(() => {
-        const query = window.matchMedia("(prefers-color-scheme: dark)");
+        const query = window.matchMedia('(prefers-color-scheme: dark)');
 
         function updateTheme(e: MediaQueryList | MediaQueryListEvent) {
-            document.documentElement.classList.toggle("dark", e.matches);
+            document.documentElement.classList.toggle('dark', e.matches);
         }
 
         updateTheme(query);
 
-        query.addEventListener("change", updateTheme);
+        query.addEventListener('change', updateTheme);
 
         return () => {
-            query.removeEventListener("change", updateTheme);
+            query.removeEventListener('change', updateTheme);
         };
     });
 
     const count = writable(0);
     const message = writable(0);
+    const isOnline = writable(0);
 
     const buildTime = __BUILD_TIME__;
 
     onMount(() => {
-        window.electronAPI.onMessage((msg) => {
-            let number = parseInt(msg) | 0;
-            message.set(number + 1000);
-        });
-    });
+        let received = false;
 
-    function increment() {
-        count.update((n) => n + 1);
-        window.electronAPI.sendMessage($count.toString());
-    }
+        const retry = setInterval(() => {
+            if (!received) {
+                window.electronAPI.sendMessage($isOnline.toString());
+                console.log('Retrying...');
+            }
+        }, 1000);
+
+        window.electronAPI.onMessage((msg) => {
+            received = true;
+            clearInterval(retry);
+
+            let state = parseInt(msg) || 0;
+
+            if (state === 0) state = 1;
+
+            isOnline.set(state);
+        });
+
+        return () => clearInterval(retry);
+    });
 </script>
 
 <div class="min-h-screen flex items-center justify-center">
     <div class="w-50 flex flex-col gap-6 items-center justify-center">
         <p class="w-full text-center font-bold font-mono rounded-lg bg-secondary p-4 text-secondary-foreground">
-            Build {buildTime}
-        </p>
-        <Separator.Root
-            class="w-25 bg-border my-0 shrink-0 data-[orientation=horizontal]:h-px data-[orientation=vertical]:h-25 data-[orientation=horizontal]:w-25 data-[orientation=vertical]:w-px"
-        />
-        <Button class="w-full font-bold" onclick={increment}>Increment</Button>
-        <p class="text-center w-full rounded-lg bg-secondary p-4 text-secondary-foreground">
-            {$count} + 1000: {$message}
+            Build {buildTime}<br />
+            Python server: {$isOnline}
         </p>
     </div>
 </div>
