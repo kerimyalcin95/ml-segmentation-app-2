@@ -50,10 +50,9 @@ const connectToPythonServer = (): void => {
     });
 
     webSocket.on('message', (data) => {
-        console.log(`Python: ${data}`);
-        const win = BrowserWindow.getAllWindows()[0];
-        if (win && !win.webContents.isLoading()) {
-            win.webContents.send('update-button', data.toString());
+        const window = BrowserWindow.getAllWindows()[0];
+        if (window && !window.webContents.isLoading()) {
+            window.webContents.send('update-button', data.toString());
         }
     });
 
@@ -85,6 +84,10 @@ ipcMain.on('send-to-python', (event: IpcMainEvent, message: string) => {
     } else {
         console.error('WebSocket not connected');
     }
+});
+
+ipcMain.on('renderer-log', (_event: IpcMainEvent, ...args: unknown[]) => {
+    console.log('Electron: ', ...args);
 });
 
 app.whenReady().then(() => {

@@ -37,7 +37,7 @@
         const retry = setInterval(() => {
             if (!received) {
                 window.electronAPI.sendMessage($isOnline.toString());
-                console.log('Retrying...');
+                window.electronAPI.log("Retrying to connect");
             }
         }, 1000);
 
