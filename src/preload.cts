@@ -1,17 +1,10 @@
 import { contextBridge, ipcRenderer, IpcRendererEvent } from 'electron';
 
-console.log("preload.js loaded.");
-
 contextBridge.exposeInMainWorld('versions', {
     node: (): string => process.versions.node,
     chrome: (): string => process.versions.chrome,
     electron: (): string => process.versions.electron,
 });
-
-type ElectronAPI = {
-    onMessage: (callback: (message: string) => void) => void;
-    sendMessage: (message: string) => void;
-};
 
 contextBridge.exposeInMainWorld('electronAPI', {
     onMessage: (callback: (message: string) => void) => {
@@ -21,6 +14,8 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
     sendMessage: (message: string) => {
         ipcRenderer.send('send-to-python', message);
-        console.log("ipcRenderer sends.");
     },
-} as ElectronAPI);
+    log: (...args: unknown[]) => {
+        ipcRenderer.send("renderer-log", ...args);
+    }
+});
