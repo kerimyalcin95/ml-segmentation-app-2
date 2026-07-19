@@ -23,5 +23,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
     },
     log: (...args: unknown[]) => {
         ipcRenderer.send("renderer-log", ...args);
-    }
+    },
+    openImage: () => ipcRenderer.invoke("open-image")
 });

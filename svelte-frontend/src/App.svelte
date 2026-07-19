@@ -12,39 +12,41 @@
     import { Separator } from '$lib/components/ui/separator';
     import { Card } from '$lib/components/ui/card';
 
-    import Konva from 'konva';
+    import { CanvasManager } from '$lib/canvas/canvas';
 
     const buildTime = __BUILD_TIME__;
 
+    let viewport: HTMLDivElement;
     let container: HTMLDivElement;
+    let canvas: CanvasManager;
+
+    async function loadImage() {
+        const path = await window.electronAPI.openImage();
+
+        if (!path) return;
+
+        canvas.loadImage(path);
+    }
+
+    function setGrayscale() {
+        canvas.setGrayscale(true);
+    }
 
     onMount(() => {
         const darkThemeCleanup = darkThemeSetup();
         const connectivityCleanup = setupConnectivity();
 
-        const stage = new Konva.Stage({
-            container: container,
-            width: container.clientWidth,
-            height: container.clientHeight,
+        canvas = new CanvasManager(container, viewport);
+
+        window.addEventListener('resize', () => {
+            canvas.resize(viewport);
         });
-
-        const layer = new Konva.Layer();
-
-        const rectangle = new Konva.Rect({
-            x: 100,
-            y: 100,
-            width: 200,
-            height: 100,
-            fill: 'blue',
-        });
-
-        layer.add(rectangle);
-        stage.add(layer);
 
         return () => {
             darkThemeCleanup();
             connectivityCleanup();
-            stage.destroy();
+
+            canvas.destroy();
         };
     });
 </script>
@@ -55,9 +57,9 @@
         <!-- Sidebar -->
         <aside class="w-72 p-4">
             <Card class="h-full p-4 flex flex-col gap-4">
-                <Button>Load Image</Button>
+                <Button onclick={loadImage}>Load Image</Button>
 
-                <Button variant="secondary">Test</Button>
+                <Button onclick={setGrayscale} variant="secondary">Grayscale</Button>
 
                 <div class="space-y-2">
                     <span class="text-sm"> Threshold </span>
@@ -77,9 +79,9 @@
         <Separator orientation="vertical" />
 
         <!-- Konva -->
-        <main class="flex-1 relative">
-            <div bind:this={container} id="konva-container" class="absolute inset-0"></div>
-        </main>
+        <div bind:this={viewport} class="flex-1 relative overflow-auto">
+            <div bind:this={container} class="relative w-full h-full"></div>
+        </div>
     </div>
 
     <!-- Status bar -->

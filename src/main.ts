@@ -1,4 +1,4 @@
-import { app, BrowserWindow, ipcMain, IpcMainEvent } from 'electron';
+import { app, BrowserWindow, ipcMain, IpcMainEvent, dialog } from 'electron';
 import path from 'node:path';
 import { fileURLToPath } from "node:url";
 import { spawn, ChildProcessWithoutNullStreams } from 'node:child_process';
@@ -91,6 +91,24 @@ ipcMain.on('send-to-python', (event: IpcMainEvent, message: string) => {
 
 ipcMain.on('renderer-log', (_event: IpcMainEvent, ...args: unknown[]) => {
     console.log('Electron: ', ...args);
+});
+
+ipcMain.handle("open-image", async () => {
+    const result = await dialog.showOpenDialog({
+        properties: ["openFile"],
+        filters: [
+            {
+                name: "Images",
+                extensions: ["png", "jpg", "jpeg", "webp", "bmp", "tiff"]
+            }
+        ]
+    });
+
+    if (result.canceled) {
+        return null;
+    }
+
+    return result.filePaths[0];
 });
 
 app.whenReady().then(() => {

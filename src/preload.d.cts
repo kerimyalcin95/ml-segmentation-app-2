@@ -1,11 +1,12 @@
 export interface ElectronAPI {
-  onMessage: (callback: (message: string) => void) => void;
-  sendMessage: (message: string) => void;
-  log: (...args: unknown[]) => void;
+    onMessage: (callback: (message: string) => void) => void;
+    sendMessage: (message: string) => void;
+    log: (...args: unknown[]) => void;
+    openImage: () => Promise<string | null>;
 }
 
 declare global {
-  interface Window {
-    electronAPI: ElectronAPI;
-  }
+    interface Window {
+        electronAPI: ElectronAPI;
+    }
 }
