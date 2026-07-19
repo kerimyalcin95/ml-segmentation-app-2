@@ -3,31 +3,26 @@
 </script>
 
 <script lang="ts">
+    import { darkThemeSetup } from '$lib/utils/darkTheme.js';
+    import { setupConnectivity, isOnline } from '$lib/utils/connectivity.js';
     import { onMount } from 'svelte';
     import { writable } from 'svelte/store';
-    import { ModeWatcher } from 'mode-watcher';
     import { Separator } from '$lib/components/ui/separator';
     import { Button } from '$lib/components/ui/button/index.js';
 
+    const buildTime = __BUILD_TIME__;
+
     onMount(() => {
-        const query = window.matchMedia('(prefers-color-scheme: dark)');
-
-        function updateTheme(e: MediaQueryList | MediaQueryListEvent) {
-            document.documentElement.classList.toggle('dark', e.matches);
-        }
-
-        updateTheme(query);
-
-        query.addEventListener('change', updateTheme);
+        const darkThemeCleanup = darkThemeSetup();
+        const connectivityCleanup = setupConnectivity();
 
         return () => {
-            query.removeEventListener('change', updateTheme);
-        };
+            darkThemeCleanup();
+            connectivityCleanup();
+        }
     });
-    
-    const isOnline = writable(0);
 
-    const buildTime = __BUILD_TIME__;
+    
 
     onMount(() => {
         let received = false;

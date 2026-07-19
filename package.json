@@ -71,6 +71,9 @@
     "build": {
         "appId": "com.kerimyalcin.mlsegmentation2",
         "productName": "ML-Segmentation-2",
+        "directories": {
+            "output": "make"
+        },
         "asar": true,
         "asarUnpack": [
             "**/*.py"

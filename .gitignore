@@ -1,5 +1,6 @@
-node_modules
+node_modules/
 out/
 dist/
 python/manualSegmentation.py
 python/semanticSegmentation.py
+make/
