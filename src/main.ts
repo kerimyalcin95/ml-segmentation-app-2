@@ -57,7 +57,8 @@ const connectToPythonServer = (): void => {
     });
 
     webSocket.on('close', (code, reason) => {
-        console.log(`WebSocket closed: ${code}, ${reason.toString()}`);
+        const reasonStr = reason ? `, ${reason.toString()}` : '';
+        console.log(`WebSocket closed: ${code}${reasonStr}`);
     });
 
     webSocket.on('error', (err) => {
