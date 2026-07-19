@@ -1,6 +1,6 @@
 # Segmentation App 2
 
-⚠️ This project is in early stage. It is mostly empty and contains test structures only. Right now, it has no functionality.
+⚠️ Work in progress. This project is currently in an early development stage. Core functionality is being implemented, but many features, components, and integrations are still missing or incomplete. The application may contain bugs, unstable behavior, and breaking changes. Not intended for production use yet.
 
 ## Table of Contents
 
