@@ -21,8 +21,9 @@
         "noImplicitReturns": true
     },
     "include": [
-        "src/**/*",
-        "eslint.config.mts",
+        "src/**/*.ts",
+        "src/**/*.d.ts",
+        "eslint.config.ts",
         "vitest.config.ts"
-    ]
+, "src/preload.d.cts", "src/preload.cts"    ]
 }

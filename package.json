@@ -1,6 +1,6 @@
 {
     "name": "ml-segmentation-2",
-    "version": "1.0.0",
+    "version": "2.0.0-alpha.3",
     "description": "This side project builds on my previous work in machine learning-based image segmentation. The current focus is on enhancing software quality and user experience. It serves as a practical environment to improve and deepen my software engineering skills.",
     "homepage": "https://github.com/kerimyalcin95/ml-segmentation-2#readme",
     "bugs": {
@@ -13,10 +13,10 @@
     "license": "MIT",
     "author": "Kerim Yalcin",
     "type": "module",
-    "main": "dist/src/main.cjs",
+    "main": "dist/src/main.js",
     "scripts": {
         "build": "tsc && npm --prefix ./svelte-frontend run build",
-        "start": "electron .",
+        "start": "npm run build && electron .",
         "make": "npm run build && electron-builder",
         "test": "vitest",
         "package": "electron-builder --dir",
