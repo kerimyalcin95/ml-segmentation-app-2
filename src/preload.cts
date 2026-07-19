@@ -8,9 +8,15 @@ contextBridge.exposeInMainWorld('versions', {
 
 contextBridge.exposeInMainWorld('electronAPI', {
     onMessage: (callback: (message: string) => void) => {
-        ipcRenderer.on('update-button', (_event: IpcRendererEvent, message: string) => {
+        const listener = (_event: IpcRendererEvent, message: string) => {
             callback(message);
-        });
+        };
+
+        ipcRenderer.on('update-button', listener);
+
+        return () => {
+            ipcRenderer.removeListener('update-button', listener);
+        };
     },
     sendMessage: (message: string) => {
         ipcRenderer.send('send-to-python', message);

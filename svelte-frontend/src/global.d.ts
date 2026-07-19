@@ -1,8 +1,8 @@
 declare global {
     type ElectronAPI = {
-        onMessage: (callback: (message: string) => void) => void;
+        onMessage: (callback: (message: string) => void) => () => void;
         sendMessage: (message: string) => void;
-        log: (message: string) => void;
+        log: (...args: unknown[]) => void;
     };
 
     interface Window {
@@ -11,8 +11,8 @@ declare global {
             chrome: () => string;
             electron: () => string;
         };
-        electronAPI: ElectronAPI;
+        electronAPI?: ElectronAPI;
     }
 }
 
-export {};
+export { };

@@ -22,4 +22,11 @@ export default defineConfig({
     define: {
         __BUILD_TIME__: JSON.stringify(new Date().toLocaleString())
     },
+    server: {
+        // OneDrive/Windows setups can miss fs events without polling.
+        watch: {
+            usePolling: true,
+            interval: 100
+        }
+    }
 });
