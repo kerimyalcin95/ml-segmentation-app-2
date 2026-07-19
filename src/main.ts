@@ -29,6 +29,8 @@ const createWindow = (): void => {
             contextIsolation: true,
             nodeIntegration: false
         },
+        minHeight: 500,
+        minWidth: 500
     });
 
     window.webContents.on("before-input-event", (event, input) => {
