@@ -11,8 +11,10 @@
         "url": "git+https://github.com/kerimyalcin95/ml-segmentation-2.git"
     },
     "license": "MIT",
-    "author": "Kerim Yalcin",
-    "email": "kerimyalcin.95@it-yalc.in",
+    "author": {
+        "name": "Kerim Yalcin",
+        "email": "kerimyalcin.95@gmail.com"
+    },
     "type": "module",
     "main": "dist/src/main.js",
     "scripts": {
