@@ -1,0 +1,53 @@
+name: All Build
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        include:
+          - os: windows-latest
+            artifact: windows-release
+            path: make/*.exe
+
+          - os: ubuntu-latest
+            artifact: linux-release
+            path: make/*.deb
+
+          - os: macos-latest
+            artifact: macos-release
+            path: make/*.dmg
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version: 26
+          cache: npm
+
+      - name: Install root dependencies
+        run: npm ci
+
+      - name: Install frontend dependencies
+        run: npm ci
+        working-directory: svelte-frontend
+
+      - name: Build application
+        run: npm run make -- --publish never
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v5
+        with:
+          name: ${{ matrix.artifact }}
+          path: ${{ matrix.path }}

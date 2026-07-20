@@ -116,6 +116,7 @@
                     ]
                 }
             ],
+            "category": "Science",
             "artifactName": "${productName}-${version}-${arch}.deb"
         },
         "mac": {
