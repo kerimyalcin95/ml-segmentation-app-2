@@ -85,6 +85,7 @@
             "python/**/*"
         ],
         "win": {
+            "icon": "assets/icon.ico",
             "target": [
                 {
                     "target": "nsis",
@@ -92,25 +93,43 @@
                         "x64"
                     ]
                 }
-            ]
+            ],
+            "artifactName": "${productName}-${version}-${arch}.exe"
         },
         "nsis": {
-            "artifactName": "ml-segmentation-2-setup.exe",
+            "installerIcon": "assets/icon.ico",
+            "uninstallerIcon": "assets/icon.ico",
             "perMachine": true,
             "createDesktopShortcut": true,
-            "shortcutName": "ML-Segmentation-2",
+            "createStartMenuShortcut": true,
+            "shortcutName": "ML-Segmentation",
             "allowToChangeInstallationDirectory": true,
             "oneClick": false
         },
         "linux": {
+            "icon": "assets/icons",
             "target": [
-                "deb"
-            ]
+                {
+                    "target": "deb",
+                    "arch": [
+                        "x64"
+                    ]
+                }
+            ],
+            "artifactName": "${productName}-${version}-${arch}.deb"
         },
         "mac": {
+            "icon": "assets/icon.icns",
             "target": [
-                "zip"
-            ]
+                {
+                    "target": "dmg",
+                    "arch": [
+                        "x64",
+                        "arm64"
+                    ]
+                }
+            ],
+            "artifactName": "${productName}-${version}-${arch}.dmg"
         }
     }
 }
