@@ -33,5 +33,5 @@ jobs:
       - name: Upload installer
         uses: actions/upload-artifact@v5
         with:
-          name: release
+          name: windows-release
           path: make/ml-segmentation-2-setup.exe
