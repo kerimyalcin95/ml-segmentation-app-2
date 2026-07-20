@@ -12,6 +12,7 @@
     },
     "license": "MIT",
     "author": "Kerim Yalcin",
+    "email": "kerimyalcin.95@it-yalc.in",
     "type": "module",
     "main": "dist/src/main.js",
     "scripts": {
