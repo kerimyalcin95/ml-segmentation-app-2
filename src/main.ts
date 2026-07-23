@@ -45,8 +45,8 @@ const createWindow = (): void => {
 };
 
 const connectToPythonServer = (): void => {
-    webSocket = new WebSocket('ws://localhost:8765');
-    console.log('Electron: Listening on ws://localhost:8765');
+    webSocket = new WebSocket('ws://localhost:56767');
+    console.log('Electron: Listening on ws://localhost:56767');
 
     webSocket.on('open', () => {
         console.log('Electron: Connected');

@@ -14,8 +14,8 @@ async def handler(websocket):
         print(f"Connection closed. \n Error message: {e.code}\n Reason message: {e.reason}", end='')
 
 async def main():
-    async with websockets.serve(handler, "localhost", 8765):
-        print("Listening on ws://localhost:8765", end='')
+    async with websockets.serve(handler, "localhost", 56767):
+        print("Listening on ws://localhost:56767", end='')
         await asyncio.Future() 
 
 if __name__ == "__main__":
