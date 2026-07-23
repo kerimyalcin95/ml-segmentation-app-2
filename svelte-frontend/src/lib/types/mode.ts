@@ -1,0 +1,1 @@
+export type Mode = 'editing' | 'annotation' | 'training' | 'prediction';

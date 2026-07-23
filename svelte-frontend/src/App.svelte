@@ -16,15 +16,15 @@ import { Card } from '$lib/components/ui/card';
 import * as ToggleGroup from '$lib/components/ui/toggle-group';
 
 import { CanvasManager } from '$lib/canvas/canvas';
+import ModeSelector from '$lib/app/ModeSelector.svelte';
+import type { Mode } from '$lib/types/mode';
 
 let viewport: HTMLDivElement;
 let container: HTMLDivElement;
 
 let canvas: CanvasManager;
 
-type Mode = 'editing' | 'annotation' | 'training' | 'prediction';
-
-let mode = $state<string>('editing');
+let mode = $state<Mode>('editing');
 
 let opacity = $state(50);
 let threshold = $state(50);
@@ -133,25 +133,7 @@ onMount(() => {
         <div bind:this={viewport} class="flex-1 relative overflow-auto">
             <!-- Floating mode selector -->
             <div class="absolute top-4 left-4 z-20">
-                <Card class="p-1">
-                    <ToggleGroup.Root type="single" bind:value={mode}>
-                        <ToggleGroup.Item value="editing">
-                            Editing
-                        </ToggleGroup.Item>
-
-                        <ToggleGroup.Item value="annotation">
-                            Annotation
-                        </ToggleGroup.Item>
-
-                        <ToggleGroup.Item value="training">
-                            Training
-                        </ToggleGroup.Item>
-
-                        <ToggleGroup.Item value="prediction">
-                            Prediction
-                        </ToggleGroup.Item>
-                    </ToggleGroup.Root>
-                </Card>
+                <ModeSelector bind:mode></ModeSelector>
             </div>
 
             <!-- Konva container -->
