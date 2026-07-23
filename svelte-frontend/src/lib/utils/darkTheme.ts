@@ -1,16 +1,19 @@
 export function darkThemeSetup() {
     const query = window.matchMedia('(prefers-color-scheme: dark)');
 
-    function updateTheme(e: MediaQueryList | MediaQueryListEvent) {
-        document.documentElement.classList.toggle('dark', e.matches);
-    }
+    const apply = (dark: boolean) => {
+        document.documentElement.classList.toggle('dark', dark);
+    };
 
-    updateTheme(query);
+    apply(query.matches);
 
-    query.addEventListener('change', updateTheme);
+    const listener = (e: MediaQueryListEvent) => {
+        apply(e.matches);
+    };
+
+    query.addEventListener('change', listener);
 
     return () => {
-        query.removeEventListener('change', updateTheme);
+        query.removeEventListener('change', listener);
     };
 }
-

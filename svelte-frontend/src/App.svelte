@@ -1,81 +1,67 @@
-<script context="module" lang="ts">
-    declare const __BUILD_TIME__: string;
-    declare const __APP_VERSION__: string;
+<script module lang="ts">
+declare const __BUILD_TIME__: string;
+declare const __APP_VERSION__: string;
 </script>
 
 <script lang="ts">
-    import { onMount } from 'svelte';
+import { onMount } from 'svelte';
 
-    import { darkThemeSetup } from '$lib/utils/darkTheme';
-    import { setupConnectivity, isOnline } from '$lib/utils/connectivity';
+import { darkThemeSetup } from '$lib/utils/darkTheme';
+import { setupConnectivity, isOnline } from '$lib/utils/connectivity';
 
-    import { Button } from '$lib/components/ui/button';
-    import { Slider } from '$lib/components/ui/slider';
-    import { Separator } from '$lib/components/ui/separator';
-    import { Card } from '$lib/components/ui/card';
-    import {
-        ToggleGroup,
-        ToggleGroupItem,
-    } from '$lib/components/ui/toggle-group';
+import { Button } from '$lib/components/ui/button';
+import { Slider } from '$lib/components/ui/slider';
+import { Separator } from '$lib/components/ui/separator';
+import { Card } from '$lib/components/ui/card';
+import * as ToggleGroup from '$lib/components/ui/toggle-group';
 
-    import { CanvasManager } from '$lib/canvas/canvas';
+import { CanvasManager } from '$lib/canvas/canvas';
 
-    type Mode = 'editing' | 'labeling' | 'training' | 'prediction';
+let viewport: HTMLDivElement;
+let container: HTMLDivElement;
 
-    let mode: Mode = 'editing';
+let canvas: CanvasManager;
 
-    let viewport: HTMLDivElement;
-    let container: HTMLDivElement;
+type Mode = 'editing' | 'annotation' | 'training' | 'prediction';
 
-    let canvas: CanvasManager;
+let mode = $state<string>('editing');
 
-    async function loadImage() {
-        const path = await window.electronAPI.openImage();
+let opacity = $state(50);
+let threshold = $state(50);
 
-        if (!path) return;
+async function loadImage() {
+    const path = await window.electronAPI.openImage();
 
-        canvas.loadImage(path);
-    }
+    if (!path) return;
 
-    function setGrayscale() {
-        canvas.setGrayscale(true);
-    }
+    canvas.loadImage(path);
+}
 
-    function setThreshold(value: number[]) {
-        canvas.setThreshold?.(value[0]);
-    }
+function setGrayscale() {
+    canvas.setGrayscale(true);
+}
 
-    function setOpacity(value: number[]) {
-        canvas.setOpacity?.(value[0]);
-    }
+onMount(() => {
+    const darkThemeCleanup = darkThemeSetup();
+    const connectivityCleanup = setupConnectivity();
 
-    function changeMode(value: string) {
-        if (value) {
-            mode = value as Mode;
-        }
-    }
+    canvas = new CanvasManager(container, viewport);
 
-    onMount(() => {
-        const darkThemeCleanup = darkThemeSetup();
-        const connectivityCleanup = setupConnectivity();
+    const resizeHandler = () => {
+        canvas.resize(viewport);
+    };
 
-        canvas = new CanvasManager(container, viewport);
+    window.addEventListener('resize', resizeHandler);
 
-        const resizeHandler = () => {
-            canvas.resize(viewport);
-        };
+    return () => {
+        darkThemeCleanup();
+        connectivityCleanup();
 
-        window.addEventListener('resize', resizeHandler);
+        window.removeEventListener('resize', resizeHandler);
 
-        return () => {
-            darkThemeCleanup();
-            connectivityCleanup();
-
-            window.removeEventListener('resize', resizeHandler);
-
-            canvas.destroy();
-        };
-    });
+        canvas.destroy();
+    };
+});
 </script>
 
 <div class="h-screen flex flex-col">
@@ -98,10 +84,9 @@
 
                         <Slider
                             type="single"
-                            value={[50]}
+                            bind:value={threshold}
                             max={100}
                             step={1}
-                            onValueChange={setThreshold}
                         />
                     </div>
 
@@ -110,13 +95,12 @@
 
                         <Slider
                             type="single"
-                            value={[80]}
+                            bind:value={opacity}
                             max={100}
                             step={1}
-                            onValueChange={setOpacity}
                         />
                     </div>
-                {:else if mode === 'labeling'}
+                {:else if mode === 'annotation'}
                     <h2 class="text-sm font-semibold">Labeling</h2>
 
                     <Button>Add Label</Button>
@@ -149,24 +133,24 @@
         <div bind:this={viewport} class="flex-1 relative overflow-auto">
             <!-- Floating mode selector -->
             <div class="absolute top-4 left-4 z-20">
-                <Card class="p-1 shadow-lg">
-                    <ToggleGroup type="single" bind:value={mode}>
-                        <ToggleGroupItem value="editing"
-                            >Editing</ToggleGroupItem
-                        >
+                <Card class="p-1">
+                    <ToggleGroup.Root type="single" bind:value={mode}>
+                        <ToggleGroup.Item value="editing">
+                            Editing
+                        </ToggleGroup.Item>
 
-                        <ToggleGroupItem value="labeling"
-                            >Labeling</ToggleGroupItem
-                        >
+                        <ToggleGroup.Item value="annotation">
+                            Annotation
+                        </ToggleGroup.Item>
 
-                        <ToggleGroupItem value="training"
-                            >Training</ToggleGroupItem
-                        >
+                        <ToggleGroup.Item value="training">
+                            Training
+                        </ToggleGroup.Item>
 
-                        <ToggleGroupItem value="prediction"
-                            >Prediction</ToggleGroupItem
-                        >
-                    </ToggleGroup>
+                        <ToggleGroup.Item value="prediction">
+                            Prediction
+                        </ToggleGroup.Item>
+                    </ToggleGroup.Root>
                 </Card>
             </div>
 
