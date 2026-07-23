@@ -129,10 +129,10 @@ export class CanvasManager {
             if (!pointer) return;
 
 
-            const mousePointTo = {
-                x: (pointer.x - this.imageGroup.x()) / oldScale,
-                y: (pointer.y - this.imageGroup.y()) / oldScale,
-            };
+            // const mousePointTo = {
+            //     x: (pointer.x - this.imageGroup.x()) / oldScale,
+            //     y: (pointer.y - this.imageGroup.y()) / oldScale,
+            // };
 
 
             let newScale =

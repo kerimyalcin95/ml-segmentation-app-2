@@ -4,7 +4,14 @@ import * as ToggleGroup from '$lib/components/ui/toggle-group';
 import { Card } from '$lib/components/ui/card';
 import type { Mode } from '$lib/types/mode';
 
-export let mode: Mode;
+interface Props {
+    mode: Mode
+}
+
+let {
+    mode
+} = $props<Props>();
+
 let lastMode: Mode = 'editing';
 
 onMount(() => {

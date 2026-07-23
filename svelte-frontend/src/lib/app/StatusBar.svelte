@@ -1,8 +1,12 @@
 <script lang="ts">
 import { isOnline } from '$lib/utils/connectivity';
 
-export let appVersion: string;
-export let buildTime: string;
+interface Props {
+    readonly appVersion: string;
+    readonly buildTime: string;
+}
+
+let { appVersion, buildTime } = $props<Props>();
 </script>
 
 <div

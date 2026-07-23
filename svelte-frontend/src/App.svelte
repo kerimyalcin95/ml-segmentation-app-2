@@ -9,38 +9,21 @@ import { onMount } from 'svelte';
 import { darkThemeSetup } from '$lib/utils/darkTheme';
 import { setupConnectivity, isOnline } from '$lib/utils/connectivity';
 
-import { Button } from '$lib/components/ui/button';
-import { Slider } from '$lib/components/ui/slider';
 import { Separator } from '$lib/components/ui/separator';
-import { Card } from '$lib/components/ui/card';
 import * as ToggleGroup from '$lib/components/ui/toggle-group';
 
 import { CanvasManager } from '$lib/canvas/canvas';
+import Sidebar from '$lib/app/Sidebar.svelte';
 import ModeSelector from '$lib/app/ModeSelector.svelte';
-import StatusBar from '$lib/app/StatusBar.svelte';
+import Statusbar from '$lib/app/Statusbar.svelte';
 import type { Mode } from '$lib/types/mode';
 
 let viewport: HTMLDivElement;
 let container: HTMLDivElement;
 
-let canvas: CanvasManager;
+let canvas = $state<CanvasManager | undefined>(undefined);
 
 let mode = $state<Mode>('editing');
-
-let opacity = $state(50);
-let threshold = $state(50);
-
-async function loadImage() {
-    const path = await window.electronAPI.openImage();
-
-    if (!path) return;
-
-    canvas.loadImage(path);
-}
-
-function setGrayscale() {
-    canvas.setGrayscale(true);
-}
 
 onMount(() => {
     const darkThemeCleanup = darkThemeSetup();
@@ -68,64 +51,10 @@ onMount(() => {
 <div class="h-screen flex flex-col">
     <!-- Workspace -->
     <div class="flex-1 flex overflow-hidden">
-        <!-- Sidebar -->
-        <aside class="w-72 p-4">
-            <Card class="h-full p-4 flex flex-col gap-4 overflow-auto">
-                {#if mode === 'editing'}
-                    <h2 class="text-sm font-semibold">Editing</h2>
-
-                    <Button onclick={loadImage}>Load Image</Button>
-
-                    <Button onclick={setGrayscale} variant="secondary"
-                        >Grayscale</Button
-                    >
-
-                    <div class="space-y-2">
-                        <span class="text-sm"> Threshold </span>
-
-                        <Slider
-                            type="single"
-                            bind:value={threshold}
-                            max={100}
-                            step={1}
-                        />
-                    </div>
-
-                    <div class="space-y-2">
-                        <span class="text-sm"> Opacity </span>
-
-                        <Slider
-                            type="single"
-                            bind:value={opacity}
-                            max={100}
-                            step={1}
-                        />
-                    </div>
-                {:else if mode === 'annotation'}
-                    <h2 class="text-sm font-semibold">Annotation</h2>
-
-                    <Button>Add Label</Button>
-
-                    <Button variant="secondary">Delete Label</Button>
-                {:else if mode === 'training'}
-                    <h2 class="text-sm font-semibold">Training</h2>
-
-                    <Button>Start Training</Button>
-
-                    <div class="text-sm text-muted-foreground">
-                        Dataset configuration and training parameters.
-                    </div>
-                {:else if mode === 'prediction'}
-                    <h2 class="text-sm font-semibold">Prediction</h2>
-
-                    <Button>Run Prediction</Button>
-
-                    <div class="text-sm text-muted-foreground">
-                        Model output and prediction controls.
-                    </div>
-                {/if}
-            </Card>
-        </aside>
+        <Sidebar
+            {mode}
+            {canvas}
+        />
 
         <!-- Divider -->
         <Separator orientation="vertical" />
@@ -142,5 +71,5 @@ onMount(() => {
         </div>
     </div>
 
-    <StatusBar appVersion={__APP_VERSION__} buildTime={__BUILD_TIME__} />
+    <Statusbar appVersion={__APP_VERSION__} buildTime={__BUILD_TIME__} />
 </div>
