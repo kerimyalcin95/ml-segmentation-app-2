@@ -1,6 +1,6 @@
 <script lang="ts">
 import { onMount } from 'svelte';
-import ModeSelector from '$lib/app/ModeSelector.svelte';
+import ModeSelector from '$lib/components/app/ModeSelector.svelte';
 import { CanvasManager } from '$lib/canvas/canvas';
 import type { Mode } from '$lib/types/mode';
 

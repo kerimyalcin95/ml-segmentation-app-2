@@ -5,9 +5,9 @@ import { darkThemeSetup } from '$lib/utils/darkTheme';
 
 import { Separator } from '$lib/components/ui/separator';
 import { CanvasManager } from '$lib/canvas/canvas';
-import Sidebar from '$lib/app/Sidebar.svelte';
-import Statusbar from '$lib/app/Statusbar.svelte';
-import CanvasView from '$lib/app/CanvasView.svelte';
+import Sidebar from '$lib/components/app/Sidebar.svelte';
+import Statusbar from '$lib/components/app/Statusbar.svelte';
+import CanvasView from '$lib/components/app/CanvasView.svelte';
 import type { Mode } from '$lib/types/mode';
 
 let canvas = $state<CanvasManager | undefined>(undefined);
