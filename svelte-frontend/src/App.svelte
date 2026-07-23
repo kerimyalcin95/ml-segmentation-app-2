@@ -101,7 +101,7 @@ onMount(() => {
                         />
                     </div>
                 {:else if mode === 'annotation'}
-                    <h2 class="text-sm font-semibold">Labeling</h2>
+                    <h2 class="text-sm font-semibold">Annotation</h2>
 
                     <Button>Add Label</Button>
 
