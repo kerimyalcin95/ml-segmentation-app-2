@@ -16,8 +16,7 @@ onMount(() => {
 function onValueChange(value: string) {
     if (value == '') {
         mode = lastMode;
-    }
-    else {
+    } else {
         lastMode = mode;
     }
 }
@@ -25,12 +24,28 @@ function onValueChange(value: string) {
 
 <Card class="p-1">
     <ToggleGroup.Root type="single" bind:value={mode} {onValueChange}>
-        <ToggleGroup.Item value="editing">Editing</ToggleGroup.Item>
+        <ToggleGroup.Item
+            value="editing"
+            class="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            >Editing</ToggleGroup.Item
+        >
 
-        <ToggleGroup.Item value="annotation">Annotation</ToggleGroup.Item>
+        <ToggleGroup.Item
+            value="annotation"
+            class="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            >Annotation</ToggleGroup.Item
+        >
 
-        <ToggleGroup.Item value="training">Training</ToggleGroup.Item>
+        <ToggleGroup.Item
+            value="training"
+            class="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            >Training</ToggleGroup.Item
+        >
 
-        <ToggleGroup.Item value="prediction">Prediction</ToggleGroup.Item>
+        <ToggleGroup.Item
+            value="prediction"
+            class="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            >Prediction</ToggleGroup.Item
+        >
     </ToggleGroup.Root>
 </Card>
