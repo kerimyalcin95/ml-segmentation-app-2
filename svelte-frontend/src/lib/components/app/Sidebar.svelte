@@ -10,13 +10,18 @@ interface Props {
     mode: Mode;
 }
 
-let { canvas, mode = 'editing'}: Props = $props();
+let { canvas, mode = 'editing' }: Props = $props();
 
 let opacity = $state(50);
 let threshold = $state(50);
 
 async function loadImage() {
-    const path = await window.electronAPI!.openImage();
+    if (!window.electronAPI) {
+        console.error('electronAPI is not available');
+        return;
+    }
+
+    const path = await window.electronAPI.openImage();
 
     if (!path) return;
 
