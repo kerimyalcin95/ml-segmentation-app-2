@@ -12,9 +12,6 @@ interface Props {
 
 let { canvas, mode = 'editing' }: Props = $props();
 
-let opacity = $state(50);
-let threshold = $state(50);
-
 async function loadImage() {
     if (!window.electronAPI) {
         console.error('electronAPI is not available');
@@ -28,7 +25,7 @@ async function loadImage() {
     canvas.loadImage(path);
 }
 
-function setGrayscale() {
+function applyFilters() {
     canvas.setGrayscale(true);
 }
 </script>
@@ -40,47 +37,14 @@ function setGrayscale() {
 
             <Button onclick={loadImage}>Load Image</Button>
 
-            <Button onclick={setGrayscale} variant="secondary">Grayscale</Button
+            <Button onclick={applyFilters} variant="secondary">Apply filters</Button
             >
-
-            <div class="space-y-2">
-                <span class="text-sm"> Threshold </span>
-
-                <Slider
-                    type="single"
-                    bind:value={threshold}
-                    max={100}
-                    step={1}
-                />
-            </div>
-
-            <div class="space-y-2">
-                <span class="text-sm"> Opacity </span>
-
-                <Slider type="single" bind:value={opacity} max={100} step={1} />
-            </div>
         {:else if mode === 'annotation'}
             <h2 class="text-sm font-semibold">Annotation</h2>
-
-            <Button>Add Label</Button>
-
-            <Button variant="secondary">Delete Label</Button>
         {:else if mode === 'training'}
             <h2 class="text-sm font-semibold">Training</h2>
-
-            <Button>Start Training</Button>
-
-            <div class="text-sm text-muted-foreground">
-                Dataset configuration and training parameters.
-            </div>
         {:else if mode === 'prediction'}
             <h2 class="text-sm font-semibold">Prediction</h2>
-
-            <Button>Run Prediction</Button>
-
-            <div class="text-sm text-muted-foreground">
-                Model output and prediction controls.
-            </div>
         {/if}
     </Card>
 </aside>
