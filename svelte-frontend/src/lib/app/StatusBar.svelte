@@ -1,12 +1,19 @@
+<script module lang="ts">
+declare const __BUILD_TIME__: string;
+declare const __APP_VERSION__: string;
+</script>
+
 <script lang="ts">
-import { isOnline } from '$lib/utils/connectivity';
+import { onMount } from 'svelte';
+import { setupConnectivity, isOnline } from '$lib/utils/connectivity';
 
-interface Props {
-    readonly appVersion: string;
-    readonly buildTime: string;
-}
+onMount(() => {
+    const connectivityCleanup = setupConnectivity();
 
-let { appVersion, buildTime } = $props<Props>();
+    return () => {
+        connectivityCleanup();
+    };
+});
 </script>
 
 <div
@@ -18,7 +25,7 @@ let { appVersion, buildTime } = $props<Props>();
     </span>
 
     <span>
-        v{appVersion}
-        | Build {buildTime}
+        v{__APP_VERSION__}
+        | Build {__BUILD_TIME__}
     </span>
 </div>
