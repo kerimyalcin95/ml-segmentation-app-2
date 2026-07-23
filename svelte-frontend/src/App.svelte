@@ -13,7 +13,10 @@
     import { Slider } from '$lib/components/ui/slider';
     import { Separator } from '$lib/components/ui/separator';
     import { Card } from '$lib/components/ui/card';
-    import { ToggleGroup, ToggleGroupItem } from '$lib/components/ui/toggle-group';
+    import {
+        ToggleGroup,
+        ToggleGroupItem,
+    } from '$lib/components/ui/toggle-group';
 
     import { CanvasManager } from '$lib/canvas/canvas';
 
@@ -46,6 +49,12 @@
         canvas.setOpacity?.(value[0]);
     }
 
+    function changeMode(value: string) {
+        if (value) {
+            mode = value as Mode;
+        }
+    }
+
     onMount(() => {
         const darkThemeCleanup = darkThemeSetup();
         const connectivityCleanup = setupConnectivity();
@@ -69,37 +78,23 @@
     });
 </script>
 
-
 <div class="h-screen flex flex-col">
-
     <!-- Workspace -->
     <div class="flex-1 flex overflow-hidden">
-
-
         <!-- Sidebar -->
         <aside class="w-72 p-4">
-
             <Card class="h-full p-4 flex flex-col gap-4 overflow-auto">
-
                 {#if mode === 'editing'}
+                    <h2 class="text-sm font-semibold">Editing</h2>
 
-                    <h2 class="text-sm font-semibold">
-                        Editing
-                    </h2>
+                    <Button onclick={loadImage}>Load Image</Button>
 
-                    <Button onclick={loadImage}>
-                        Load Image
-                    </Button>
-
-                    <Button onclick={setGrayscale} variant="secondary">
-                        Grayscale
-                    </Button>
-
+                    <Button onclick={setGrayscale} variant="secondary"
+                        >Grayscale</Button
+                    >
 
                     <div class="space-y-2">
-                        <span class="text-sm">
-                            Threshold
-                        </span>
+                        <span class="text-sm"> Threshold </span>
 
                         <Slider
                             type="single"
@@ -110,11 +105,8 @@
                         />
                     </div>
 
-
                     <div class="space-y-2">
-                        <span class="text-sm">
-                            Opacity
-                        </span>
+                        <span class="text-sm"> Opacity </span>
 
                         <Slider
                             type="single"
@@ -124,130 +116,77 @@
                             onValueChange={setOpacity}
                         />
                     </div>
-
-
                 {:else if mode === 'labeling'}
+                    <h2 class="text-sm font-semibold">Labeling</h2>
 
-                    <h2 class="text-sm font-semibold">
-                        Labeling
-                    </h2>
+                    <Button>Add Label</Button>
 
-                    <Button>
-                        Add Label
-                    </Button>
-
-                    <Button variant="secondary">
-                        Delete Label
-                    </Button>
-
-
+                    <Button variant="secondary">Delete Label</Button>
                 {:else if mode === 'training'}
+                    <h2 class="text-sm font-semibold">Training</h2>
 
-                    <h2 class="text-sm font-semibold">
-                        Training
-                    </h2>
-
-                    <Button>
-                        Start Training
-                    </Button>
+                    <Button>Start Training</Button>
 
                     <div class="text-sm text-muted-foreground">
                         Dataset configuration and training parameters.
                     </div>
-
-
                 {:else if mode === 'prediction'}
+                    <h2 class="text-sm font-semibold">Prediction</h2>
 
-                    <h2 class="text-sm font-semibold">
-                        Prediction
-                    </h2>
-
-                    <Button>
-                        Run Prediction
-                    </Button>
+                    <Button>Run Prediction</Button>
 
                     <div class="text-sm text-muted-foreground">
                         Model output and prediction controls.
                     </div>
-
                 {/if}
-
             </Card>
-
         </aside>
-
 
         <!-- Divider -->
         <Separator orientation="vertical" />
 
-
         <!-- Canvas -->
-        <div
-            bind:this={viewport}
-            class="flex-1 relative overflow-auto"
-        >
-
+        <div bind:this={viewport} class="flex-1 relative overflow-auto">
             <!-- Floating mode selector -->
             <div class="absolute top-4 left-4 z-20">
-
                 <Card class="p-1 shadow-lg">
+                    <ToggleGroup type="single" bind:value={mode}>
+                        <ToggleGroupItem value="editing"
+                            >Editing</ToggleGroupItem
+                        >
 
-                    <ToggleGroup
-                        type="single"
-                        bind:value={mode}
-                    >
+                        <ToggleGroupItem value="labeling"
+                            >Labeling</ToggleGroupItem
+                        >
 
-                        <ToggleGroupItem value="editing">
-                            Editing
-                        </ToggleGroupItem>
+                        <ToggleGroupItem value="training"
+                            >Training</ToggleGroupItem
+                        >
 
-                        <ToggleGroupItem value="labeling">
-                            Labeling
-                        </ToggleGroupItem>
-
-                        <ToggleGroupItem value="training">
-                            Training
-                        </ToggleGroupItem>
-
-                        <ToggleGroupItem value="prediction">
-                            Prediction
-                        </ToggleGroupItem>
-
+                        <ToggleGroupItem value="prediction"
+                            >Prediction</ToggleGroupItem
+                        >
                     </ToggleGroup>
-
                 </Card>
-
             </div>
 
-
             <!-- Konva container -->
-            <div
-                bind:this={container}
-                class="relative w-full h-full"
-            ></div>
-
+            <div bind:this={container} class="relative w-full h-full"></div>
         </div>
-
     </div>
-
 
     <!-- Status bar -->
     <div
         class="h-8 border-t px-4 flex items-center justify-between text-sm text-muted-foreground"
     >
-
         <span>
             Python server:
             {$isOnline ? 'Online' : 'Offline'}
         </span>
 
-
         <span>
             v{__APP_VERSION__}
-            |
-            Build {__BUILD_TIME__}
+            | Build {__BUILD_TIME__}
         </span>
-
     </div>
-
 </div>
