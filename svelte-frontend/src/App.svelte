@@ -17,6 +17,7 @@ import * as ToggleGroup from '$lib/components/ui/toggle-group';
 
 import { CanvasManager } from '$lib/canvas/canvas';
 import ModeSelector from '$lib/app/ModeSelector.svelte';
+import StatusBar from '$lib/app/StatusBar.svelte';
 import type { Mode } from '$lib/types/mode';
 
 let viewport: HTMLDivElement;
@@ -141,18 +142,5 @@ onMount(() => {
         </div>
     </div>
 
-    <!-- Status bar -->
-    <div
-        class="h-8 border-t px-4 flex items-center justify-between text-sm text-muted-foreground"
-    >
-        <span>
-            Python server:
-            {$isOnline ? 'Online' : 'Offline'}
-        </span>
-
-        <span>
-            v{__APP_VERSION__}
-            | Build {__BUILD_TIME__}
-        </span>
-    </div>
+    <StatusBar appVersion={__APP_VERSION__} buildTime={__BUILD_TIME__} />
 </div>
