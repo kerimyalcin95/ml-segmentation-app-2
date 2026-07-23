@@ -2,8 +2,11 @@
     "tabWidth": 4,
     "useTabs": false,
     "semi": true,
+    "bracketSameLine": false,
     "singleQuote": true,
     "trailingComma": "all",
-    "plugins": ["prettier-plugin-svelte"],
-    "svelteIndentScriptAndStyle": true
+    "plugins": [
+        "prettier-plugin-svelte"
+    ],
+    "svelteIndentScriptAndStyle": false
 }
