@@ -3,20 +3,20 @@ import { Button } from '$lib/components/ui/button';
 import { Slider } from '$lib/components/ui/slider';
 import { Card } from '$lib/components/ui/card';
 import type { Mode } from '$lib/types/mode';
-import type { CanvasManager } from '$lib/canvas/canvas';
+import { CanvasManager } from '$lib/canvas/canvas';
 
 interface Props {
     canvas: CanvasManager;
     mode: Mode;
 }
 
-let { canvas, mode = 'editing' } = $props<Props>();
+let { canvas, mode = 'editing'}: Props = $props();
 
 let opacity = $state(50);
 let threshold = $state(50);
 
 async function loadImage() {
-    const path = await window.electronAPI.openImage();
+    const path = await window.electronAPI!.openImage();
 
     if (!path) return;
 
@@ -35,8 +35,7 @@ function setGrayscale() {
 
             <Button onclick={loadImage}>Load Image</Button>
 
-            <Button onclick={setGrayscale} variant="secondary"
-                >Grayscale</Button
+            <Button onclick={setGrayscale} variant="secondary">Grayscale</Button
             >
 
             <div class="space-y-2">

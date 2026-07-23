@@ -9,7 +9,7 @@ interface Props {
     mode: Mode;
 }
 
-let { onCanvasReady, mode = 'editing' } = $props<Props>();
+let { onCanvasReady, mode = 'editing' }: Props = $props();
 
 let viewport: HTMLDivElement;
 let container: HTMLDivElement;
@@ -18,22 +18,25 @@ let canvas: CanvasManager;
 onMount(() => {
     canvas = new CanvasManager(container, viewport);
 
+    const observer = new ResizeObserver(() => {
+        canvas.resize(viewport);
+    });
+
+    observer.observe(viewport);
+
     onCanvasReady?.(canvas);
 
-    const resizeHandler = () => {
-        canvas.resize(viewport);
-    };
-
-    window.addEventListener('resize', resizeHandler);
-
     return () => {
-        window.removeEventListener('resize', resizeHandler);
+        observer.disconnect();
         canvas.destroy();
     };
 });
 </script>
 
-<div bind:this={viewport} class="flex-1 relative overflow-auto">
-    <ModeSelector bind:mode></ModeSelector>
-    <div bind:this={container} class="relative w-full h-full"></div>
+<div class="flex-1 relative">
+    <ModeSelector bind:mode />
+
+    <div bind:this={viewport} class="absolute inset-0 overflow-auto">
+        <div bind:this={container} class="relative w-full h-full"></div>
+    </div>
 </div>

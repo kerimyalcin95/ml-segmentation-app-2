@@ -10,7 +10,7 @@ import Statusbar from '$lib/components/app/Statusbar.svelte';
 import CanvasView from '$lib/components/app/CanvasView.svelte';
 import type { Mode } from '$lib/types/mode';
 
-let canvas = $state<CanvasManager | undefined>(undefined);
+let canvas = $state<CanvasManager>();
 let mode = $state<Mode>('editing');
 
 onMount(() => {
@@ -25,7 +25,9 @@ onMount(() => {
 <div class="h-screen flex flex-col">
     <!-- Workspace -->
     <div class="flex-1 flex overflow-hidden">
-        <Sidebar {mode} {canvas} />
+        {#if canvas}
+            <Sidebar {mode} {canvas} />
+        {/if}
         <Separator orientation="vertical" />
         <CanvasView
             {mode}

@@ -3,6 +3,7 @@ declare global {
         onMessage: (callback: (message: string) => void) => () => void;
         sendMessage: (message: string) => void;
         log: (...args: unknown[]) => void;
+        openImage(): Promise<string | null>;
     };
 
     interface Window {

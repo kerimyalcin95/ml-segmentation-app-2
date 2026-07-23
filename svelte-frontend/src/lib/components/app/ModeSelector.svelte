@@ -8,7 +8,7 @@ interface Props {
     mode: Mode;
 }
 
-let { mode } = $props<Props>();
+let { mode = $bindable() }: Props = $props();
 
 let lastMode: Mode = 'editing';
 
