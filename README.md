@@ -8,7 +8,6 @@
   - [Table of Contents](#table-of-contents)
   - [About](#about)
   - [Architecture](#architecture)
-  - [Architecture](#architecture-1)
   - [Installation](#installation)
     - [How to Install the Release](#how-to-install-the-release)
   - [Project Structure](#project-structure)
@@ -36,8 +35,6 @@ This side project builds on my previous work in machine learning-based image seg
 The application is designed for end-to-end image segmentation workflows using the fastai API. It enables users to create and manage segmentation datasets, annotate images, perform image editing and cropping, train neural network models, and generate segmentation predictions from trained models. By integrating dataset preparation, model training, and inference into a single application, the project provides a streamlined workflow for developing and evaluating image segmentation models.
 
 Recent improvements include codebase refactoring, automated unit testing, UI modernisation, performance enhancements, and the addition of new features that were missing in the previous version.
-
-## Architecture
 
 ## Architecture
 
