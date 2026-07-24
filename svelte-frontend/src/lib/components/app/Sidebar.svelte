@@ -10,7 +10,7 @@ interface Props {
     mode: Mode;
 }
 
-let { canvas, mode = 'editing' }: Props = $props();
+let { canvas, mode = $bindable()}: Props = $props();
 
 async function loadImage() {
     if (!window.electronAPI) {

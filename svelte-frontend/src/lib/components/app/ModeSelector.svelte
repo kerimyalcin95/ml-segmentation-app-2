@@ -12,12 +12,6 @@ let { mode = $bindable() }: Props = $props();
 
 let lastMode: Mode = 'editing';
 
-onMount(() => {
-    if (!mode) {
-        mode = 'editing';
-    }
-});
-
 function onValueChange(value: string) {
     if (value == '') {
         mode = lastMode;

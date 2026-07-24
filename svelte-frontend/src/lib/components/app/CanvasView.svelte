@@ -9,7 +9,7 @@ interface Props {
     mode: Mode;
 }
 
-let { onCanvasReady, mode = 'editing' }: Props = $props();
+let { onCanvasReady, mode = $bindable()}: Props = $props();
 
 let viewport: HTMLDivElement;
 let container: HTMLDivElement;
