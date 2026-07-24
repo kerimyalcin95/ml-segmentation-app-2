@@ -503,39 +503,65 @@ This command builds the complete Electron application:
 
 ### Test the Electron App
 
-Inside the project folder run:  
-`npm run start`
+Inside the project folder, run:
 
-The project frontend and backend is build and the Electron app is started for testing.
+```bash
+npm run start
+```
+
+This command builds the backend and Svelte frontend, then starts the Electron application for local testing.
 
 ### Test the Svelte Frontend
 
-Inside the project folder run:  
-`npm run fe-start`
+Start the Svelte frontend development server using:
 
-or  
-`npm run fe-preview`
+```bash
+npm run fe-dev
+```
 
-The Svelte frontend project files are build and saved into `\svelte-frontend\dist`.  
-A local server will be started where the frontend app can be run on a browser.
+This starts the Vite development server and opens the Svelte frontend in a browser. Changes to the frontend files are automatically updated during development.
 
-To kill the server, type:  
-`q + enter`
+Alternatively, run the command directly inside the `svelte-frontend` folder:
+
+```bash
+cd svelte-frontend
+npm run dev
+```
+
+To stop the development server, press:
+
+```bash
+q + Enter
+```
 
 ### Build the Svelte Frontend
 
-Inside the project folder run:  
-`npm run fe-build`  
+Build the Svelte frontend using:
 
-The Svelte frontend project files are build and saved into `\svelte-frontend\dist`.
+```bash
+npm run fe-build
+```
+
+This compiles the Svelte frontend into production files and saves the output to `svelte-frontend/dist`.
+
+Alternatively, run the build command directly inside the `svelte-frontend` folder:
+
+```bash
+cd svelte-frontend
+npm run build
+```
 
 ### Run Unit Tests in TypeScript
 
-The project uses Vitest for Unit testing.  
-TypeScript unit test files are saved as `*.test.ts` beside the reference file.
+The project uses **Vitest** for TypeScript unit testing.
 
-To run a unit test type:  
-`npm run test`
+Unit test files follow the naming convention `*.test.ts` and are located next to the files they test.
+
+Run all TypeScript unit tests from the project folder:
+
+```bash
+npm run test
+```
 
 ## Manual
 
