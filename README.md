@@ -12,7 +12,8 @@
     - [How to Install the Release](#how-to-install-the-release)
   - [Project Structure](#project-structure)
   - [How to Build and Run the Project](#how-to-build-and-run-the-project)
-    - [Node.js and Python](#nodejs-and-python)
+    - [Download the repository](#download-the-repository)
+    - [Install Node.js and Python](#install-nodejs-and-python)
     - [Installing Node.js packages](#installing-nodejs-packages)
     - [Installing Python packages](#installing-python-packages)
       - [How to Install Python Packages on Windows](#how-to-install-python-packages-on-windows)
@@ -138,10 +139,47 @@ Other directories and files included in the `svelte-frontend` directory:
 
 ## How to Build and Run the Project
 
-### Node.js and Python
+### Download the repository
 
-Download and install [Node.js](https://nodejs.org/en/download).  
-Download and install [Python](https://www.python.org/downloads/).
+Download the repository as a ZIP file, extract it, and navigate to the root folder `ml-segmentation-app-2`.
+
+Alternatively, clone the repository from GitHub using Git:
+
+```bash
+git clone https://github.com/kerimyalcin95/ml-segmentation-app-2.git
+```
+
+Navigate into the project directory:
+
+```bash
+cd ml-segmentation-app-2
+```
+
+### Install Node.js and Python
+
+Install [Node.js](https://nodejs.org/en/download) and [Python](https://www.python.org/downloads/).
+
+**Windows (console):**
+
+```bash
+winget install OpenJS.NodeJS.LTS
+winget install Python.Python.3
+```
+
+**Linux (Ubuntu/Debian):**
+
+```bash
+sudo apt update
+sudo apt install nodejs npm python3 python3-pip
+```
+
+Verify installation:
+
+```bash
+node --version
+npm --version
+python --version
+```
 
 ### Installing Node.js packages
 
