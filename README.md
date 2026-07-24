@@ -12,22 +12,20 @@
     - [How to Install the Release](#how-to-install-the-release)
   - [Project Structure](#project-structure)
   - [How to Build and Run the Project](#how-to-build-and-run-the-project)
+    - [Recommended VS Code extensions](#recommended-vs-code-extensions)
+    - [Install VS Code extensions](#install-vs-code-extensions)
     - [Download the repository](#download-the-repository)
     - [Install Node.js and Python](#install-nodejs-and-python)
-    - [Installing Node.js packages](#installing-nodejs-packages)
-    - [Installing Python packages](#installing-python-packages)
-      - [How to Install Python Packages on Windows](#how-to-install-python-packages-on-windows)
-      - [How to Install Python Packages on Linux (Debian)](#how-to-install-python-packages-on-linux-debian)
-      - [How to Install Python Packages on macOS](#how-to-install-python-packages-on-macos)
-    - [How to Build the Electron app](#how-to-build-the-electron-app)
-    - [How to Test the Electron App](#how-to-test-the-electron-app)
-    - [How to Distribute the Electron App](#how-to-distribute-the-electron-app)
-    - [How to Test the Svelte Frontend](#how-to-test-the-svelte-frontend)
-    - [How to Build the Svelte Frontend](#how-to-build-the-svelte-frontend)
-    - [How to Run Unit Tests in TypeScript](#how-to-run-unit-tests-in-typescript)
-    - [Import the Electron project to use Electron Forge](#import-the-electron-project-to-use-electron-forge)
+    - [Install Node.js packages](#install-nodejs-packages)
+    - [Install Python packages](#install-python-packages)
+    - [Build the Electron app](#build-the-electron-app)
+    - [Test the Electron App](#test-the-electron-app)
+    - [Distribute the Electron App with Electron Builder](#distribute-the-electron-app-with-electron-builder)
+    - [Test the Svelte Frontend](#test-the-svelte-frontend)
+    - [Build the Svelte Frontend](#build-the-svelte-frontend)
+    - [Run Unit Tests in TypeScript](#run-unit-tests-in-typescript)
   - [Manual](#manual)
-  - [Licence](#licence)
+  - [License](#license)
 
 ## About
 
@@ -135,9 +133,68 @@ Other directories and files included in the `svelte-frontend` directory:
 - `\svelte-frontend\tsconfig.node.json` contains TypeScript compiler settings for Node.js-based configuration files such as Vite configuration.
 - `\svelte-frontend\vite.config.ts` contains the configuration for [Vite](https://vite.dev/config/), which manages the frontend development server, module bundling, and production builds.
 
-*Please note that directories such as `\svelte-frontend\dist` and `\svelte-frontend\node_modules` are generated automatically after running corresponding `npm` commands and build processes.*
+> Note: Directories such as `\svelte-frontend\dist` and `\svelte-frontend\node_modules` are generated automatically after running corresponding `npm` commands and build processes.*
 
 ## How to Build and Run the Project
+
+### Recommended VS Code extensions
+
+The following VS Code extensions are recommended to provide a consistent development environment for contributors.
+
+| Extension | Purpose |
+|---|---|
+| `aaron-bond.better-comments` | Improves code comments by adding visual categories such as notes, warnings, and TODOs. |
+| `bierner.markdown-preview-github-styles` | Provides a GitHub-like preview for Markdown documentation. |
+| `bmalehorn.shell-syntax` | Adds syntax highlighting for shell scripts and commands. |
+| `bradlc.vscode-tailwindcss` | Provides Tailwind CSS IntelliSense and class suggestions. |
+| `christian-kohler.npm-intellisense` | Provides autocomplete for npm modules in JavaScript and TypeScript files. |
+| `christian-kohler.path-intellisense` | Provides autocomplete for file paths. |
+| `davidanson.vscode-markdownlint` | Checks Markdown files for formatting and documentation quality issues. |
+| `dbaeumer.vscode-eslint` | Detects JavaScript and TypeScript code quality issues. |
+| `donjayamanne.githistory` | Displays Git file history and commit information. |
+| `donjayamanne.python-environment-manager` | Helps manage Python environments inside VS Code. |
+| `esbenp.prettier-vscode` | Automatically formats code using Prettier. |
+| `formulahendry.auto-close-tag` | Automatically adds closing HTML/XML tags. |
+| `formulahendry.auto-rename-tag` | Renames matching HTML/XML tags automatically. |
+| `formulahendry.code-runner` | Allows quick execution of code snippets and scripts. |
+| `gruntfuggly.todo-tree` | Collects and displays TODO comments across the project. |
+| `htmlhint.vscode-htmlhint` | Checks HTML files for common issues and best practices. |
+| `humao.rest-client` | Allows testing HTTP requests directly from VS Code. |
+| `jasonnutter.search-node-modules` | Helps locate and search installed npm dependencies. |
+| `ms-playwright.playwright` | Provides tools for browser automation and end-to-end testing. |
+| `ms-python.autopep8` | Automatically formats Python code according to PEP 8. |
+| `ms-python.debugpy` | Provides Python debugging support. |
+| `ms-python.pylint` | Performs Python code quality checks. |
+| `ms-python.python` | Adds Python language support. |
+| `ms-python.vscode-pylance` | Provides Python IntelliSense, type checking, and analysis. |
+| `ms-python.vscode-python-envs` | Provides Python environment management features. |
+| `ms-toolsai.jupyter` | Adds support for Jupyter notebooks. |
+| `ms-toolsai.jupyter-keymap` | Adds familiar Jupyter keyboard shortcuts. |
+| `ms-toolsai.jupyter-renderers` | Improves rendering of Jupyter outputs. |
+| `ms-toolsai.vscode-jupyter-cell-tags` | Supports Jupyter cell metadata and tagging. |
+| `ms-toolsai.vscode-jupyter-slideshow` | Allows creating presentations from Jupyter notebooks. |
+| `ms-vscode-remote.remote-containers` | Enables development inside Docker containers. |
+| `ms-vscode-remote.remote-ssh` | Allows development on remote machines through SSH. |
+| `ms-vscode-remote.remote-wsl` | Enables development using Windows Subsystem for Linux. |
+| `ms-vscode-remote.vscode-remote-extensionpack` | Installs common extensions for remote development. |
+| `openai.chatgpt` | Provides AI-assisted coding, debugging, and documentation support. |
+| `redhat.vscode-yaml` | Provides YAML validation and editing support. |
+| `ritwickdey.liveserver` | Starts a local development server with live browser updates. |
+| `rvest.vs-code-prettier-eslint` | Integrates Prettier formatting with ESLint rules. |
+| `selemondev.vscode-shadcn-svelte` | Provides support for shadcn-svelte components. |
+| `svelte.svelte-vscode` | Adds Svelte language support and IntelliSense. |
+| `vitest.explorer` | Provides a graphical interface for running Vitest tests. |
+| `xabikos.javascriptsnippets` | Provides useful JavaScript code snippets. |
+| `yzhang.markdown-all-in-one` | Adds Markdown shortcuts, formatting, and navigation features. |
+| `zainchen.json` | Improves JSON editing and formatting. |
+
+These extensions can be installed automatically using the recommended extensions file located at `.vscode/extensions.json`.
+
+### Install VS Code extensions
+
+Open the project in VS Code and install the recommended extensions when prompted.
+
+Alternatively, open the Extensions panel (`Ctrl + Shift + X`) and select **Install Workspace Recommended Extensions**.
 
 ### Download the repository
 
@@ -181,45 +238,105 @@ npm --version
 python --version
 ```
 
-### Installing Node.js packages
+### Install Node.js packages
 
-Inside the project folder run:  
-`npm install`
+Install the project dependencies by running the following command inside the root folder `ml-segmentation-2`:
 
-Then inside the `/svelte-frontend` folder run  
-`npm install`  
-again.
+```bash
+npm install
+```
 
-### Installing Python packages
+Then navigate to the `/svelte-frontend` folder and install its dependencies:
 
-#### How to Install Python Packages on Windows
+```bash
+cd svelte-frontend
+npm install
+```
 
-Before installing update the package manager `pip`:  
-`python -m pip install --upgrade pip`
+### Install Python packages
 
-Open a terminal and run:  
-`pip install websockets`  
-`pip install opencv-python`  
-`pip install fastai`  
+Install the required Python dependencies using `pip`.
 
-or run:  
-`pip install websockets opencv-python fastai`  
+**Windows (console):**
 
-Please note that the current project development state requires just the `websockets` package.
+Update `pip` before installing packages:
 
-To remove **all installed packages** from your system run (e.g. in your `Desktop` folder):  
-`pip freeze > packages.txt`  
-`pip uninstall -r packages.txt -y`
+```bash
+python -m pip install --upgrade pip
+```
 
-#### How to Install Python Packages on Linux (Debian)
+Install the required packages:
 
-TODO
+```bash
+pip install websockets opencv-python fastai
+```
 
-#### How to Install Python Packages on macOS
+Alternatively, install packages individually:
 
-TODO
+```bash
+pip install websockets
+pip install opencv-python
+pip install fastai
+```
 
-### How to Build the Electron app
+> Note: The current development version of the project only requires the `websockets` package.
+
+To remove all installed packages from the current Python environment:
+
+```bash
+pip freeze > packages.txt
+pip uninstall -r packages.txt -y
+```
+
+**Linux (Ubuntu/Debian):**
+
+Install Python and `pip` if not already installed:
+
+```bash
+sudo apt update
+sudo apt install python3 python3-pip
+```
+
+Update `pip`:
+
+```bash
+python3 -m pip install --upgrade pip
+```
+
+Install the required packages:
+
+```bash
+pip3 install websockets opencv-python fastai
+```
+
+**macOS:**
+
+Install Python using [Homebrew](https://brew.sh/) if not already installed:
+
+```bash
+brew install python
+```
+
+Update `pip`:
+
+```bash
+python3 -m pip install --upgrade pip
+```
+
+Install the required packages:
+
+```bash
+pip3 install websockets opencv-python fastai
+```
+
+To remove all installed packages from the current Python environment:
+
+```bash
+pip3 freeze > packages.txt
+pip3 uninstall -r packages.txt -y
+```
+
+### Build the Electron app
 
 Inside the project folder run:  
 `npm run build`  
@@ -227,14 +344,14 @@ Inside the project folder run:
 The project backend TypeScript files are compiled into JavaScript files and saved into `\dist`.  
 Then the project frontend Svelte project is build and saved into `\svelte-frontend\dist`.
 
-### How to Test the Electron App
+### Test the Electron App
 
 Inside the project folder run:  
 `npm run start`
 
 The project frontend and backend is build and the Electron app is started for testing.
 
-### How to Distribute the Electron App
+### Distribute the Electron App with Electron Builder
 
 **Standalone package**:
 
@@ -256,7 +373,7 @@ or run:
 
 The setup installer will be created inside `\out\make`.
 
-### How to Test the Svelte Frontend
+### Test the Svelte Frontend
 
 Inside the project folder run:  
 `npm run fe-start`
@@ -270,14 +387,14 @@ A local server will be started where the frontend app can be run on a browser.
 To kill the server, type:  
 `q + enter`
 
-### How to Build the Svelte Frontend
+### Build the Svelte Frontend
 
 Inside the project folder run:  
 `npm run fe-build`  
 
 The Svelte frontend project files are build and saved into `\svelte-frontend\dist`.
 
-### How to Run Unit Tests in TypeScript
+### Run Unit Tests in TypeScript
 
 The project uses Vitest for Unit testing.  
 TypeScript unit test files are saved as `*.test.ts` beside the reference file.
@@ -285,21 +402,12 @@ TypeScript unit test files are saved as `*.test.ts` beside the reference file.
 To run a unit test type:  
 `npm run test`
 
-### Import the Electron project to use Electron Forge
-
-Use if there is a need to add the Electron project manually to Electron Forge (e.g. accidentally removing all dependencies from `package.json`)
-
-Inside the root project folder `ml-segmentation-2` run:
-
-`npm install --save-dev @electron-forge/cli`  
-`npm exec --package=@electron-forge/cli -c "electron-forge import"`
-
-Electron Forge's `import` commmand will import the existing Electron project to Electron Forge automatically. Refer to the [Electron Forge Documentation page](https://www.electronforge.io/import-existing-project) for more details.
-
 ## Manual
 
 TODO
 
-## Licence
+## License
 
 This project is licensed under the [MIT License](LICENSE).
+
+Some components of this project use third-party software. The corresponding licenses and notices can be found in [THIRD_PARTY_LICENSE](THIRD_PARTY_LICENSE).
