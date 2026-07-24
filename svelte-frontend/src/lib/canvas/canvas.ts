@@ -1,112 +1,105 @@
 import Konva from 'konva';
 
+
+interface Camera {
+    x: number;
+    y: number;
+    zoom: number;
+}
+
+
 export class CanvasManager {
     private stage: Konva.Stage;
     private layer: Konva.Layer;
     private imageGroup: Konva.Group;
     private imageNode?: Konva.Image;
 
-    private container: HTMLDivElement;
-
-    private viewportWidth = 0;
-    private viewportHeight = 0;
-
-    private imageWidth = 0;
-    private imageHeight = 0;
+    private documentSize = {
+        width: 0,
+        height: 0,
+    };
 
 
-    constructor(container: HTMLDivElement, viewport: HTMLDivElement) {
-        this.container = container;
+    private camera: Camera = {
+        x: 0,
+        y: 0,
+        zoom: 1,
+    };
 
-        this.viewportWidth = viewport.clientWidth;
-        this.viewportHeight = viewport.clientHeight;
 
+    private documentResizeCallback?: (
+        width: number,
+        height: number
+    ) => void;
+
+
+    private zoomCallback?: (
+        zoom: number
+    ) => void;
+
+
+    constructor(container: HTMLDivElement) {
         this.stage = new Konva.Stage({
             container,
-            width: this.viewportWidth,
-            height: this.viewportHeight,
+            width: container.clientWidth,
+            height: container.clientHeight,
         });
+
 
         this.layer = new Konva.Layer();
 
         this.imageGroup = new Konva.Group();
 
         this.layer.add(this.imageGroup);
+
         this.stage.add(this.layer);
-
-        this.updateContainerSize();
-
-        this.setupZoom();
     }
 
 
-    resize(viewport: HTMLDivElement) {
-        this.viewportWidth = viewport.clientWidth;
-        this.viewportHeight = viewport.clientHeight;
+    resize(width: number, height: number) {
+        this.stage.size({
+            width,
+            height,
+        });
 
-        this.stage.width(this.viewportWidth);
-        this.stage.height(this.viewportHeight);
-
-        this.updateContainerSize();
+        this.layer.batchDraw();
     }
 
 
-    private updateContainerSize() {
-        const scale = this.imageGroup.scaleX();
-
-        const width = Math.max(
-            this.viewportWidth,
-            this.imageWidth * scale
-        );
-
-        const height = Math.max(
-            this.viewportHeight,
-            this.imageHeight * scale
-        );
-
-        this.container.style.width = `${width}px`;
-        this.container.style.height = `${height}px`;
-
-        this.stage.width(width);
-        this.stage.height(height);
-    }
-
-
-    async loadImage(path: string) {
+    loadImage(path: string) {
         const image = new Image();
 
+
         image.onload = () => {
-            this.imageWidth = image.width;
-            this.imageHeight = image.height;
-
-            this.imageGroup.scale({
-                x: 1,
-                y: 1,
-            });
-
-            this.imageGroup.position({
-                x: 0,
-                y: 0,
-            });
+            this.documentSize.width = image.width;
+            this.documentSize.height = image.height;
 
 
             this.imageGroup.destroyChildren();
 
 
-            const konvaImage = new Konva.Image({
+            this.imageNode = new Konva.Image({
                 image,
                 x: 0,
                 y: 0,
-                width: this.imageWidth,
-                height: this.imageHeight,
+                width: image.width,
+                height: image.height,
                 listening: false,
             });
 
-            this.imageNode = konvaImage;
 
-            this.imageGroup.add(konvaImage);
+            this.imageGroup.add(
+                this.imageNode
+            );
 
-            this.updateContainerSize();
+
+            this.documentResizeCallback?.(
+                image.width,
+                image.height
+            );
+
+
+            this.applyCamera();
 
             this.layer.batchDraw();
         };
@@ -115,82 +108,78 @@ export class CanvasManager {
         image.src = `file://${path}`;
     }
 
-    saveImage(): string {
-        return this.stage.toDataURL({
-            mimeType: "image/png",
-            pixelRatio: 1
-        });
+
+    setCamera(camera: Camera) {
+        this.camera = camera;
+
+        this.applyCamera();
     }
 
 
-    private setupZoom() {
-        this.stage.on('wheel', (e) => {
-            e.evt.preventDefault();
+    setZoom(zoom: number) {
+        this.camera.zoom = zoom;
 
-            const scaleBy = 1.1;
+        this.applyCamera();
 
-            const oldScale = this.imageGroup.scaleX();
-
-            const pointer = this.stage.getPointerPosition();
-
-            if (!pointer) return;
+        this.zoomCallback?.(zoom);
+    }
 
 
-            // const mousePointTo = {
-            //     x: (pointer.x - this.imageGroup.x()) / oldScale,
-            //     y: (pointer.y - this.imageGroup.y()) / oldScale,
-            // };
+    private applyCamera() {
+        this.imageGroup.scale({
+            x: this.camera.zoom,
+            y: this.camera.zoom,
+        });
 
 
-            let newScale =
-                e.evt.deltaY > 0
-                    ? oldScale / scaleBy
-                    : oldScale * scaleBy;
+        this.imageGroup.position({
+            x: -this.camera.x,
+            y: -this.camera.y,
+        });
 
 
-            newScale = Math.max(
-                0.1,
-                Math.min(5, newScale)
-            );
+        this.layer.batchDraw();
+    }
 
 
-            this.imageGroup.scale({
-                x: newScale,
-                y: newScale,
-            });
+    onDocumentResize(
+        callback: (width: number, height: number) => void
+    ) {
+        this.documentResizeCallback = callback;
+    }
 
 
-            // this.imageGroup.position({
-            //     x: pointer.x - mousePointTo.x * newScale,
-            //     y: pointer.y - mousePointTo.y * newScale,
-            // });
-
-            this.imageGroup.position({
-                x: 0,
-                y: 0,
-            });
+    onZoomChange(
+        callback: (zoom: number) => void
+    ) {
+        this.zoomCallback = callback;
+    }
 
 
-            this.updateContainerSize();
-
-            this.layer.batchDraw();
+    saveImage() {
+        return this.imageNode?.toDataURL({
+            mimeType: 'image/png',
+            pixelRatio: 1,
         });
     }
+
 
     setGrayscale(enabled: boolean) {
         if (!this.imageNode) return;
 
-        if (enabled) {
-            this.imageNode.filters([
-                Konva.Filters.Grayscale,
-            ]);
-        } else {
-            this.imageNode.filters([]);
-        }
+
+        this.imageNode.filters(
+            enabled
+                ? [Konva.Filters.Grayscale]
+                : []
+        );
+
 
         this.imageNode.cache();
+
         this.layer.batchDraw();
     }
+
 
     destroy() {
         this.stage.destroy();

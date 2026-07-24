@@ -7,7 +7,7 @@ import { Separator } from '$lib/components/ui/separator';
 import { CanvasManager } from '$lib/canvas/canvas';
 import Sidebar from '$lib/components/app/Sidebar.svelte';
 import Statusbar from '$lib/components/app/Statusbar.svelte';
-import CanvasView from '$lib/components/app/CanvasView.svelte';
+import CanvasView from '$lib/components/app/canvas/CanvasView.svelte';
 import type { Mode } from '$lib/types/mode';
 
 let canvas = $state<CanvasManager>();
@@ -24,7 +24,7 @@ onMount(() => {
 
 <div class="h-screen flex flex-col">
     <!-- Workspace -->
-    <div class="flex-1 flex overflow-hidden">
+    <div class="flex-1 flex overflow-hidden min-h-0 min-w-0">
         {#if canvas}
             <Sidebar {mode} {canvas} />
         {/if}
