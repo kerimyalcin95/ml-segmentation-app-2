@@ -62,7 +62,8 @@ In future releases the python packages will be installed directly from the app.
 ### How to Install the Release
 
 - Download and install [Python](https://www.python.org/downloads/). During installation please **disable** the `MAX_PATH` limit.  
-- Download the latest [release](https://github.com/kerimyalcin95/ml-segmentation-2/tags) into your `Desktop` folder. You need the setup executable and the compressed source files.  
+- Download the latest release from GitHub and place it in your Desktop folder. Make sure to download both the compiled application binary (named according to the format ${productName}-${version}-${arch}) and the compressed source archive. The binary is required to install and run the application, while the source files are needed for the Python package installation steps.  
+- The installation procedure depends on your operating system. Follow the platform-specific instructions: run the installer on Windows, move the application to the appropriate application directory on macOS, or follow the recommended installation steps for your Linux distribution.
 - Unzip the source files into your `Desktop` folder.  
 - Follow the instructions in [Installing Python packages](#installing-python-packages)
 - After `pip` installed all packages, run the setup executable. The executable can also be run before installing all Python packages, but the app won't work.  
