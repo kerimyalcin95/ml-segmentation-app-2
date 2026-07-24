@@ -18,9 +18,9 @@
     - [Install Node.js and Python](#install-nodejs-and-python)
     - [Install Node.js packages](#install-nodejs-packages)
     - [Install Python packages](#install-python-packages)
-    - [npm commands Overview](#npm-commands-overview)
-      - [Root project commands](#root-project-commands)
-      - [Frontend commands (`svelte-frontend/package.json`)](#frontend-commands-svelte-frontendpackagejson)
+    - [npm Commands Overview](#npm-commands-overview)
+      - [Root Project Commands (`package.json`)](#root-project-commands-packagejson)
+      - [Frontend Project Commands (`svelte-frontend/package.json`)](#frontend-project-commands-svelte-frontendpackagejson)
     - [Build the Electron app (GitHub Actions)](#build-the-electron-app-github-actions)
       - [GitHub Actions workflow files](#github-actions-workflow-files)
       - [`build-all.yml`](#build-allyml)
@@ -33,7 +33,7 @@
     - [Test the Electron App](#test-the-electron-app)
     - [Test the Svelte Frontend](#test-the-svelte-frontend)
     - [Build the Svelte Frontend](#build-the-svelte-frontend)
-    - [Run Unit Tests in TypeScript](#run-unit-tests-in-typescript)
+    - [Run Unit Tests](#run-unit-tests)
   - [Manual](#manual)
   - [License](#license)
 
@@ -346,14 +346,14 @@ pip3 freeze > packages.txt
 pip3 uninstall -r packages.txt -y
 ```
 
-### npm commands Overview
+### npm Commands Overview
 
 The project uses npm scripts defined in two `package.json` files:
 
 - The root `package.json` contains Electron, backend, and release commands.
 - The `svelte-frontend/package.json` contains Svelte frontend development commands.
 
-#### Root project commands
+#### Root Project Commands (`package.json`)
 
 | Command | Description |
 | --- | --- |
@@ -376,7 +376,7 @@ The project uses npm scripts defined in two `package.json` files:
 | `npm run fe-test` | Runs frontend tests using Vitest. |
 | `npm run fe-npm` | Runs npm commands inside the `svelte-frontend` directory. |
 
-#### Frontend commands (`svelte-frontend/package.json`)
+#### Frontend Project Commands (`svelte-frontend/package.json`)
 
 | Command | Description |
 | --- | --- |
@@ -551,7 +551,7 @@ cd svelte-frontend
 npm run build
 ```
 
-### Run Unit Tests in TypeScript
+### Run Unit Tests
 
 The project uses **Vitest** for TypeScript unit testing.
 
