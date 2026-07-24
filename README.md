@@ -21,9 +21,16 @@
     - [npm commands Overview](#npm-commands-overview)
       - [Root project commands](#root-project-commands)
       - [Frontend commands (`svelte-frontend/package.json`)](#frontend-commands-svelte-frontendpackagejson)
-    - [Build the Electron app](#build-the-electron-app)
+    - [Build the Electron app (GitHub Actions)](#build-the-electron-app-github-actions)
+      - [GitHub Actions workflow files](#github-actions-workflow-files)
+      - [`build-all.yml`](#build-allyml)
+      - [`build-linux.yml`](#build-linuxyml)
+      - [`build-macos.yml`](#build-macosyml)
+      - [`build-windows.yml`](#build-windowsyml)
+      - [Common workflow steps](#common-workflow-steps)
+      - [Build configuration](#build-configuration)
+    - [Build the Electron app (Local)](#build-the-electron-app-local)
     - [Test the Electron App](#test-the-electron-app)
-    - [Distribute the Electron App with Electron Builder](#distribute-the-electron-app-with-electron-builder)
     - [Test the Svelte Frontend](#test-the-svelte-frontend)
     - [Build the Svelte Frontend](#build-the-svelte-frontend)
     - [Run Unit Tests in TypeScript](#run-unit-tests-in-typescript)
@@ -342,6 +349,7 @@ pip3 uninstall -r packages.txt -y
 ### npm commands Overview
 
 The project uses npm scripts defined in two `package.json` files:
+
 - The root `package.json` contains Electron, backend, and release commands.
 - The `svelte-frontend/package.json` contains Svelte frontend development commands.
 
@@ -378,13 +386,120 @@ The project uses npm scripts defined in two `package.json` files:
 | `npm test` | Runs frontend tests using Vitest. |
 | `npm run check` | Checks Svelte components and TypeScript configuration. |
 
-### Build the Electron app
+### Build the Electron app (GitHub Actions)
 
-Inside the project folder run:  
-`npm run build`  
+The project can be built automatically using GitHub Actions. The workflows create platform-specific application packages on GitHub's build servers.
 
-The project backend TypeScript files are compiled into JavaScript files and saved into `\dist`.  
-Then the project frontend Svelte project is build and saved into `\svelte-frontend\dist`.
+To start a build manually:
+
+1. Open the repository on GitHub.
+2. Go to **Actions**.
+3. Select the desired workflow.
+4. Click **Run workflow**.
+5. Download the generated artifact after the build finishes.
+
+The build output is stored as a workflow artifact and can be downloaded from the completed workflow run.
+
+#### GitHub Actions workflow files
+
+All workflow files are located in:
+
+```text
+.github/workflows/
+```
+
+#### `build-all.yml`
+
+Builds the application for all supported platforms:
+
+- Windows → `.exe` installer
+- Linux → `.deb` package
+- macOS → `.dmg` package
+
+The workflow uses a build matrix to run the same build process on multiple operating systems simultaneously.
+
+Main steps:
+
+- Checks out the repository.
+- Installs Node.js.
+- Installs root and frontend dependencies.
+- Runs `npm run make`.
+- Uploads the generated installer as an artifact.
+
+#### `build-linux.yml`
+
+Builds only the Linux version.
+
+Output:
+
+```text
+make/*.deb
+```
+
+Used for creating Debian packages for Ubuntu/Debian-based distributions.
+
+#### `build-macos.yml`
+
+Builds only the macOS version.
+
+Output:
+
+```text
+make/*.dmg
+```
+
+Creates a macOS disk image containing the application.
+
+#### `build-windows.yml`
+
+Builds only the Windows version.
+
+Output:
+
+```text
+make/*.exe
+```
+
+Creates the Windows installer using Electron Builder.
+
+#### Common workflow steps
+
+All workflows perform the same basic build process:
+
+| Step | Description |
+| --- | --- |
+| `actions/checkout` | Downloads the repository source code to the build machine. |
+| `actions/setup-node` | Installs the required Node.js version and enables npm caching. |
+| `npm ci` | Installs dependencies from `package-lock.json`. |
+| `npm run make` | Builds the application and creates the platform package. |
+| `actions/upload-artifact` | Stores the generated installer as a downloadable build artifact. |
+
+#### Build configuration
+
+The generated packages are configured through the `build` section in the root `package.json`.
+
+Electron Builder uses this configuration to determine:
+
+- Application name and version.
+- Included files.
+- Application icons.
+- Target package format.
+- Output filenames.
+- Installer options.
+
+### Build the Electron app (Local)
+
+Inside the project folder, run:
+
+```bash
+npm run make
+```
+
+This command builds the complete Electron application:
+
+- The backend TypeScript files are compiled into JavaScript and saved to `dist`.
+- The Svelte frontend is built and saved to `svelte-frontend/dist`.
+- Electron Builder packages the application into a distributable release to `make`
 
 ### Test the Electron App
 
@@ -392,28 +507,6 @@ Inside the project folder run:
 `npm run start`
 
 The project frontend and backend is build and the Electron app is started for testing.
-
-### Distribute the Electron App with Electron Builder
-
-**Standalone package**:
-
-To create a standalone package, where all components of the app are packaged **inside a folder** run:  
-`npm run make-package`
-
-or run:  
-`npm run make-standalone`
-
-The standalone package will be created inside `\out`.
-
-**Setup installer**:
-
-To create a setup installer, where all components the app are packaged **inside an installer** run:  
-`npm run make-setup`  
-
-or run:  
-`npm run make-installer`  
-
-The setup installer will be created inside `\out\make`.
 
 ### Test the Svelte Frontend
 
