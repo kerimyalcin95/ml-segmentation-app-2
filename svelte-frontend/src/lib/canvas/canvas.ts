@@ -65,7 +65,6 @@ export class CanvasManager {
         this.layer.batchDraw();
     }
 
-
     loadImage(path: string) {
         const image = new Image();
 
@@ -106,6 +105,39 @@ export class CanvasManager {
 
 
         image.src = `file://${path}`;
+    }
+
+    saveImage() {
+        const oldScale = this.imageGroup.scale();
+        const oldPosition = this.imageGroup.position();
+
+        this.imageGroup.scale({
+            x: 1,
+            y: 1,
+        });
+
+        this.imageGroup.position({
+            x: 0,
+            y: 0,
+        });
+
+
+        const data = this.stage.toDataURL({
+            x: 0,
+            y: 0,
+            width: this.documentSize.width,
+            height: this.documentSize.height,
+            mimeType: 'image/png',
+            pixelRatio: 1,
+        });
+
+
+        this.imageGroup.scale(oldScale);
+        this.imageGroup.position(oldPosition);
+
+        this.layer.batchDraw();
+
+        return data;
     }
 
 
@@ -153,14 +185,6 @@ export class CanvasManager {
         callback: (zoom: number) => void
     ) {
         this.zoomCallback = callback;
-    }
-
-
-    saveImage() {
-        return this.imageNode?.toDataURL({
-            mimeType: 'image/png',
-            pixelRatio: 1,
-        });
     }
 
 
