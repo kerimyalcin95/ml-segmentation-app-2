@@ -18,6 +18,9 @@
     - [Install Node.js and Python](#install-nodejs-and-python)
     - [Install Node.js packages](#install-nodejs-packages)
     - [Install Python packages](#install-python-packages)
+    - [npm commands Overview](#npm-commands-overview)
+      - [Root project commands](#root-project-commands)
+      - [Frontend commands (`svelte-frontend/package.json`)](#frontend-commands-svelte-frontendpackagejson)
     - [Build the Electron app](#build-the-electron-app)
     - [Test the Electron App](#test-the-electron-app)
     - [Distribute the Electron App with Electron Builder](#distribute-the-electron-app-with-electron-builder)
@@ -64,7 +67,7 @@ In future releases the python packages will be installed directly from the app.
 - Download the latest release from GitHub and place it in your Desktop folder. Make sure to download both the compiled application binary (named according to the format ${productName}-${version}-${arch}) and the compressed source archive. The binary is required to install and run the application, while the source files are needed for the Python package installation steps.  
 - The installation procedure depends on your operating system. Follow the platform-specific instructions: run the installer on Windows, move the application to the appropriate application directory on macOS, or follow the recommended installation steps for your Linux distribution.
 - Unzip the source files into your `Desktop` folder.  
-- Follow the instructions in [Installing Python packages](#installing-python-packages)
+- Follow the instructions in [Install Python packages](#install-python-packages)
 - After `pip` installed all packages, run the setup executable. The executable can also be run before installing all Python packages, but the app won't work.  
 
 ## Project Structure
@@ -335,6 +338,45 @@ To remove all installed packages from the current Python environment:
 pip3 freeze > packages.txt
 pip3 uninstall -r packages.txt -y
 ```
+
+### npm commands Overview
+
+The project uses npm scripts defined in two `package.json` files:
+- The root `package.json` contains Electron, backend, and release commands.
+- The `svelte-frontend/package.json` contains Svelte frontend development commands.
+
+#### Root project commands
+
+| Command | Description |
+| --- | --- |
+| `npm install` | Installs all project dependencies. |
+| `npm run build` | Builds the TypeScript backend and Svelte frontend. |
+| `npm start` | Builds and starts the Electron application. |
+| `npm run make` | Builds the application and creates platform-specific installers. |
+| `npm test` | Runs the Vitest test suite. |
+| `npm run clean` | Removes generated build files. |
+| `npm run package` | Packages the application without creating an installer. |
+| `npm run make-package` | Builds and packages the application without creating an installer. |
+| `npm run make-standalone` | Creates a standalone application package. |
+| `npm run make-setup` | Builds the application and creates an installer. |
+| `npm run make-installer` | Alias for creating an installer. |
+| `npm run fe-build` | Builds the Svelte frontend. |
+| `npm run fe-preview` | Starts the Svelte frontend preview server. |
+| `npm run fe-start` | Starts the frontend preview server. |
+| `npm run fe-dev` | Starts the Svelte frontend development server. |
+| `npm run fe-check` | Checks the Svelte frontend and TypeScript files for errors. |
+| `npm run fe-test` | Runs frontend tests using Vitest. |
+| `npm run fe-npm` | Runs npm commands inside the `svelte-frontend` directory. |
+
+#### Frontend commands (`svelte-frontend/package.json`)
+
+| Command | Description |
+| --- | --- |
+| `npm run dev` | Starts the Vite development server. |
+| `npm run build` | Builds the Svelte production application. |
+| `npm run preview` | Starts a local preview server for the production build. |
+| `npm test` | Runs frontend tests using Vitest. |
+| `npm run check` | Checks Svelte components and TypeScript configuration. |
 
 ### Build the Electron app
 
