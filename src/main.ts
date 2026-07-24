@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from "node:url";
 import { spawn, ChildProcessWithoutNullStreams } from 'node:child_process';
 import WebSocket from 'ws';
+import fs from "node:fs";
 
 let webSocket: WebSocket | undefined;
 let pythonProcess: ChildProcessWithoutNullStreams | undefined;
@@ -111,6 +112,43 @@ ipcMain.handle("open-image", async () => {
 
     return result.filePaths[0];
 });
+
+ipcMain.handle(
+    "save-image",
+    async (_event, imageData: string) => {
+
+        const result = await dialog.showSaveDialog({
+            title: "Save Image",
+            defaultPath: "image.png",
+            filters: [
+                {
+                    name: "PNG Image",
+                    extensions: ["png"]
+                }
+            ]
+        });
+
+
+        if (result.canceled || !result.filePath) {
+            return null;
+        }
+
+
+        const base64Data = imageData.replace(
+            /^data:image\/png;base64,/,
+            ""
+        );
+
+
+        fs.writeFileSync(
+            result.filePath,
+            Buffer.from(base64Data, "base64")
+        );
+
+
+        return result.filePath;
+    }
+);
 
 app.whenReady().then(() => {
     createWindow();

@@ -115,6 +115,13 @@ export class CanvasManager {
         image.src = `file://${path}`;
     }
 
+    saveImage(): string {
+        return this.stage.toDataURL({
+            mimeType: "image/png",
+            pixelRatio: 1
+        });
+    }
+
 
     private setupZoom() {
         this.stage.on('wheel', (e) => {
@@ -184,7 +191,7 @@ export class CanvasManager {
         this.imageNode.cache();
         this.layer.batchDraw();
     }
-    
+
     destroy() {
         this.stage.destroy();
     }

@@ -2,8 +2,8 @@
 import { Card } from '$lib/components/ui/card';
 import type { Mode } from '$lib/types/mode';
 import { CanvasManager } from '$lib/canvas/canvas';
-import ImageEditing from '$lib/components/app/imageEditing/ImageEditing.svelte';
-import FilterSystem from './filters/FilterSystem.svelte';
+import ImageFileControl from '$lib/components/app/editing/imageFileControl/ImageFileControl.svelte';
+import FilterSystem from './editing/filters/FilterSystem.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -17,7 +17,7 @@ let { canvas, mode }: Props = $props();
     {#if mode === 'editing'}
         <h2 class="text-md font-bold mb-3">Editing</h2>
         <div class="flex flex-col gap-4">
-            <ImageEditing {canvas} />
+            <ImageFileControl {canvas} />
             <FilterSystem {canvas} />
         </div>
     {:else if mode === 'annotation'}

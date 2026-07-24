@@ -2,9 +2,9 @@
 import { Button } from '$lib/components/ui/button';
 import { Card } from '$lib/components/ui/card';
 
-import FilterSelect from '$lib/components/app/filters/FilterSelect.svelte';
-import FilterDragList from '$lib/components/app/filters/FilterDragList.svelte';
-import FilterSettings from '$lib/components/app/filters/FilterSettings.svelte';
+import FilterSelect from '$lib/components/app/editing/filters/FilterSelect.svelte';
+import FilterDragList from '$lib/components/app/editing/filters/FilterDragList.svelte';
+import FilterSettings from '$lib/components/app/editing/filters/FilterSettings.svelte';
 
 import type { Filter } from '$lib/types/filter';
 import { CanvasManager } from '$lib/canvas/canvas';
