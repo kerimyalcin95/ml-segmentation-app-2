@@ -142,7 +142,7 @@ Other directories and files included in the `svelte-frontend` directory:
 The following VS Code extensions are recommended to provide a consistent development environment for contributors.
 
 | Extension | Purpose |
-|---|---|
+| --- | --- |
 | `aaron-bond.better-comments` | Improves code comments by adding visual categories such as notes, warnings, and TODOs. |
 | `bierner.markdown-preview-github-styles` | Provides a GitHub-like preview for Markdown documentation. |
 | `bmalehorn.shell-syntax` | Adds syntax highlighting for shell scripts and commands. |
