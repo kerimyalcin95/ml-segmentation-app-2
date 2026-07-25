@@ -20,7 +20,8 @@ export default defineConfig({
     base: './',
     build: {
         outDir: './dist',
-        assetsDir: './assets'
+        assetsDir: './assets',
+        chunkSizeWarningLimit: 1000,
     },
     resolve: {
         alias: {
