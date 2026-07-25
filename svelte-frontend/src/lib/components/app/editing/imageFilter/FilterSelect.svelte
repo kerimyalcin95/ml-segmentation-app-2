@@ -61,7 +61,7 @@ function addFilter() {
             </Select.Trigger>
 
             <Select.Content>
-                {#each availableFilters as filter}
+                {#each availableFilters as filter (filter.name)}
                     <Select.Item value={filter.name}>
                         {filter.name}
                     </Select.Item>

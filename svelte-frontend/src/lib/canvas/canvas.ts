@@ -1,12 +1,10 @@
 import Konva from 'konva';
 
-
 interface Camera {
     x: number;
     y: number;
     zoom: number;
 }
-
 
 export class CanvasManager {
     private stage: Konva.Stage;
@@ -36,24 +34,20 @@ export class CanvasManager {
         vertical: false,
     };
 
-
     private cameraCallback?: (
         x: number,
         y: number,
         zoom: number
     ) => void;
 
-
     private documentResizeCallback?: (
         width: number,
         height: number
     ) => void;
 
-
     private zoomCallback?: (
         zoom: number
     ) => void;
-
 
     constructor(container: HTMLDivElement) {
         this.stage = new Konva.Stage({
@@ -61,7 +55,6 @@ export class CanvasManager {
             width: container.clientWidth,
             height: container.clientHeight,
         });
-
 
         this.layer = new Konva.Layer();
 
@@ -71,21 +64,17 @@ export class CanvasManager {
 
         this.segmentationGroup = new Konva.Group();
 
-
         this.documentGroup.add(
             this.segmentationGroup
         );
-
 
         this.cameraGroup.add(
             this.documentGroup
         );
 
-
         this.layer.add(
             this.cameraGroup
         );
-
 
         this.stage.add(
             this.layer
@@ -147,18 +136,15 @@ export class CanvasManager {
         const rotated =
             Math.abs(this.documentRotation) % 180 === 90;
 
-
         const width =
             rotated
                 ? this.imageNode?.height() ?? this.documentSize.width
                 : this.imageNode?.width() ?? this.documentSize.width;
 
-
         const height =
             rotated
                 ? this.imageNode?.width() ?? this.documentSize.height
                 : this.imageNode?.height() ?? this.documentSize.height;
-
 
         this.documentGroup.position({
             x: width / 2,
@@ -172,16 +158,13 @@ export class CanvasManager {
             this.documentRotation
         );
 
-
         this.documentGroup.scale({
             x: this.documentFlip.horizontal ? -1 : 1,
             y: this.documentFlip.vertical ? -1 : 1,
         });
 
-
         this.updateDocumentTransformOrigin();
     }
-
 
     onDocumentResize(
         callback: (width: number, height: number) => void
@@ -203,7 +186,6 @@ export class CanvasManager {
         return this.camera;
     }
 
-
     private clampCamera() {
 
         const rect =
@@ -211,13 +193,11 @@ export class CanvasManager {
                 relativeTo: this.cameraGroup,
             });
 
-
         const contentWidth =
             rect.width * this.camera.zoom;
 
         const contentHeight =
             rect.height * this.camera.zoom;
-
 
         const offsetX =
             Math.min(0, rect.x * this.camera.zoom);
@@ -225,20 +205,17 @@ export class CanvasManager {
         const offsetY =
             Math.min(0, rect.y * this.camera.zoom);
 
-
         const maxX =
             Math.max(
                 0,
                 contentWidth + offsetX - this.stage.width()
             );
 
-
         const maxY =
             Math.max(
                 0,
                 contentHeight + offsetY - this.stage.height()
             );
-
 
         this.camera.x =
             Math.max(
@@ -248,7 +225,6 @@ export class CanvasManager {
                     maxX
                 )
             );
-
 
         this.camera.y =
             Math.max(
@@ -273,16 +249,13 @@ export class CanvasManager {
         const worldY =
             (centerY + this.camera.y) / oldZoom;
 
-
         this.camera.zoom = zoom;
-
 
         this.camera.x =
             worldX * zoom - centerX;
 
         this.camera.y =
             worldY * zoom - centerY;
-
 
         this.clampCamera();
 
@@ -301,12 +274,10 @@ export class CanvasManager {
             y: this.camera.zoom,
         });
 
-
         this.cameraGroup.position({
             x: -this.camera.x,
             y: -this.camera.y,
         });
-
 
         this.layer.batchDraw();
     }
@@ -326,14 +297,11 @@ export class CanvasManager {
     loadImage(path: string) {
         const image = new Image();
 
-
         image.onload = () => {
             this.documentSize.width = image.width;
             this.documentSize.height = image.height;
 
-
             this.documentGroup.destroyChildren();
-
 
             this.imageNode = new Konva.Image({
                 image,
@@ -355,18 +323,15 @@ export class CanvasManager {
                 this.imageNode
             );
 
-
             this.documentResizeCallback?.(
                 image.width,
                 image.height
             );
 
-
             this.applyCamera();
 
             this.layer.batchDraw();
         };
-
 
         image.src = `file://${path}`;
     }
@@ -385,10 +350,8 @@ export class CanvasManager {
             y: 0,
         });
 
-
         const bounds =
             this.documentGroup.getClientRect();
-
 
         const data =
             this.stage.toDataURL({
@@ -399,7 +362,6 @@ export class CanvasManager {
                 mimeType: 'image/png',
                 pixelRatio: 1,
             });
-
 
         this.cameraGroup.scale(oldScale);
         this.cameraGroup.position(oldPosition);
@@ -415,26 +377,21 @@ export class CanvasManager {
     ) {
         if (!this.imageNode) return;
 
-
         this.imageNode.width(width);
         this.imageNode.height(height);
 
         this.imageNode.offsetX(width / 2);
         this.imageNode.offsetY(height / 2);
 
-
         this.documentSize.width = width;
         this.documentSize.height = height;
 
-
         this.applyDocumentTransform();
-
 
         this.documentResizeCallback?.(
             this.getDocumentSize().width,
             this.getDocumentSize().height
         );
-
 
         this.clampCamera();
 
@@ -445,7 +402,6 @@ export class CanvasManager {
             this.camera.y,
             this.camera.zoom
         );
-
 
         this.layer.batchDraw();
     }
@@ -458,11 +414,9 @@ export class CanvasManager {
     ) {
         if (!this.imageNode) return;
 
-
         const oldImage = this.imageNode.image();
 
         if (!oldImage) return;
-
 
         this.imageNode.crop({
             x,
@@ -470,7 +424,6 @@ export class CanvasManager {
             width,
             height,
         });
-
 
         this.imageNode.width(width);
         this.imageNode.height(height);
@@ -480,16 +433,13 @@ export class CanvasManager {
 
         this.applyDocumentTransform();
 
-
         this.documentSize.width = width;
         this.documentSize.height = height;
-
 
         this.documentResizeCallback?.(
             width,
             height
         );
-
 
         this.clampCamera();
 
@@ -498,7 +448,6 @@ export class CanvasManager {
         this.layer.batchDraw();
     }
 
-
     rotateImage(angle: number) {
 
         this.documentRotation =
@@ -506,15 +455,12 @@ export class CanvasManager {
                 this.documentRotation + angle
             ) % 360;
 
-
         this.applyDocumentTransform();
-
 
         this.documentResizeCallback?.(
             this.getDocumentSize().width,
             this.getDocumentSize().height
         );
-
 
         this.clampCamera();
 
@@ -526,10 +472,8 @@ export class CanvasManager {
             this.camera.zoom
         );
 
-
         this.layer.batchDraw();
     }
-
 
     flipImage(
         horizontal: boolean,
@@ -541,18 +485,14 @@ export class CanvasManager {
                 !this.documentFlip.horizontal;
         }
 
-
         if (vertical) {
             this.documentFlip.vertical =
                 !this.documentFlip.vertical;
         }
 
-
         this.applyDocumentTransform();
 
-
         this.clampCamera();
-
 
         this.cameraCallback?.(
             this.camera.x,
@@ -560,21 +500,17 @@ export class CanvasManager {
             this.camera.zoom
         );
 
-
         this.layer.batchDraw();
     }
 
-
     setImageFilterGrayscale(enabled: boolean) {
         if (!this.imageNode) return;
-
 
         this.imageNode.filters(
             enabled
                 ? [Konva.Filters.Grayscale]
                 : []
         );
-
 
         this.imageNode.cache();
 

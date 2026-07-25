@@ -15,7 +15,6 @@ let {
     onChange,
 }: Props = $props();
 
-
 let track: HTMLDivElement;
 
 let dragging = $state(false);
@@ -23,14 +22,12 @@ let dragging = $state(false);
 let startX = 0;
 let startPosition = 0;
 
-
 const maxPosition = $derived(
     Math.max(
         0,
         contentSize - viewportSize
     )
 );
-
 
 const thumbWidth = $derived(
     Math.max(
@@ -42,7 +39,6 @@ const thumbWidth = $derived(
     )
 );
 
-
 const thumbPosition = $derived(
     maxPosition === 0
         ? 0
@@ -50,33 +46,27 @@ const thumbPosition = $derived(
           (100 - thumbWidth)
 );
 
-
 const thumbClass = $derived(
     dragging
         ? 'bg-primary'
         : 'bg-primary/40 hover:bg-primary/70'
 );
 
-
 function pointerDown(event: PointerEvent) {
     const rect =
         track.getBoundingClientRect();
 
-
     const clickX =
         event.clientX - rect.left;
-
 
     const thumbStart =
         (thumbPosition / 100) *
         rect.width;
 
-
     const thumbEnd =
         thumbStart +
         (thumbWidth / 100) *
         rect.width;
-
 
     if (
         clickX >= thumbStart &&
@@ -94,33 +84,26 @@ function pointerDown(event: PointerEvent) {
         return;
     }
 
-
     jumpToPosition(event);
 }
-
 
 function moveDrag(event: PointerEvent) {
     if (!dragging) return;
 
-
     const rect =
         track.getBoundingClientRect();
-
 
     const usableWidth =
         rect.width *
         (1 - thumbWidth / 100);
 
-
     const delta =
         event.clientX - startX;
-
 
     const value =
         startPosition +
         (delta / usableWidth) *
         maxPosition;
-
 
     onChange(
         Math.max(
@@ -133,10 +116,8 @@ function moveDrag(event: PointerEvent) {
     );
 }
 
-
 function endDrag(event: PointerEvent) {
     dragging = false;
-
 
     if (
         track.hasPointerCapture(
@@ -149,19 +130,15 @@ function endDrag(event: PointerEvent) {
     }
 }
 
-
 function jumpToPosition(event: PointerEvent) {
     const rect =
         track.getBoundingClientRect();
 
-
     const click =
         event.clientX - rect.left;
 
-
     const ratio =
         click / rect.width;
-
 
     onChange(
         Math.max(
@@ -174,10 +151,8 @@ function jumpToPosition(event: PointerEvent) {
     );
 }
 
-
 function handleKey(event: KeyboardEvent) {
     const step = 50;
-
 
     if (event.key === 'ArrowRight') {
         onChange(
@@ -188,7 +163,6 @@ function handleKey(event: KeyboardEvent) {
         );
     }
 
-
     if (event.key === 'ArrowLeft') {
         onChange(
             Math.max(
@@ -198,18 +172,15 @@ function handleKey(event: KeyboardEvent) {
         );
     }
 
-
     if (event.key === 'Home') {
         onChange(0);
     }
-
 
     if (event.key === 'End') {
         onChange(maxPosition);
     }
 }
 </script>
-
 
 <div
     bind:this={track}

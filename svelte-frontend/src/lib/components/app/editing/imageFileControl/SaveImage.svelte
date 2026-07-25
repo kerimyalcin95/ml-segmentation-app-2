@@ -10,13 +10,11 @@ interface Props {
 
 let { canvas }: Props = $props();
 
-
 async function saveImage() {
     if (!window.electronAPI) {
         console.error("electronAPI is not available");
         return;
     }
-
 
     const imageData = canvas.saveImage();
 
@@ -27,7 +25,6 @@ async function saveImage() {
     }
 }
 </script>
-
 
 <Button onclick={saveImage}>
     <FloppyDiskIcon weight="bold" />

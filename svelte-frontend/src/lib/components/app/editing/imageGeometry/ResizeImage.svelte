@@ -14,7 +14,6 @@
     let width = $state(0);
     let height = $state(0);
 
-
     onMount(() => {
         canvas.onDocumentResize((newWidth, newHeight) => {
             width = newWidth;
@@ -26,7 +25,6 @@
         width = size.width;
         height = size.height;
     });
-
 
     function resize() {
         canvas.resizeImage(

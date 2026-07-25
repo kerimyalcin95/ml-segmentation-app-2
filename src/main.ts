@@ -128,23 +128,19 @@ ipcMain.handle(
             ]
         });
 
-
         if (result.canceled || !result.filePath) {
             return null;
         }
-
 
         const base64Data = imageData.replace(
             /^data:image\/png;base64,/,
             ""
         );
 
-
         fs.writeFileSync(
             result.filePath,
             Buffer.from(base64Data, "base64")
         );
-
 
         return result.filePath;
     }

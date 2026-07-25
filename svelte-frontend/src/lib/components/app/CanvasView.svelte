@@ -4,7 +4,6 @@ import Canvas from '$lib/components/app/canvas/Canvas.svelte';
 import { CanvasManager } from '$lib/canvas/canvas';
 import type { Mode } from '$lib/types/mode';
 
-
 interface Props {
     onCanvasReady?: (canvas: CanvasManager) => void;
     mode: Mode;
@@ -16,7 +15,6 @@ let {
 }: Props = $props();
 
 </script>
-
 
 <div class="flex-1 relative flex flex-col min-h-0 min-w-0">
 
