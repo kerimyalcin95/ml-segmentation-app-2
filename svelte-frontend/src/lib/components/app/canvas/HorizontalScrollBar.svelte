@@ -1,4 +1,3 @@
-<!-- svelte-frontend/src/lib/components/app/canvas/HorizontalScrollBar.svelte -->
 <script lang="ts">
 interface Props {
     viewportId: string;

@@ -199,28 +199,33 @@ export class CanvasManager {
     }
 
     private getDocumentBounds() {
-        const rotation =
-            this.documentGroup.rotation();
 
-        if (
-            rotation === 90 ||
-            rotation === 270
-        ) {
-            return {
-                width: this.documentSize.height,
-                height: this.documentSize.width,
-            };
-        }
+        const rect =
+            this.documentGroup.getClientRect({
+                relativeTo: this.cameraGroup,
+            });
 
-        return this.documentSize;
+
+        return {
+            width: rect.width,
+            height: rect.height,
+        };
+    }
+
+    getDocumentSize() {
+        const bounds = this.getDocumentBounds();
+
+        return {
+            width: bounds.width,
+            height: bounds.height,
+        };
     }
 
     private updateDocumentTransformOrigin() {
-        const bounds = this.getDocumentBounds();
 
         this.documentGroup.position({
-            x: bounds.width / 2,
-            y: bounds.height / 2,
+            x: this.documentSize.width / 2,
+            y: this.documentSize.height / 2,
         });
     }
 
@@ -239,13 +244,19 @@ export class CanvasManager {
 
 
     private clampCamera() {
-        const bounds = this.getDocumentBounds();
+
+        const rect =
+            this.documentGroup.getClientRect({
+                relativeTo: this.cameraGroup,
+            });
+
 
         const contentWidth =
-            bounds.width * this.camera.zoom;
+            rect.width * this.camera.zoom;
+
 
         const contentHeight =
-            bounds.height * this.camera.zoom;
+            rect.height * this.camera.zoom;
 
 
         const maxX = Math.max(
@@ -253,21 +264,31 @@ export class CanvasManager {
             contentWidth - this.stage.width()
         );
 
+
         const maxY = Math.max(
             0,
             contentHeight - this.stage.height()
         );
 
 
-        this.camera.x = Math.max(
-            0,
-            Math.min(this.camera.x, maxX)
-        );
+        this.camera.x =
+            Math.max(
+                0,
+                Math.min(
+                    this.camera.x,
+                    maxX
+                )
+            );
 
-        this.camera.y = Math.max(
-            0,
-            Math.min(this.camera.y, maxY)
-        );
+
+        this.camera.y =
+            Math.max(
+                0,
+                Math.min(
+                    this.camera.y,
+                    maxY
+                )
+            );
     }
 
 
@@ -321,6 +342,22 @@ export class CanvasManager {
 
 
         this.layer.batchDraw();
+    }
+
+    private applyDocumentTransform() {
+
+        this.documentGroup.rotation(
+            this.documentRotation
+        );
+
+
+        this.documentGroup.scale({
+            x: this.documentFlip.horizontal ? -1 : 1,
+            y: this.documentFlip.vertical ? -1 : 1,
+        });
+
+
+        this.updateDocumentTransformOrigin();
     }
 
 
@@ -397,15 +434,7 @@ export class CanvasManager {
         this.imageNode.width(width);
         this.imageNode.height(height);
 
-        this.imageNode.offsetX(
-            width / 2
-        );
-
-        this.imageNode.offsetY(
-            height / 2
-        );
-
-        this.imageNode.position({
+        this.documentGroup.position({
             x: width / 2,
             y: height / 2,
         });
@@ -437,15 +466,24 @@ export class CanvasManager {
             ) % 360;
 
 
-        this.documentGroup.rotation(
-            this.documentRotation
+        this.applyDocumentTransform();
+
+
+        this.documentResizeCallback?.(
+            this.getDocumentSize().width,
+            this.getDocumentSize().height
         );
 
 
-        this.updateDocumentTransformOrigin();
-
-
         this.clampCamera();
+
+
+        this.cameraCallback?.(
+            this.camera.x,
+            this.camera.y,
+            this.camera.zoom
+        );
+
 
         this.layer.batchDraw();
     }
@@ -455,22 +493,30 @@ export class CanvasManager {
         horizontal: boolean,
         vertical: boolean,
     ) {
-        this.documentFlip.horizontal =
-            horizontal
-                ? !this.documentFlip.horizontal
-                : this.documentFlip.horizontal;
+
+        if (horizontal) {
+            this.documentFlip.horizontal =
+                !this.documentFlip.horizontal;
+        }
 
 
-        this.documentFlip.vertical =
-            vertical
-                ? !this.documentFlip.vertical
-                : this.documentFlip.vertical;
+        if (vertical) {
+            this.documentFlip.vertical =
+                !this.documentFlip.vertical;
+        }
 
 
-        this.documentGroup.scale({
-            x: this.documentFlip.horizontal ? -1 : 1,
-            y: this.documentFlip.vertical ? -1 : 1,
-        });
+        this.applyDocumentTransform();
+
+
+        this.clampCamera();
+
+
+        this.cameraCallback?.(
+            this.camera.x,
+            this.camera.y,
+            this.camera.zoom
+        );
 
 
         this.layer.batchDraw();

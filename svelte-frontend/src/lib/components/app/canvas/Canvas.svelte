@@ -34,9 +34,14 @@ let scroll = $state({
     y: 0,
 });
 
-const contentWidth = $derived(documentSize.width * zoom);
+let transformedDocumentSize = $state({
+    width: 0,
+    height: 0,
+});
 
-const contentHeight = $derived(documentSize.height * zoom);
+const contentWidth = $derived(transformedDocumentSize.width * zoom);
+
+const contentHeight = $derived(transformedDocumentSize.height * zoom);
 
 const maxScrollX = $derived(Math.max(0, contentWidth - viewportSize.width));
 
@@ -105,6 +110,8 @@ onMount(() => {
     canvas.onDocumentResize((width, height) => {
         documentSize.width = width;
         documentSize.height = height;
+
+        transformedDocumentSize = canvas.getDocumentSize();
     });
 
     const observer = new ResizeObserver(() => {
