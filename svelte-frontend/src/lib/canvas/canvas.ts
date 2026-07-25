@@ -23,12 +23,13 @@ export class CanvasManager {
         height: 0,
     };
 
-
     private camera: Camera = {
         x: 0,
         y: 0,
         zoom: 1,
     };
+
+    private documentRotation = 0;
 
 
     private cameraCallback?: (
@@ -120,8 +121,8 @@ export class CanvasManager {
 
             this.imageNode = new Konva.Image({
                 image,
-                x: image.width / 2,
-                y: image.height / 2,
+                x: 0,
+                y: 0,
                 width: image.width,
                 height: image.height,
                 offsetX: image.width / 2,
@@ -129,6 +130,10 @@ export class CanvasManager {
                 listening: false,
             });
 
+            this.documentGroup.position({
+                x: image.width / 2,
+                y: image.height / 2,
+            });
 
             this.documentGroup.add(
                 this.imageNode
@@ -183,6 +188,23 @@ export class CanvasManager {
         return data;
     }
 
+    private getDocumentBounds() {
+        const rotation =
+            this.documentGroup.rotation();
+
+        if (
+            rotation === 90 ||
+            rotation === 270
+        ) {
+            return {
+                width: this.documentSize.height,
+                height: this.documentSize.width,
+            };
+        }
+
+        return this.documentSize;
+    }
+
 
     setCamera(camera: Camera) {
         this.camera = camera;
@@ -198,11 +220,13 @@ export class CanvasManager {
 
 
     private clampCamera() {
+        const bounds = this.getDocumentBounds();
+
         const contentWidth =
-            this.documentSize.width * this.camera.zoom;
+            bounds.width * this.camera.zoom;
 
         const contentHeight =
-            this.documentSize.height * this.camera.zoom;
+            bounds.height * this.camera.zoom;
 
 
         const maxX = Math.max(
