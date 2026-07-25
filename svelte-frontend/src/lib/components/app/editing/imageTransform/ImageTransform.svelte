@@ -16,11 +16,11 @@ interface Props {
 let { canvas }: Props = $props();
 
 function rotate(angle: number) {
-    canvas.rotate(angle);
+    canvas.rotateImage(angle);
 }
 
 function flip(horizontal: boolean, vertical: boolean) {
-    canvas.flip(horizontal, vertical);
+    canvas.flipImage(horizontal, vertical);
 }
 </script>
 
@@ -28,33 +28,21 @@ function flip(horizontal: boolean, vertical: boolean) {
     <div class="flex flex-col gap-2 mx-4">
         <span class="text-sm font-medium mb-2"> Transform </span>
         <div class="flex flex-col gap-2 items-center">
-            <Button
-                class="w-full"
-                onclick={() => rotate(90)}
-            >
+            <Button class="w-full" onclick={() => rotate(90)}>
                 <ArrowClockwiseIcon weight="bold" />
                 Rotate CW
             </Button>
-            <Button
-                class="w-full mb-2"
-                onclick={() => rotate(-90)}
-            >
+            <Button class="w-full mb-2" onclick={() => rotate(-90)}>
                 <ArrowCounterClockwiseIcon weight="bold" />
                 Rotate CCW
             </Button>
 
-            <Button
-                class="w-full"
-                onclick={() => flip(true, false)}
-            >
+            <Button class="w-full" onclick={() => flip(true, false)}>
                 <FlipHorizontalIcon weight="bold" />
                 Flip Horizontal
             </Button>
 
-            <Button
-                class="w-full"
-                onclick={() => flip(false, true)}
-            >
+            <Button class="w-full" onclick={() => flip(false, true)}>
                 <FlipVerticalIcon weight="bold" />
                 Flip Vertical
             </Button>

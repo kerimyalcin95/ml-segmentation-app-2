@@ -92,8 +92,9 @@ export class CanvasManager {
         );
     }
 
+    // Canvas, Stage
 
-    resize(width: number, height: number) {
+    resizeCanvas(width: number, height: number) {
         this.stage.size({
             width,
             height,
@@ -111,6 +112,216 @@ export class CanvasManager {
 
         this.layer.batchDraw();
     }
+
+    destroyStage() {
+        this.stage.destroy();
+    }
+
+    // Document
+
+    private getDocumentBounds() {
+        const rect =
+            this.documentGroup.getClientRect({
+                relativeTo: this.cameraGroup,
+            });
+
+        return {
+            x: rect.x,
+            y: rect.y,
+            width: rect.width,
+            height: rect.height,
+        };
+    }
+
+    getDocumentSize() {
+        const bounds = this.getDocumentBounds();
+
+        return {
+            width: bounds.width,
+            height: bounds.height,
+        };
+    }
+
+    private updateDocumentTransformOrigin() {
+
+        const rotated =
+            Math.abs(this.documentRotation) % 180 === 90;
+
+
+        const width =
+            rotated
+                ? this.imageNode?.height() ?? this.documentSize.width
+                : this.imageNode?.width() ?? this.documentSize.width;
+
+
+        const height =
+            rotated
+                ? this.imageNode?.width() ?? this.documentSize.height
+                : this.imageNode?.height() ?? this.documentSize.height;
+
+
+        this.documentGroup.position({
+            x: width / 2,
+            y: height / 2,
+        });
+    }
+
+    private applyDocumentTransform() {
+
+        this.documentGroup.rotation(
+            this.documentRotation
+        );
+
+
+        this.documentGroup.scale({
+            x: this.documentFlip.horizontal ? -1 : 1,
+            y: this.documentFlip.vertical ? -1 : 1,
+        });
+
+
+        this.updateDocumentTransformOrigin();
+    }
+
+
+    onDocumentResize(
+        callback: (width: number, height: number) => void
+    ) {
+        this.documentResizeCallback = callback;
+    }
+
+    // Camera
+
+    setCamera(camera: Camera) {
+        this.camera = camera;
+
+        this.clampCamera();
+
+        this.applyCamera();
+    }
+
+    getCamera() {
+        return this.camera;
+    }
+
+
+    private clampCamera() {
+
+        const rect =
+            this.documentGroup.getClientRect({
+                relativeTo: this.cameraGroup,
+            });
+
+
+        const contentWidth =
+            rect.width * this.camera.zoom;
+
+        const contentHeight =
+            rect.height * this.camera.zoom;
+
+
+        const offsetX =
+            Math.min(0, rect.x * this.camera.zoom);
+
+        const offsetY =
+            Math.min(0, rect.y * this.camera.zoom);
+
+
+        const maxX =
+            Math.max(
+                0,
+                contentWidth + offsetX - this.stage.width()
+            );
+
+
+        const maxY =
+            Math.max(
+                0,
+                contentHeight + offsetY - this.stage.height()
+            );
+
+
+        this.camera.x =
+            Math.max(
+                0,
+                Math.min(
+                    this.camera.x,
+                    maxX
+                )
+            );
+
+
+        this.camera.y =
+            Math.max(
+                0,
+                Math.min(
+                    this.camera.y,
+                    maxY
+                )
+            );
+    }
+
+    setCameraZoom(
+        zoom: number,
+        centerX: number,
+        centerY: number,
+    ) {
+        const oldZoom = this.camera.zoom;
+
+        const worldX =
+            (centerX + this.camera.x) / oldZoom;
+
+        const worldY =
+            (centerY + this.camera.y) / oldZoom;
+
+
+        this.camera.zoom = zoom;
+
+
+        this.camera.x =
+            worldX * zoom - centerX;
+
+        this.camera.y =
+            worldY * zoom - centerY;
+
+
+        this.clampCamera();
+
+        this.applyCamera();
+
+        this.cameraCallback?.(
+            this.camera.x,
+            this.camera.y,
+            this.camera.zoom
+        );
+    }
+
+    private applyCamera() {
+        this.cameraGroup.scale({
+            x: this.camera.zoom,
+            y: this.camera.zoom,
+        });
+
+
+        this.cameraGroup.position({
+            x: -this.camera.x,
+            y: -this.camera.y,
+        });
+
+
+        this.layer.batchDraw();
+    }
+
+    onCameraChange(
+        callback: (
+            x: number,
+            y: number,
+            zoom: number
+        ) => void
+    ) {
+        this.cameraCallback = callback;
+    }
+
+    // Image editing
 
     loadImage(path: string) {
         const image = new Image();
@@ -198,209 +409,6 @@ export class CanvasManager {
         return data;
     }
 
-    private getDocumentBounds() {
-        const rect =
-            this.documentGroup.getClientRect({
-                relativeTo: this.cameraGroup,
-            });
-
-        return {
-            x: rect.x,
-            y: rect.y,
-            width: rect.width,
-            height: rect.height,
-        };
-    }
-
-    getDocumentSize() {
-        const bounds = this.getDocumentBounds();
-
-        return {
-            width: bounds.width,
-            height: bounds.height,
-        };
-    }
-
-    private updateDocumentTransformOrigin() {
-
-        const rotated =
-            Math.abs(this.documentRotation) % 180 === 90;
-
-
-        const width =
-            rotated
-                ? this.imageNode?.height() ?? this.documentSize.width
-                : this.imageNode?.width() ?? this.documentSize.width;
-
-
-        const height =
-            rotated
-                ? this.imageNode?.width() ?? this.documentSize.height
-                : this.imageNode?.height() ?? this.documentSize.height;
-
-
-        this.documentGroup.position({
-            x: width / 2,
-            y: height / 2,
-        });
-    }
-
-
-    setCamera(camera: Camera) {
-        this.camera = camera;
-
-        this.clampCamera();
-
-        this.applyCamera();
-    }
-
-    getCamera() {
-        return this.camera;
-    }
-
-
-    private clampCamera() {
-
-        const rect =
-            this.documentGroup.getClientRect({
-                relativeTo: this.cameraGroup,
-            });
-
-
-        const contentWidth =
-            rect.width * this.camera.zoom;
-
-        const contentHeight =
-            rect.height * this.camera.zoom;
-
-
-        const offsetX =
-            Math.min(0, rect.x * this.camera.zoom);
-
-        const offsetY =
-            Math.min(0, rect.y * this.camera.zoom);
-
-
-        const maxX =
-            Math.max(
-                0,
-                contentWidth + offsetX - this.stage.width()
-            );
-
-
-        const maxY =
-            Math.max(
-                0,
-                contentHeight + offsetY - this.stage.height()
-            );
-
-
-        this.camera.x =
-            Math.max(
-                0,
-                Math.min(
-                    this.camera.x,
-                    maxX
-                )
-            );
-
-
-        this.camera.y =
-            Math.max(
-                0,
-                Math.min(
-                    this.camera.y,
-                    maxY
-                )
-            );
-    }
-
-
-    setZoom(
-        zoom: number,
-        centerX: number,
-        centerY: number,
-    ) {
-        const oldZoom = this.camera.zoom;
-
-        const worldX =
-            (centerX + this.camera.x) / oldZoom;
-
-        const worldY =
-            (centerY + this.camera.y) / oldZoom;
-
-
-        this.camera.zoom = zoom;
-
-
-        this.camera.x =
-            worldX * zoom - centerX;
-
-        this.camera.y =
-            worldY * zoom - centerY;
-
-
-        this.clampCamera();
-
-        this.applyCamera();
-
-        this.cameraCallback?.(
-            this.camera.x,
-            this.camera.y,
-            this.camera.zoom
-        );
-    }
-
-
-    private applyCamera() {
-        this.cameraGroup.scale({
-            x: this.camera.zoom,
-            y: this.camera.zoom,
-        });
-
-
-        this.cameraGroup.position({
-            x: -this.camera.x,
-            y: -this.camera.y,
-        });
-
-
-        this.layer.batchDraw();
-    }
-
-    private applyDocumentTransform() {
-
-        this.documentGroup.rotation(
-            this.documentRotation
-        );
-
-
-        this.documentGroup.scale({
-            x: this.documentFlip.horizontal ? -1 : 1,
-            y: this.documentFlip.vertical ? -1 : 1,
-        });
-
-
-        this.updateDocumentTransformOrigin();
-    }
-
-
-    onDocumentResize(
-        callback: (width: number, height: number) => void
-    ) {
-        this.documentResizeCallback = callback;
-    }
-
-    onCameraChange(
-        callback: (
-            x: number,
-            y: number,
-            zoom: number
-        ) => void
-    ) {
-        this.cameraCallback = callback;
-    }
-
     resizeImage(
         width: number,
         height: number,
@@ -442,8 +450,7 @@ export class CanvasManager {
         this.layer.batchDraw();
     }
 
-
-    crop(
+    cropImage(
         x: number,
         y: number,
         width: number,
@@ -492,7 +499,7 @@ export class CanvasManager {
     }
 
 
-    rotate(angle: number) {
+    rotateImage(angle: number) {
 
         this.documentRotation =
             (
@@ -524,7 +531,7 @@ export class CanvasManager {
     }
 
 
-    flip(
+    flipImage(
         horizontal: boolean,
         vertical: boolean,
     ) {
@@ -558,7 +565,7 @@ export class CanvasManager {
     }
 
 
-    setGrayscale(enabled: boolean) {
+    setImageFilterGrayscale(enabled: boolean) {
         if (!this.imageNode) return;
 
 
@@ -572,10 +579,5 @@ export class CanvasManager {
         this.imageNode.cache();
 
         this.layer.batchDraw();
-    }
-
-
-    destroy() {
-        this.stage.destroy();
     }
 }

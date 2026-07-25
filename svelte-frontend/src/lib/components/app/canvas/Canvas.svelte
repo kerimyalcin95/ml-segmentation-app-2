@@ -54,7 +54,7 @@ function updateViewport() {
     viewportSize.width = width;
     viewportSize.height = height;
 
-    canvas?.resize(width, height);
+    canvas?.resizeCanvas(width, height);
 
     scroll.x = canvas?.getCamera().x ?? 0;
     scroll.y = canvas?.getCamera().y ?? 0;
@@ -84,7 +84,7 @@ function handleWheel(event: WheelEvent) {
             ? Math.min(5, zoom * factor)
             : Math.max(0.1, zoom / factor);
 
-    canvas?.setZoom(newZoom, centerX, centerY);
+    canvas?.setCameraZoom(newZoom, centerX, centerY);
 }
 
 onMount(() => {
@@ -133,7 +133,7 @@ onMount(() => {
 
         viewport.removeEventListener('wheel', handleWheel);
 
-        canvas.destroy();
+        canvas.destroyStage();
     };
 });
 </script>

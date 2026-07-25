@@ -26,7 +26,7 @@ let currentFilter = $derived(
 );
 
 function applyFilters() {
-    canvas.setGrayscale(true);
+    canvas.setImageFilterGrayscale(true);
 }
 </script>
 
