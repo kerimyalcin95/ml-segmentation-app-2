@@ -31,6 +31,11 @@ export class CanvasManager {
 
     private documentRotation = 0;
 
+    private documentFlip = {
+        horizontal: false,
+        vertical: false,
+    };
+
 
     private cameraCallback?: (
         x: number,
@@ -170,14 +175,19 @@ export class CanvasManager {
         });
 
 
-        const data = this.stage.toDataURL({
-            x: 0,
-            y: 0,
-            width: this.documentSize.width,
-            height: this.documentSize.height,
-            mimeType: 'image/png',
-            pixelRatio: 1,
-        });
+        const bounds =
+            this.documentGroup.getClientRect();
+
+
+        const data =
+            this.stage.toDataURL({
+                x: bounds.x,
+                y: bounds.y,
+                width: bounds.width,
+                height: bounds.height,
+                mimeType: 'image/png',
+                pixelRatio: 1,
+            });
 
 
         this.cameraGroup.scale(oldScale);
@@ -203,6 +213,15 @@ export class CanvasManager {
         }
 
         return this.documentSize;
+    }
+
+    private updateDocumentTransformOrigin() {
+        const bounds = this.getDocumentBounds();
+
+        this.documentGroup.position({
+            x: bounds.width / 2,
+            y: bounds.height / 2,
+        });
     }
 
 
@@ -331,15 +350,7 @@ export class CanvasManager {
         this.imageNode.width(width);
         this.imageNode.height(height);
 
-        this.imageNode.offsetX(
-            width / 2
-        );
-
-        this.imageNode.offsetY(
-            height / 2
-        );
-
-        this.imageNode.position({
+        this.documentGroup.position({
             x: width / 2,
             y: height / 2,
         });
@@ -420,17 +431,21 @@ export class CanvasManager {
 
     rotate(angle: number) {
 
-        const rotation =
+        this.documentRotation =
             (
-                this.documentGroup.rotation()
-                + angle
+                this.documentRotation + angle
             ) % 360;
 
 
         this.documentGroup.rotation(
-            rotation
+            this.documentRotation
         );
 
+
+        this.updateDocumentTransformOrigin();
+
+
+        this.clampCamera();
 
         this.layer.batchDraw();
     }
@@ -440,12 +455,23 @@ export class CanvasManager {
         horizontal: boolean,
         vertical: boolean,
     ) {
-        if (!this.imageNode) return;
+        this.documentFlip.horizontal =
+            horizontal
+                ? !this.documentFlip.horizontal
+                : this.documentFlip.horizontal;
+
+
+        this.documentFlip.vertical =
+            vertical
+                ? !this.documentFlip.vertical
+                : this.documentFlip.vertical;
+
 
         this.documentGroup.scale({
-            x: horizontal ? -1 : 1,
-            y: vertical ? -1 : 1,
+            x: this.documentFlip.horizontal ? -1 : 1,
+            y: this.documentFlip.vertical ? -1 : 1,
         });
+
 
         this.layer.batchDraw();
     }
