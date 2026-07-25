@@ -2,6 +2,8 @@
 import { Button } from '$lib/components/ui/button';
 import { CanvasManager } from '$lib/canvas/canvas';
 
+import ImageSquareIcon from 'phosphor-svelte/lib/ImageSquareIcon';
+
 interface Props {
     canvas: CanvasManager;
 }
@@ -23,5 +25,6 @@ async function loadImage() {
 </script>
 
 <Button onclick={loadImage}>
+    <ImageSquareIcon weight="bold" />
     Load Image
 </Button>

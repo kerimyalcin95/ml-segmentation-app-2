@@ -2,6 +2,8 @@
 import { Button } from '$lib/components/ui/button';
 import { CanvasManager } from '$lib/canvas/canvas';
 
+import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon'
+
 interface Props {
     canvas: CanvasManager;
 }
@@ -28,5 +30,6 @@ async function saveImage() {
 
 
 <Button onclick={saveImage}>
+    <FloppyDiskIcon weight="bold" />
     Save Image
 </Button>

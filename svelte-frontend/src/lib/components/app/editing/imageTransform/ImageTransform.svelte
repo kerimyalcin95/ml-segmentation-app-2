@@ -28,26 +28,26 @@ function flip(horizontal: boolean, vertical: boolean) {
         <span class="text-sm font-medium mb-2"> Transform </span>
         <div class="flex flex-col gap-2 items-center">
             <Button
-                class="w-full justify-center gap-2 mb-2 pr-4"
+                class="w-full mb-2"
                 onclick={() => rotate(90)}
             >
-                <ArrowClockwiseIcon size={18} />
+                <ArrowClockwiseIcon weight="bold" />
                 Rotate
             </Button>
 
             <Button
-                class="w-full justify-center gap-2 pr-4"
+                class="w-full"
                 onclick={() => flip(true, false)}
             >
-                <FlipHorizontalIcon size={18} />
+                <FlipHorizontalIcon weight="bold" />
                 Flip Horizontal
             </Button>
 
             <Button
-                class="w-full justify-center gap-2 pr-4"
+                class="w-full"
                 onclick={() => flip(false, true)}
             >
-                <FlipVerticalIcon size={18} />
+                <FlipVerticalIcon weight="bold" />
                 Flip Vertical
             </Button>
         </div>

@@ -9,6 +9,8 @@ import FilterSettings from '$lib/components/app/editing/imageFilter/FilterSettin
 import type { Filter } from '$lib/types/filter';
 import { CanvasManager } from '$lib/canvas/canvas';
 
+import CircleHalfIcon from 'phosphor-svelte/lib/CircleHalfIcon';
+
 interface Props {
     canvas: CanvasManager;
 }
@@ -43,8 +45,9 @@ function applyFilters() {
 
         <FilterSettings {currentFilter} />
 
-        <Button class="mt-2" onclick={applyFilters}
-            >Apply filters</Button
-        >
+        <Button class="mt-2" onclick={applyFilters}>
+            <CircleHalfIcon weight="bold" />
+            Apply filters
+        </Button>
     </div>
 </Card>
