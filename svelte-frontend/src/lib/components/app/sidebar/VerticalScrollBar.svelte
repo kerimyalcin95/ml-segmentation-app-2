@@ -8,14 +8,8 @@ interface Props {
     onChange: (value: number) => void;
 }
 
-let {
-    viewportId,
-    viewportSize,
-    contentSize,
-    position,
-    onChange,
-}: Props = $props();
-
+let { viewportId, viewportSize, contentSize, position, onChange }: Props =
+    $props();
 
 let track: HTMLDivElement;
 
@@ -27,42 +21,21 @@ let startPosition = 0;
 
 let hideTimer: ReturnType<typeof setTimeout>;
 
-
-const maxPosition = $derived(
-    Math.max(
-        0,
-        contentSize - viewportSize
-    )
-);
-
+const maxPosition = $derived(Math.max(0, contentSize - viewportSize));
 
 const thumbHeight = $derived(
     contentSize <= 0
         ? 100
-        : Math.max(
-            20,
-            Math.min(
-                100,
-                (viewportSize / contentSize) * 100
-            )
-        )
+        : Math.max(20, Math.min(100, (viewportSize / contentSize) * 100)),
 );
-
 
 const thumbPosition = $derived(
-    maxPosition === 0
-        ? 0
-        : (position / maxPosition) *
-          (100 - thumbHeight)
+    maxPosition === 0 ? 0 : (position / maxPosition) * (100 - thumbHeight),
 );
-
 
 const thumbClass = $derived(
-    dragging
-        ? 'bg-primary'
-        : 'bg-primary/40 hover:bg-primary/70'
+    dragging ? 'bg-primary' : 'bg-primary/40 hover:bg-primary/70',
 );
-
 
 export function showScrollbar() {
     visible = true;
@@ -76,169 +49,91 @@ export function showScrollbar() {
     }, 1200);
 }
 
-
 function pointerDown(event: PointerEvent) {
     showScrollbar();
 
-    const rect =
-        track.getBoundingClientRect();
+    const rect = track.getBoundingClientRect();
 
+    const clickY = event.clientY - rect.top;
 
-    const clickY =
-        event.clientY - rect.top;
+    const thumbStart = (thumbPosition / 100) * rect.height;
 
+    const thumbEnd = thumbStart + (thumbHeight / 100) * rect.height;
 
-    const thumbStart =
-        (thumbPosition / 100) *
-        rect.height;
-
-
-    const thumbEnd =
-        thumbStart +
-        (thumbHeight / 100) *
-        rect.height;
-
-
-    if (
-        clickY >= thumbStart &&
-        clickY <= thumbEnd
-    ) {
+    if (clickY >= thumbStart && clickY <= thumbEnd) {
         dragging = true;
 
         startY = event.clientY;
         startPosition = position;
 
-        track.setPointerCapture(
-            event.pointerId
-        );
+        track.setPointerCapture(event.pointerId);
 
         return;
     }
 
-
     jumpToPosition(event);
 }
-
 
 function moveDrag(event: PointerEvent) {
     showScrollbar();
 
     if (!dragging) return;
 
+    const rect = track.getBoundingClientRect();
 
-    const rect =
-        track.getBoundingClientRect();
+    const usableHeight = rect.height * (1 - thumbHeight / 100);
 
+    const delta = event.clientY - startY;
 
-    const usableHeight =
-        rect.height *
-        (1 - thumbHeight / 100);
+    const value = startPosition + (delta / usableHeight) * maxPosition;
 
-
-    const delta =
-        event.clientY - startY;
-
-
-    const value =
-        startPosition +
-        (delta / usableHeight) *
-        maxPosition;
-
-
-    onChange(
-        Math.max(
-            0,
-            Math.min(
-                maxPosition,
-                value
-            )
-        )
-    );
+    onChange(Math.max(0, Math.min(maxPosition, value)));
 }
-
 
 function endDrag(event: PointerEvent) {
     dragging = false;
 
     showScrollbar();
 
-
-    if (
-        track.hasPointerCapture(
-            event.pointerId
-        )
-    ) {
-        track.releasePointerCapture(
-            event.pointerId
-        );
+    if (track.hasPointerCapture(event.pointerId)) {
+        track.releasePointerCapture(event.pointerId);
     }
 }
-
 
 function jumpToPosition(event: PointerEvent) {
     showScrollbar();
 
-    const rect =
-        track.getBoundingClientRect();
+    const rect = track.getBoundingClientRect();
 
+    const click = event.clientY - rect.top;
 
-    const click =
-        event.clientY - rect.top;
+    const ratio = click / rect.height;
 
-
-    const ratio =
-        click / rect.height;
-
-
-    onChange(
-        Math.max(
-            0,
-            Math.min(
-                maxPosition,
-                ratio * maxPosition
-            )
-        )
-    );
+    onChange(Math.max(0, Math.min(maxPosition, ratio * maxPosition)));
 }
-
 
 function handleKey(event: KeyboardEvent) {
     showScrollbar();
 
     const step = 50;
 
-
     if (event.key === 'ArrowDown') {
-        onChange(
-            Math.min(
-                maxPosition,
-                position + step
-            )
-        );
+        onChange(Math.min(maxPosition, position + step));
     }
-
 
     if (event.key === 'ArrowUp') {
-        onChange(
-            Math.max(
-                0,
-                position - step
-            )
-        );
+        onChange(Math.max(0, position - step));
     }
-
 
     if (event.key === 'Home') {
         onChange(0);
     }
-
 
     if (event.key === 'End') {
         onChange(maxPosition);
     }
 }
 </script>
-
 
 <div
     bind:this={track}
@@ -249,7 +144,6 @@ function handleKey(event: KeyboardEvent) {
     aria-valuemax={maxPosition}
     aria-valuenow={position}
     tabindex="0"
-
     class="
         absolute
         top-1
@@ -262,12 +156,10 @@ function handleKey(event: KeyboardEvent) {
         transition-opacity
         duration-500
     "
-
     style="
         opacity: {visible ? 1 : 0};
         pointer-events: {visible ? 'auto' : 'none'};
     "
-
     onpointerdown={pointerDown}
     onpointermove={moveDrag}
     onpointerup={endDrag}
@@ -283,7 +175,6 @@ function handleKey(event: KeyboardEvent) {
             'pointer-events-none',
             thumbClass,
         ].join(' ')}
-
         style="
             height: {thumbHeight}%;
             top: {thumbPosition}%;
