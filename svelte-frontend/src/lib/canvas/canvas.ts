@@ -199,14 +199,14 @@ export class CanvasManager {
     }
 
     private getDocumentBounds() {
-
         const rect =
             this.documentGroup.getClientRect({
                 relativeTo: this.cameraGroup,
             });
 
-
         return {
+            x: rect.x,
+            y: rect.y,
             width: rect.width,
             height: rect.height,
         };
@@ -223,9 +223,25 @@ export class CanvasManager {
 
     private updateDocumentTransformOrigin() {
 
+        const rotation =
+            Math.abs(this.documentRotation) % 180 === 90;
+
+
+        const width =
+            rotation
+                ? this.documentSize.height
+                : this.documentSize.width;
+
+
+        const height =
+            rotation
+                ? this.documentSize.width
+                : this.documentSize.height;
+
+
         this.documentGroup.position({
-            x: this.documentSize.width / 2,
-            y: this.documentSize.height / 2,
+            x: width / 2,
+            y: height / 2,
         });
     }
 
@@ -254,21 +270,29 @@ export class CanvasManager {
         const contentWidth =
             rect.width * this.camera.zoom;
 
-
         const contentHeight =
             rect.height * this.camera.zoom;
 
 
-        const maxX = Math.max(
-            0,
-            contentWidth - this.stage.width()
-        );
+        const offsetX =
+            Math.min(0, rect.x * this.camera.zoom);
+
+        const offsetY =
+            Math.min(0, rect.y * this.camera.zoom);
 
 
-        const maxY = Math.max(
-            0,
-            contentHeight - this.stage.height()
-        );
+        const maxX =
+            Math.max(
+                0,
+                contentWidth + offsetX - this.stage.width()
+            );
+
+
+        const maxY =
+            Math.max(
+                0,
+                contentHeight + offsetY - this.stage.height()
+            );
 
 
         this.camera.x =
@@ -477,6 +501,7 @@ export class CanvasManager {
 
         this.clampCamera();
 
+        this.applyCamera();
 
         this.cameraCallback?.(
             this.camera.x,
