@@ -96,10 +96,12 @@ export class CanvasManager {
 
             this.imageNode = new Konva.Image({
                 image,
-                x: 0,
-                y: 0,
+                x: image.width / 2,
+                y: image.height / 2,
                 width: image.width,
                 height: image.height,
+                offsetX: image.width / 2,
+                offsetY: image.height / 2,
                 listening: false,
             });
 
@@ -347,57 +349,60 @@ export class CanvasManager {
     rotate(angle: number) {
         if (!this.imageNode) return;
 
-        const oldWidth = this.imageNode.width();
-        const oldHeight = this.imageNode.height();
+        const image = this.imageNode;
+
+        const width = image.width();
+        const height = image.height();
 
         const rotation =
-            ((this.imageNode.rotation() + angle) % 360 + 360) % 360;
+            ((image.rotation() + angle) % 360 + 360) % 360;
 
 
-        this.imageNode.offset({
-            x: 0,
-            y: 0,
+        image.rotation(rotation);
+
+
+        let x = 0;
+        let y = 0;
+
+
+        switch (rotation) {
+            case 0:
+                x = width / 2;
+                y = height / 2;
+                break;
+
+            case 90:
+                x = height / 2;
+                y = width / 2;
+                break;
+
+            case 180:
+                x = width / 2;
+                y = height / 2;
+                break;
+
+            case 270:
+                x = height / 2;
+                y = width / 2;
+                break;
+        }
+
+
+        image.position({
+            x,
+            y,
         });
 
-        this.imageNode.position({
-            x: 0,
-            y: 0,
-        });
 
+        const newWidth =
+            rotation === 90 || rotation === 270
+                ? height
+                : width;
 
-        this.imageNode.rotation(rotation);
-
-
-        let newWidth = oldWidth;
-        let newHeight = oldHeight;
-
-        if (rotation === 90 || rotation === 270) {
-            newWidth = oldHeight;
-            newHeight = oldWidth;
-        }
-
-
-        // move rotated image back into positive coordinates
-        if (rotation === 90) {
-            this.imageNode.position({
-                x: oldHeight,
-                y: 0,
-            });
-        }
-
-        if (rotation === 180) {
-            this.imageNode.position({
-                x: oldWidth,
-                y: oldHeight,
-            });
-        }
-
-        if (rotation === 270) {
-            this.imageNode.position({
-                x: 0,
-                y: oldWidth,
-            });
-        }
+        const newHeight =
+            rotation === 90 || rotation === 270
+                ? width
+                : height;
 
 
         this.documentSize.width = newWidth;
@@ -423,23 +428,14 @@ export class CanvasManager {
     ) {
         if (!this.imageNode) return;
 
+        const image = this.imageNode;
 
-        this.imageNode.scale({
-            x: horizontal ? -1 : 1,
-            y: vertical ? -1 : 1,
+        const scale = image.scale();
+
+        image.scale({
+            x: horizontal ? -scale.x : scale.x,
+            y: vertical ? -scale.y : scale.y,
         });
-
-
-        this.imageNode.offset({
-            x: horizontal
-                ? this.imageNode.width()
-                : 0,
-
-            y: vertical
-                ? this.imageNode.height()
-                : 0,
-        });
-
 
         this.layer.batchDraw();
     }
