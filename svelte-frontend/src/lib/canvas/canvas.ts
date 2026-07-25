@@ -69,6 +69,16 @@ export class CanvasManager {
             height,
         });
 
+        this.clampCamera();
+
+        this.applyCamera();
+
+        this.cameraCallback?.(
+            this.camera.x,
+            this.camera.y,
+            this.camera.zoom
+        );
+
         this.layer.batchDraw();
     }
 
@@ -151,7 +161,44 @@ export class CanvasManager {
     setCamera(camera: Camera) {
         this.camera = camera;
 
+        this.clampCamera();
+
         this.applyCamera();
+    }
+
+    getCamera() {
+        return this.camera;
+    }
+
+
+    private clampCamera() {
+        const contentWidth =
+            this.documentSize.width * this.camera.zoom;
+
+        const contentHeight =
+            this.documentSize.height * this.camera.zoom;
+
+
+        const maxX = Math.max(
+            0,
+            contentWidth - this.stage.width()
+        );
+
+        const maxY = Math.max(
+            0,
+            contentHeight - this.stage.height()
+        );
+
+
+        this.camera.x = Math.max(
+            0,
+            Math.min(this.camera.x, maxX)
+        );
+
+        this.camera.y = Math.max(
+            0,
+            Math.min(this.camera.y, maxY)
+        );
     }
 
 
@@ -175,10 +222,11 @@ export class CanvasManager {
         this.camera.x =
             worldX * zoom - centerX;
 
-
         this.camera.y =
             worldY * zoom - centerY;
 
+
+        this.clampCamera();
 
         this.applyCamera();
 
@@ -221,6 +269,150 @@ export class CanvasManager {
         ) => void
     ) {
         this.cameraCallback = callback;
+    }
+
+    resizeImage(
+        width: number,
+        height: number,
+    ) {
+        if (!this.imageNode) return;
+
+
+        this.imageNode.width(width);
+        this.imageNode.height(height);
+
+
+        this.documentSize.width = width;
+        this.documentSize.height = height;
+
+
+        this.documentResizeCallback?.(
+            width,
+            height
+        );
+
+
+        this.clampCamera();
+
+        this.applyCamera();
+
+        this.layer.batchDraw();
+    }
+
+
+    crop(
+        x: number,
+        y: number,
+        width: number,
+        height: number,
+    ) {
+        if (!this.imageNode) return;
+
+
+        const oldImage = this.imageNode.image();
+
+        if (!oldImage) return;
+
+
+        this.imageNode.crop({
+            x,
+            y,
+            width,
+            height,
+        });
+
+
+        this.imageNode.width(width);
+        this.imageNode.height(height);
+
+
+        this.documentSize.width = width;
+        this.documentSize.height = height;
+
+
+        this.documentResizeCallback?.(
+            width,
+            height
+        );
+
+
+        this.clampCamera();
+
+        this.applyCamera();
+
+        this.layer.batchDraw();
+    }
+
+
+    rotate(angle: number) {
+        if (!this.imageNode) return;
+
+
+        const normalized =
+            ((angle % 360) + 360) % 360;
+
+
+        const oldWidth =
+            this.imageNode.width();
+
+        const oldHeight =
+            this.imageNode.height();
+
+
+        if (
+            normalized === 90 ||
+            normalized === 270
+        ) {
+            this.imageNode.width(oldHeight);
+            this.imageNode.height(oldWidth);
+
+            this.documentSize.width = oldHeight;
+            this.documentSize.height = oldWidth;
+        }
+
+
+        this.imageNode.rotation(normalized);
+
+
+        this.documentResizeCallback?.(
+            this.documentSize.width,
+            this.documentSize.height
+        );
+
+
+        this.clampCamera();
+
+        this.applyCamera();
+
+        this.layer.batchDraw();
+    }
+
+
+    flip(
+        horizontal: boolean,
+        vertical: boolean,
+    ) {
+        if (!this.imageNode) return;
+
+
+        this.imageNode.scale({
+            x: horizontal ? -1 : 1,
+            y: vertical ? -1 : 1,
+        });
+
+
+        this.imageNode.offset({
+            x: horizontal
+                ? this.imageNode.width()
+                : 0,
+
+            y: vertical
+                ? this.imageNode.height()
+                : 0,
+        });
+
+
+        this.layer.batchDraw();
     }
 
 

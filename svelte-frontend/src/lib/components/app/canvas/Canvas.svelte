@@ -43,11 +43,16 @@ const maxScrollX = $derived(Math.max(0, contentWidth - viewportSize.width));
 const maxScrollY = $derived(Math.max(0, contentHeight - viewportSize.height));
 
 function updateViewport() {
-    viewportSize.width = viewport.clientWidth;
+    const width = viewport.clientWidth;
+    const height = viewport.clientHeight;
 
-    viewportSize.height = viewport.clientHeight;
+    viewportSize.width = width;
+    viewportSize.height = height;
 
-    canvas?.resize(viewportSize.width, viewportSize.height);
+    canvas?.resize(width, height);
+
+    scroll.x = canvas?.getCamera().x ?? 0;
+    scroll.y = canvas?.getCamera().y ?? 0;
 }
 
 function updateCamera() {

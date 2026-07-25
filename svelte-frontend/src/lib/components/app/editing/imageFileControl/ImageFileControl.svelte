@@ -13,7 +13,7 @@ let { canvas }: Props = $props();
 
 <Card class="h-min flex flex-col gap-4 py-4">
     <div class="flex flex-col gap-2 mx-4">
-        <span class="text-sm font-medium mb-2"> Image File Control </span>
+        <span class="text-sm font-medium mb-2"> File Control </span>
         <LoadImage {canvas} />
         <SaveImage {canvas} />
     </div>
