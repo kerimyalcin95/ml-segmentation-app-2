@@ -27,6 +27,13 @@ export class CanvasManager {
     };
 
 
+    private cameraCallback?: (
+        x: number,
+        y: number,
+        zoom: number
+    ) => void;
+
+
     private documentResizeCallback?: (
         width: number,
         height: number
@@ -148,12 +155,38 @@ export class CanvasManager {
     }
 
 
-    setZoom(zoom: number) {
+    setZoom(
+        zoom: number,
+        centerX: number,
+        centerY: number,
+    ) {
+        const oldZoom = this.camera.zoom;
+
+        const worldX =
+            (centerX + this.camera.x) / oldZoom;
+
+        const worldY =
+            (centerY + this.camera.y) / oldZoom;
+
+
         this.camera.zoom = zoom;
+
+
+        this.camera.x =
+            worldX * zoom - centerX;
+
+
+        this.camera.y =
+            worldY * zoom - centerY;
+
 
         this.applyCamera();
 
-        this.zoomCallback?.(zoom);
+        this.cameraCallback?.(
+            this.camera.x,
+            this.camera.y,
+            this.camera.zoom
+        );
     }
 
 
@@ -180,11 +213,14 @@ export class CanvasManager {
         this.documentResizeCallback = callback;
     }
 
-
-    onZoomChange(
-        callback: (zoom: number) => void
+    onCameraChange(
+        callback: (
+            x: number,
+            y: number,
+            zoom: number
+        ) => void
     ) {
-        this.zoomCallback = callback;
+        this.cameraCallback = callback;
     }
 
 
