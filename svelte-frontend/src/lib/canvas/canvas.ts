@@ -347,41 +347,70 @@ export class CanvasManager {
     rotate(angle: number) {
         if (!this.imageNode) return;
 
+        const oldWidth = this.imageNode.width();
+        const oldHeight = this.imageNode.height();
 
-        const normalized =
-            ((angle % 360) + 360) % 360;
-
-
-        const oldWidth =
-            this.imageNode.width();
-
-        const oldHeight =
-            this.imageNode.height();
+        const rotation =
+            ((this.imageNode.rotation() + angle) % 360 + 360) % 360;
 
 
-        if (
-            normalized === 90 ||
-            normalized === 270
-        ) {
-            this.imageNode.width(oldHeight);
-            this.imageNode.height(oldWidth);
+        this.imageNode.offset({
+            x: 0,
+            y: 0,
+        });
 
-            this.documentSize.width = oldHeight;
-            this.documentSize.height = oldWidth;
+        this.imageNode.position({
+            x: 0,
+            y: 0,
+        });
+
+
+        this.imageNode.rotation(rotation);
+
+
+        let newWidth = oldWidth;
+        let newHeight = oldHeight;
+
+        if (rotation === 90 || rotation === 270) {
+            newWidth = oldHeight;
+            newHeight = oldWidth;
         }
 
 
-        this.imageNode.rotation(normalized);
+        // move rotated image back into positive coordinates
+        if (rotation === 90) {
+            this.imageNode.position({
+                x: oldHeight,
+                y: 0,
+            });
+        }
+
+        if (rotation === 180) {
+            this.imageNode.position({
+                x: oldWidth,
+                y: oldHeight,
+            });
+        }
+
+        if (rotation === 270) {
+            this.imageNode.position({
+                x: 0,
+                y: oldWidth,
+            });
+        }
+
+
+        this.documentSize.width = newWidth;
+        this.documentSize.height = newHeight;
 
 
         this.documentResizeCallback?.(
-            this.documentSize.width,
-            this.documentSize.height
+            newWidth,
+            newHeight
         );
 
 
         this.clampCamera();
-
         this.applyCamera();
 
         this.layer.batchDraw();
