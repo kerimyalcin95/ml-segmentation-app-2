@@ -223,20 +223,20 @@ export class CanvasManager {
 
     private updateDocumentTransformOrigin() {
 
-        const rotation =
+        const rotated =
             Math.abs(this.documentRotation) % 180 === 90;
 
 
         const width =
-            rotation
-                ? this.documentSize.height
-                : this.documentSize.width;
+            rotated
+                ? this.imageNode?.height() ?? this.documentSize.width
+                : this.imageNode?.width() ?? this.documentSize.width;
 
 
         const height =
-            rotation
-                ? this.documentSize.width
-                : this.documentSize.height;
+            rotated
+                ? this.imageNode?.width() ?? this.documentSize.height
+                : this.imageNode?.height() ?? this.documentSize.height;
 
 
         this.documentGroup.position({
@@ -411,23 +411,33 @@ export class CanvasManager {
         this.imageNode.width(width);
         this.imageNode.height(height);
 
-        this.documentGroup.position({
-            x: width / 2,
-            y: height / 2,
-        });
+        this.imageNode.offsetX(width / 2);
+        this.imageNode.offsetY(height / 2);
+
 
         this.documentSize.width = width;
         this.documentSize.height = height;
 
+
+        this.applyDocumentTransform();
+
+
         this.documentResizeCallback?.(
-            width,
-            height
+            this.getDocumentSize().width,
+            this.getDocumentSize().height
         );
 
 
         this.clampCamera();
 
         this.applyCamera();
+
+        this.cameraCallback?.(
+            this.camera.x,
+            this.camera.y,
+            this.camera.zoom
+        );
+
 
         this.layer.batchDraw();
     }
@@ -458,10 +468,10 @@ export class CanvasManager {
         this.imageNode.width(width);
         this.imageNode.height(height);
 
-        this.documentGroup.position({
-            x: width / 2,
-            y: height / 2,
-        });
+        this.imageNode.offsetX(width / 2);
+        this.imageNode.offsetY(height / 2);
+
+        this.applyDocumentTransform();
 
 
         this.documentSize.width = width;

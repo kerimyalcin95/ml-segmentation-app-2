@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { onMount } from 'svelte';
+
     import { Button } from '$lib/components/ui/button';
     import { Input } from '$lib/components/ui/input';
     import { CanvasManager } from '$lib/canvas/canvas';
@@ -12,8 +14,25 @@
     let width = $state(0);
     let height = $state(0);
 
+
+    onMount(() => {
+        canvas.onDocumentResize((newWidth, newHeight) => {
+            width = newWidth;
+            height = newHeight;
+        });
+
+        const size = canvas.getDocumentSize();
+
+        width = size.width;
+        height = size.height;
+    });
+
+
     function resize() {
-        canvas.resizeImage(width, height);
+        canvas.resizeImage(
+            Number(width),
+            Number(height)
+        );
     }
 </script>
 
