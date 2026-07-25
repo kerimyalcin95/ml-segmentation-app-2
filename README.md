@@ -132,6 +132,7 @@ Other directories and files included in the `svelte-frontend` directory:
 - `\svelte-frontend\node_modules` contains Node.js packages and dependencies required to develop, build, and run the Svelte frontend application.
 - `\svelte-frontend\public` contains static assets that are directly copied into the final frontend build without additional processing by Vite.
 - `\svelte-frontend\src` contains the main Svelte frontend source code, including components, application logic, styles, and other resources required to build the user interface.
+- `\svelte-frontend\stats.html` contains the generated bundle visualization report from Vite/Rollup, used to analyze JavaScript chunk sizes and dependency contributions.
 - `\svelte-frontend\.gitignore` defines files and directories that are excluded from version control using Git.
 - `\svelte-frontend\components.json` contains the configuration for [shadcn-svelte](https://www.shadcn-svelte.com/) components, defining component paths and styling-related settings.
 - `\svelte-frontend\index.html` contains the main HTML entry point used by Vite to initialize and load the Svelte application.
