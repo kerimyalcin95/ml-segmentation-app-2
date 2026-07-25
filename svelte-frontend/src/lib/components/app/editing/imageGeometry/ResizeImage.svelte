@@ -1,20 +1,21 @@
 <script lang="ts">
-import { Button } from '$lib/components/ui/button';
-import { Input } from '$lib/components/ui/input';
+    import { Button } from '$lib/components/ui/button';
+    import { Input } from '$lib/components/ui/input';
+    import { CanvasManager } from '$lib/canvas/canvas';
 
-interface Props {
-    width: number;
-    height: number;
-    onclick: () => void;
-}
+    interface Props {
+        canvas: CanvasManager;
+    }
 
-let {
-    width = $bindable(),
-    height = $bindable(),
-    onclick,
-}: Props = $props();
+    let { canvas }: Props = $props();
+
+    let width = $state(0);
+    let height = $state(0);
+
+    function resize() {
+        canvas.resizeImage(width, height);
+    }
 </script>
-
 
 <div class="flex flex-col gap-2">
     <div class="flex gap-2">
@@ -31,7 +32,7 @@ let {
         />
     </div>
 
-    <Button onclick={onclick}>
+    <Button onclick={resize}>
         Resize
     </Button>
 </div>
