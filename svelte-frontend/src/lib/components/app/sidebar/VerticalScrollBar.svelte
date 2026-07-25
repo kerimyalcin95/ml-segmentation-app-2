@@ -46,7 +46,7 @@ export function showScrollbar() {
         if (!dragging) {
             visible = false;
         }
-    }, 1200);
+    }, 800);
 }
 
 function pointerDown(event: PointerEvent) {
@@ -111,28 +111,6 @@ function jumpToPosition(event: PointerEvent) {
 
     onChange(Math.max(0, Math.min(maxPosition, ratio * maxPosition)));
 }
-
-function handleKey(event: KeyboardEvent) {
-    showScrollbar();
-
-    const step = 50;
-
-    if (event.key === 'ArrowDown') {
-        onChange(Math.min(maxPosition, position + step));
-    }
-
-    if (event.key === 'ArrowUp') {
-        onChange(Math.max(0, position - step));
-    }
-
-    if (event.key === 'Home') {
-        onChange(0);
-    }
-
-    if (event.key === 'End') {
-        onChange(maxPosition);
-    }
-}
 </script>
 
 <div
@@ -164,7 +142,6 @@ function handleKey(event: KeyboardEvent) {
     onpointermove={moveDrag}
     onpointerup={endDrag}
     onpointercancel={endDrag}
-    onkeydown={handleKey}
 >
     <div
         class={[
