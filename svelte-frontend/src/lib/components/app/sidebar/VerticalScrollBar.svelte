@@ -253,7 +253,7 @@ function handleKey(event: KeyboardEvent) {
     class="
         absolute
         top-1
-        right-1
+        right-0
         bottom-1
         w-2
         cursor-pointer

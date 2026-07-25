@@ -104,7 +104,6 @@ function handleMouseMove() {
             relative
             h-full
             overflow-hidden
-            p-4
         "
         onwheel={handleWheel}
     >
@@ -114,6 +113,7 @@ function handleMouseMove() {
                 flex-col
                 gap-4
                 pb-12
+                p-4
             "
             style="
                 transform: translateY(-{scrollY}px);
