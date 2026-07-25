@@ -5,6 +5,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { sveltePhosphorOptimize } from "phosphor-svelte/vite";
 import path from "path";
 import { readFileSync } from 'fs';
+import { visualizer } from "rollup-plugin-visualizer";
 
 const packageJson = JSON.parse(
     readFileSync('./../package.json', 'utf-8')
@@ -16,6 +17,8 @@ export default defineConfig({
         tailwindcss(),
         svelte(),
         sveltePhosphorOptimize(),
+        visualizer(),
+
     ],
     base: './',
     build: {

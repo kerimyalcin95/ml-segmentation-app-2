@@ -1,0 +1,12 @@
+{
+    "eslint.enable": true,
+    "eslint.validate": [
+        "javascript",
+        "typescript",
+        "svelte"
+    ],
+    "files.associations": {
+        "stats.html": "plaintext"
+    },
+    "javascript.validate.enable": false
+}

@@ -17,6 +17,7 @@ export default defineConfig(
             "make",
             ".svelte-kit",
             "build",
+            "svelte-frontend/stats.html"
         ],
     },
 
