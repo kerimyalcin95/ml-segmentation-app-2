@@ -11,7 +11,11 @@ interface Camera {
 export class CanvasManager {
     private stage: Konva.Stage;
     private layer: Konva.Layer;
-    private imageGroup: Konva.Group;
+
+    private cameraGroup: Konva.Group;
+    private documentGroup: Konva.Group;
+    private segmentationGroup: Konva.Group;
+
     private imageNode?: Konva.Image;
 
     private documentSize = {
@@ -55,11 +59,31 @@ export class CanvasManager {
 
         this.layer = new Konva.Layer();
 
-        this.imageGroup = new Konva.Group();
+        this.cameraGroup = new Konva.Group();
 
-        this.layer.add(this.imageGroup);
+        this.documentGroup = new Konva.Group();
 
-        this.stage.add(this.layer);
+        this.segmentationGroup = new Konva.Group();
+
+
+        this.documentGroup.add(
+            this.segmentationGroup
+        );
+
+
+        this.cameraGroup.add(
+            this.documentGroup
+        );
+
+
+        this.layer.add(
+            this.cameraGroup
+        );
+
+
+        this.stage.add(
+            this.layer
+        );
     }
 
 
@@ -91,7 +115,7 @@ export class CanvasManager {
             this.documentSize.height = image.height;
 
 
-            this.imageGroup.destroyChildren();
+            this.documentGroup.destroyChildren();
 
 
             this.imageNode = new Konva.Image({
@@ -106,7 +130,7 @@ export class CanvasManager {
             });
 
 
-            this.imageGroup.add(
+            this.documentGroup.add(
                 this.imageNode
             );
 
@@ -127,15 +151,15 @@ export class CanvasManager {
     }
 
     saveImage() {
-        const oldScale = this.imageGroup.scale();
-        const oldPosition = this.imageGroup.position();
+        const oldScale = this.cameraGroup.scale();
+        const oldPosition = this.cameraGroup.position();
 
-        this.imageGroup.scale({
+        this.cameraGroup.scale({
             x: 1,
             y: 1,
         });
 
-        this.imageGroup.position({
+        this.cameraGroup.position({
             x: 0,
             y: 0,
         });
@@ -151,8 +175,8 @@ export class CanvasManager {
         });
 
 
-        this.imageGroup.scale(oldScale);
-        this.imageGroup.position(oldPosition);
+        this.cameraGroup.scale(oldScale);
+        this.cameraGroup.position(oldPosition);
 
         this.layer.batchDraw();
 
@@ -241,13 +265,13 @@ export class CanvasManager {
 
 
     private applyCamera() {
-        this.imageGroup.scale({
+        this.cameraGroup.scale({
             x: this.camera.zoom,
             y: this.camera.zoom,
         });
 
 
-        this.imageGroup.position({
+        this.cameraGroup.position({
             x: -this.camera.x,
             y: -this.camera.y,
         });
@@ -283,10 +307,21 @@ export class CanvasManager {
         this.imageNode.width(width);
         this.imageNode.height(height);
 
+        this.imageNode.offsetX(
+            width / 2
+        );
+
+        this.imageNode.offsetY(
+            height / 2
+        );
+
+        this.imageNode.position({
+            x: width / 2,
+            y: height / 2,
+        });
 
         this.documentSize.width = width;
         this.documentSize.height = height;
-
 
         this.documentResizeCallback?.(
             width,
@@ -327,6 +362,19 @@ export class CanvasManager {
         this.imageNode.width(width);
         this.imageNode.height(height);
 
+        this.imageNode.offsetX(
+            width / 2
+        );
+
+        this.imageNode.offsetY(
+            height / 2
+        );
+
+        this.imageNode.position({
+            x: width / 2,
+            y: height / 2,
+        });
+
 
         this.documentSize.width = width;
         this.documentSize.height = height;
@@ -347,76 +395,18 @@ export class CanvasManager {
 
 
     rotate(angle: number) {
-        if (!this.imageNode) return;
-
-        const image = this.imageNode;
-
-        const width = image.width();
-        const height = image.height();
 
         const rotation =
-            ((image.rotation() + angle) % 360 + 360) % 360;
+            (
+                this.documentGroup.rotation()
+                + angle
+            ) % 360;
 
 
-        image.rotation(rotation);
-
-
-        let x = 0;
-        let y = 0;
-
-
-        switch (rotation) {
-            case 0:
-                x = width / 2;
-                y = height / 2;
-                break;
-
-            case 90:
-                x = height / 2;
-                y = width / 2;
-                break;
-
-            case 180:
-                x = width / 2;
-                y = height / 2;
-                break;
-
-            case 270:
-                x = height / 2;
-                y = width / 2;
-                break;
-        }
-
-
-        image.position({
-            x,
-            y,
-        });
-
-
-        const newWidth =
-            rotation === 90 || rotation === 270
-                ? height
-                : width;
-
-        const newHeight =
-            rotation === 90 || rotation === 270
-                ? width
-                : height;
-
-
-        this.documentSize.width = newWidth;
-        this.documentSize.height = newHeight;
-
-
-        this.documentResizeCallback?.(
-            newWidth,
-            newHeight
+        this.documentGroup.rotation(
+            rotation
         );
 
-
-        this.clampCamera();
-        this.applyCamera();
 
         this.layer.batchDraw();
     }
@@ -428,13 +418,9 @@ export class CanvasManager {
     ) {
         if (!this.imageNode) return;
 
-        const image = this.imageNode;
-
-        const scale = image.scale();
-
-        image.scale({
-            x: horizontal ? -scale.x : scale.x,
-            y: vertical ? -scale.y : scale.y,
+        this.documentGroup.scale({
+            x: horizontal ? -1 : 1,
+            y: vertical ? -1 : 1,
         });
 
         this.layer.batchDraw();
