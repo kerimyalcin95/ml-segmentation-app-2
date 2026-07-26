@@ -13,6 +13,10 @@ import type { Mode } from '$lib/types/mode';
 let canvas = $state<CanvasManager>();
 let mode = $state<Mode>('editing');
 
+$effect(() => {
+    document.documentElement.dataset.mode = mode;
+});
+
 onMount(() => {
     const darkThemeCleanup = darkThemeSetup();
 

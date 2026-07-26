@@ -42,6 +42,26 @@
 	--sidebar-ring: oklch(0.711 0.019 323.02);
 }
 
+:root[data-mode="editing"] {
+    --primary: oklch(0.496 0.265 301.924);
+    --card: oklch(95.343% 0.02431 331.694);
+}
+
+:root[data-mode="annotation"] {
+    --primary: oklch(0.65 0.18 40);
+    --card: oklch(96.518% 0.01361 67.486);
+}
+
+:root[data-mode="training"] {
+    --primary: oklch(0.65 0.18 145);
+    --card: oklch(97.109% 0.02507 140.027);
+}
+
+:root[data-mode="prediction"] {
+    --primary: oklch(63.882% 0.24754 31.187);
+    --card: oklch(94.973% 0.01739 17.123);
+}
+
 .dark {
 	--background: oklch(0.145 0.008 326);
 	--foreground: oklch(0.985 0 0);
@@ -74,6 +94,26 @@
 	--sidebar-accent-foreground: oklch(0.985 0 0);
 	--sidebar-border: oklch(1 0 0 / 10%);
 	--sidebar-ring: oklch(0.542 0.034 322.5);
+}
+
+.dark[data-mode="editing"] {
+    --primary: oklch(0.496 0.265 301.924);
+    	--card: oklch(0.212 0.019 322.12);
+}
+
+.dark[data-mode="annotation"] {
+    --primary: oklch(0.65 0.18 40);
+    	--card: oklch(22.096% 0.00985 67.226);
+}
+
+.dark[data-mode="training"] {
+    --primary: oklch(0.65 0.18 145);
+    --card: oklch(22.597% 0.01755 137.972);
+}
+
+.dark[data-mode="prediction"] {
+    --primary: oklch(63.882% 0.24754 31.187);
+    --card: oklch(21.014% 0.01302 18.141);
 }
 
 @theme inline {
