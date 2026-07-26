@@ -47,8 +47,8 @@ export default defineConfig(
 
     {
         files: [
-            "src/**/*.{ts,svelte}",
-            "svelte-frontend/src/**/*.{ts,svelte}",
+            "src/**/*.{html,ts,js,svelte}",
+            "svelte-frontend/**/*.{html,ts,js,svelte}",
         ],
         rules: {
             "@typescript-eslint/prefer-as-const": "warn",

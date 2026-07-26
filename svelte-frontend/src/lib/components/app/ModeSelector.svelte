@@ -1,5 +1,4 @@
 <script lang="ts">
-import { onMount } from 'svelte';
 import * as ToggleGroup from '$lib/components/ui/toggle-group';
 import { Card } from '$lib/components/ui/card';
 import type { Mode } from '$lib/types/mode';

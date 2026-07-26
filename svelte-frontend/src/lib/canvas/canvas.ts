@@ -1,4 +1,7 @@
-import Konva from 'konva';
+import { Stage } from 'konva/lib/Stage';
+import { Layer } from 'konva/lib/Layer';
+import { Group } from 'konva/lib/Group';
+import { Image } from 'konva/lib/shapes/Image';
 
 interface Camera {
     x: number;
@@ -7,14 +10,14 @@ interface Camera {
 }
 
 export class CanvasManager {
-    private stage: Konva.Stage;
-    private layer: Konva.Layer;
+    private stage: Stage;
+    private layer: Layer;
 
-    private cameraGroup: Konva.Group;
-    private documentGroup: Konva.Group;
-    private segmentationGroup: Konva.Group;
+    private cameraGroup: Group;
+    private documentGroup: Group;
+    private segmentationGroup: Group;
 
-    private imageNode?: Konva.Image;
+    private imageNode?: Image;
 
     private documentSize = {
         width: 0,
