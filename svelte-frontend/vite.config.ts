@@ -6,8 +6,8 @@ import { sveltePhosphorOptimize } from "phosphor-svelte/vite";
 import path from "path";
 import { readFileSync } from 'fs';
 import { visualizer } from "rollup-plugin-visualizer";
-import { listModules } from './vite-plugins/listModules';
-import { analyzeModules } from './vite-plugins/analyzeModules';
+// import { listModules } from './vite-plugins/listModules';
+// import { analyzeModules } from './vite-plugins/analyzeModules';
 
 const packageJson = JSON.parse(
     readFileSync('./../package.json', 'utf-8')
