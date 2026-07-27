@@ -5,3 +5,4 @@ python/manualSegmentation.py
 python/semanticSegmentation.py
 python/**/__pycache__/
 make/
+.pytest_cache/

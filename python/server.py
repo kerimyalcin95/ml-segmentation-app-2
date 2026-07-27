@@ -23,7 +23,7 @@ class WebSocketServer:
                 print(f"'{message}'", end="")
                 await websocket.send(message)
 
-        except websockets.exceptions.ConnectionClosed as e:
+        except websockets.exceptions.ConnectionClosedOK as e:
             print(
                 "Connection closed.\n"
                 f"Error message: {e.code}\n"

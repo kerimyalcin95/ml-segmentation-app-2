@@ -5,8 +5,7 @@ export default defineConfig({
     name: "electron",
     include: ['src/**/*.test.{ts,cts}'],
     exclude: [
-      'node_modules/**',
-      'svelte-frontend/**'
+      'node_modules/**'
     ]
   }
 })
