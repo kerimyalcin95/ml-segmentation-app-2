@@ -9,9 +9,9 @@
     },
     "scripts": {
         "dev": "vite",
-        "build": "vite build",
+        "build": "npm run test && vite build",
         "preview": "vite preview",
-        "test": "vitest",
+        "test": "vitest run",
         "check": "svelte-check --tsconfig ./tsconfig.app.json && tsc -p tsconfig.node.json"
     },
     "devDependencies": {
@@ -19,9 +19,12 @@
         "@internationalized/date": "^3.12.2",
         "@sveltejs/vite-plugin-svelte": "^7.2.0",
         "@tailwindcss/vite": "^4.3.2",
+        "@testing-library/jest-dom": "^7.0.0",
+        "@testing-library/svelte": "^5.4.2",
         "@tsconfig/svelte": "^5.0.8",
         "@types/node": "^26.1.1",
         "clsx": "^2.1.1",
+        "jsdom": "^30.0.0",
         "phosphor-svelte": "^3.1.0",
         "rollup-plugin-visualizer": "^7.0.1",
         "shadcn-svelte": "^1.4.2",

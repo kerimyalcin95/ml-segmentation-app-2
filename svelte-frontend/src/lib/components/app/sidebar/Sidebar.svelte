@@ -1,7 +1,5 @@
 <!-- svelte-frontend/src/lib/components/app/sidebar/Sidebar.svelte -->
 <script lang="ts">
-import { tick } from 'svelte';
-
 import { Card } from '$lib/components/ui/card';
 import type { Mode } from '$lib/types/mode';
 import { CanvasManager } from '$lib/canvas/canvas';
@@ -17,7 +15,7 @@ interface Props {
     mode: Mode;
 }
 
-let { canvas, mode}: Props = $props();
+let { canvas, mode }: Props = $props();
 
 let viewport: HTMLDivElement;
 
@@ -46,14 +44,16 @@ $effect(() => {
         updateSizes();
     });
 
+    resizeObserver.observe(viewport);
     resizeObserver.observe(content);
 
-    tick().then(() => {
-        updateSizes();
-    });
+    updateSizes();
+
+    window.addEventListener('resize', updateSizes);
 
     return () => {
         resizeObserver.disconnect();
+        window.removeEventListener('resize', updateSizes);
     };
 });
 
