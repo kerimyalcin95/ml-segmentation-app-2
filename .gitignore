@@ -3,4 +3,5 @@ out/
 dist/
 python/manualSegmentation.py
 python/semanticSegmentation.py
+python/**/__pycache__/
 make/
