@@ -17,7 +17,7 @@ interface Props {
     mode: Mode;
 }
 
-let { canvas, mode }: Props = $props();
+let { canvas, mode}: Props = $props();
 
 let viewport: HTMLDivElement;
 

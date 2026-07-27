@@ -2,6 +2,7 @@
 import { onMount } from 'svelte';
 
 import { CanvasManager } from '$lib/canvas/canvas';
+import { documentSize } from '$lib/components/stores/canvasStore.svelte';
 
 import HorizontalScrollBar from './HorizontalScrollBar.svelte';
 import VerticalScrollBar from './VerticalScrollBar.svelte';
@@ -18,11 +19,6 @@ let canvasElement: HTMLDivElement;
 let canvas: CanvasManager;
 
 let viewportSize = $state({
-    width: 0,
-    height: 0,
-});
-
-let documentSize = $state({
     width: 0,
     height: 0,
 });
