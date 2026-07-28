@@ -38,27 +38,25 @@ export class ElectronApp {
 
     public start(): void {
 
-        app.whenReady().then(() => {
+        app.whenReady().then(async () => {
 
-            this.window = this.windowManager.create();
+            try {
 
-            new IpcHandlers(this.pythonServer).register();
+                new IpcHandlers(this.pythonServer).register();
 
-            this.configurePython();
+                this.configurePython();
 
-            this.pythonServer.start();
+                await this.pythonServer.start();
 
-            setTimeout(() => {
-                this.pythonServer.connect();
-            }, 1000);
+                this.window = this.windowManager.create();
 
-            app.on("activate", () => {
+            } catch (error) {
 
-                if (BrowserWindow.getAllWindows().length === 0) {
-                    this.window = WindowManager.create();
-                }
+                console.error("Failed to start Python server:", error);
 
-            });
+                app.quit();
+
+            }
 
         });
 

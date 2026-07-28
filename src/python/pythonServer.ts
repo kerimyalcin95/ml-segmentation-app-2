@@ -18,7 +18,7 @@ export class PythonServer {
         this.pythonPath = pythonPath;
     }
 
-    public start(): void {
+    public async start(): Promise<void> {
 
         if (this.pythonProcess) {
             return;
@@ -31,61 +31,110 @@ export class PythonServer {
 
         console.log("Python: Server started.");
 
-        this.pythonProcess.stdout.on("data", (data: Buffer) => {
-            console.log(`Python: ${data}`);
+        await new Promise<void>((resolve, reject) => {
+
+            this.pythonProcess!.stdout.on("data", (data: Buffer) => {
+
+                const output = data.toString();
+
+                console.log(`Python: ${output}`);
+
+                if (output.includes("Listening on")) {
+                    resolve();
+                }
+
+            });
+
+            this.pythonProcess!.stderr.on("data", (data: Buffer) => {
+                console.error(`Python Error: ${data}`);
+            });
+
+            this.pythonProcess!.once("error", reject);
+
+            this.pythonProcess!.once("exit", (code) => {
+
+                console.log(`Python: exited with code ${code}`);
+
+                this.pythonProcess = undefined;
+
+                reject(
+                    new Error(
+                        `Python exited before becoming ready (code ${code}).`
+                    )
+                );
+
+            });
+
         });
 
-        this.pythonProcess.stderr.on("data", (data: Buffer) => {
-            console.error(`Python Error: ${data}`);
-        });
-
-        this.pythonProcess.on("exit", (code) => {
-            console.log(`Python: exited with code ${code}`);
-            this.pythonProcess = undefined;
-        });
+        await this.connect();
     }
 
-    public connect(url = "ws://localhost:56767"): void {
+    public async connect(
+        url = "ws://localhost:56767"
+    ): Promise<void> {
 
-        if (this.webSocket) {
+        if (
+            this.webSocket &&
+            (
+                this.webSocket.readyState === WebSocket.OPEN ||
+                this.webSocket.readyState === WebSocket.CONNECTING
+            )
+        ) {
             return;
         }
 
         this.webSocket = new WebSocket(url);
 
-        console.log(`Electron: Listening on ${url}`);
+        console.log(`Electron: Connecting to ${url}`);
 
-        this.webSocket.on("open", () => {
-            console.log("Electron: Connected");
-            this.onConnected?.();
+        await new Promise<void>((resolve, reject) => {
+
+            this.webSocket!.once("open", () => {
+
+                console.log("Electron: Connected");
+
+                this.onConnected?.();
+
+                resolve();
+
+            });
+
+            this.webSocket!.on("message", (data) => {
+                this.onMessage?.(data.toString());
+            });
+
+            this.webSocket!.on("close", (code, reason) => {
+
+                const reasonString = reason.toString();
+
+                console.log(
+                    `WebSocket closed: ${code}${reasonString ? `, ${reasonString}` : ""}`
+                );
+
+                this.webSocket = undefined;
+
+                this.onDisconnected?.(
+                    code,
+                    reasonString
+                );
+
+            });
+
+            this.webSocket!.once("error", (error) => {
+
+                this.webSocket = undefined;
+
+                console.error("WebSocket error:", error);
+
+                this.onError?.(error);
+
+                reject(error);
+
+            });
+
         });
 
-        this.webSocket.on("message", (data) => {
-            this.onMessage?.(data.toString());
-        });
-
-        this.webSocket.on("close", (code, reason) => {
-
-            const reasonString = reason.toString();
-
-            console.log(
-                `WebSocket closed: ${code}${reasonString ? `, ${reasonString}` : ""}`
-            );
-
-            this.webSocket = undefined;
-
-            this.onDisconnected?.(
-                code,
-                reasonString
-            );
-        });
-
-        this.webSocket.on("error", (error) => {
-
-            console.error("WebSocket error:", error);
-
-            this.onError?.(error);
-        });
     }
 
     public disconnect(): void {
