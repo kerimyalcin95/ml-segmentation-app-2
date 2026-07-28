@@ -3,6 +3,7 @@ import { onMount } from 'svelte';
 
 import { CanvasManager } from '$lib/canvas/canvas';
 import { documentSize } from '$lib/components/stores/canvasStore.svelte';
+import type { CameraState } from '$lib/canvas/camera';
 
 import HorizontalScrollBar from './HorizontalScrollBar.svelte';
 import VerticalScrollBar from './VerticalScrollBar.svelte';
@@ -86,21 +87,21 @@ function handleWheel(event: WheelEvent) {
 onMount(() => {
     canvas = new CanvasManager(canvasElement);
 
-    canvas.onCameraChange((x, y, currentZoom) => {
-        zoom = currentZoom;
+    canvas.onCameraChange((state: CameraState) => {
+        zoom = state.zoom;
 
         const newMaxScrollX = Math.max(
             0,
-            documentSize.width * currentZoom - viewportSize.width,
+            documentSize.width * zoom - viewportSize.width,
         );
 
         const newMaxScrollY = Math.max(
             0,
-            documentSize.height * currentZoom - viewportSize.height,
+            documentSize.height * zoom - viewportSize.height,
         );
 
-        scroll.x = Math.round(Math.max(0, Math.min(x, newMaxScrollX)));
-        scroll.y = Math.round(Math.max(0, Math.min(y, newMaxScrollY)));
+        scroll.x = Math.round(Math.max(0, Math.min(state.x, newMaxScrollX)));
+        scroll.y = Math.round(Math.max(0, Math.min(state.y, newMaxScrollY)));
     });
 
     canvas.onDocumentResize((width, height) => {

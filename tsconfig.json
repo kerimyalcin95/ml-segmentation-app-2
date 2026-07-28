@@ -23,7 +23,10 @@
     "noEmitOnError": true
   },
   "include": [
-    "src",
+    "src/**/*.ts",
+    "src/**/*.d.ts",
+    "src/**/*.cts",
+    "src/**/*.d.cts",
     "eslint.config.ts",
     "vitest.config.ts"
   ]

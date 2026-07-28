@@ -10,7 +10,7 @@ const typeAwareParserOptions = {
     tsconfigRootDir: import.meta.dirname,
 };
 
-export default defineConfig(
+export default tseslint.config(
     {
         ignores: [
             "node_modules",
@@ -28,7 +28,7 @@ export default defineConfig(
 
     {
         languageOptions: {
-            globals,
+            globals: globals.browser,
         },
     },
 
