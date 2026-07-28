@@ -1,6 +1,6 @@
 # Segmentation App 2
 
-⚠️ Work in progress. This project is currently in an early development stage. Core functionality is being implemented, but many features, components, and integrations are still missing or incomplete. The application may contain bugs, unstable behavior, and breaking changes. Not intended for production use yet.
+![Application screenshot](assets/snapshot-1.png)
 
 ## Table of Contents
 
@@ -46,7 +46,6 @@ ML-Segmentation 2 is an open-source desktop application for machine learning-bas
 The project is currently in the **alpha** stage of development. While the core architecture is in place, many features are still under active development and may change significantly before the first stable release. Expect incomplete functionality, bugs, breaking changes, and limited documentation as the application continues to evolve.
 
 The project also serves as a practical software engineering playground, focusing on code quality, testing, maintainability, performance, and modern desktop application development practices.
-
 
 ## Architecture
 
