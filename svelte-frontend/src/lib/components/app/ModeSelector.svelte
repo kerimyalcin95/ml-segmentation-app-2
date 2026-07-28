@@ -20,7 +20,7 @@ function onValueChange(value: string) {
 }
 </script>
 
-<div class="absolute top-4 left-4 z-20">
+<div data-e2e="mode-selector" class="absolute top-4 left-4 z-20">
     <Card class="p-1">
         <ToggleGroup.Root type="single" bind:value={mode} {onValueChange}>
             <ToggleGroup.Item

@@ -17,6 +17,7 @@ onMount(() => {
 </script>
 
 <div
+    data-e2e="statusbar"
     class="h-8 border-t px-4 flex items-center justify-between text-sm text-muted-foreground"
 >
     <span>

@@ -6,3 +6,5 @@ python/semanticSegmentation.py
 python/**/__pycache__/
 make/
 .pytest_cache/
+playwright-report/
+test-results/

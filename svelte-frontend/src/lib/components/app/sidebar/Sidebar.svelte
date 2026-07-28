@@ -90,6 +90,7 @@ function handleMouseMove() {
 </script>
 
 <aside
+    data-e2e="sidebar"
     class="
         relative
         w-84

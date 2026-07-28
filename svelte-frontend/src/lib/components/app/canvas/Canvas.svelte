@@ -134,7 +134,7 @@ onMount(() => {
 });
 </script>
 
-<div class="flex-1 relative min-h-0 min-w-0">
+<div data-e2e="canvas" class="flex-1 relative min-h-0 min-w-0">
     <div
         bind:this={viewport}
         id="canvas-viewport"

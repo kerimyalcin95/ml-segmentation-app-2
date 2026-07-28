@@ -16,7 +16,7 @@ let {
 
 </script>
 
-<div class="flex-1 relative flex flex-col min-h-0 min-w-0">
+<div data-e2e="canvas-view" class="flex-1 relative flex flex-col min-h-0 min-w-0">
 
     <ModeSelector bind:mode />
 

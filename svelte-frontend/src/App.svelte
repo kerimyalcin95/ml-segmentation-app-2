@@ -26,7 +26,7 @@ onMount(() => {
 });
 </script>
 
-<div class="h-screen flex flex-col">
+<div data-e2e="app" class="h-screen flex flex-col">
     <!-- Workspace -->
     <div class="flex-1 flex overflow-hidden min-h-0 min-w-0">
         {#if canvas}
