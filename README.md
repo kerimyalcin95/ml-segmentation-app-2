@@ -125,7 +125,6 @@ Other directories and files included in the root folder:
 - `.gitignore` defines files and directories that are excluded from version control using Git.
 - `.prettierrc` contains the configuration for Prettier, which automatically formats source code according to predefined style rules.
 - `eslint.config.ts` contains the configuration for ESLint, which analyzes TypeScript and JavaScript code to detect errors and enforce coding standards.
-- `forge.config.ts` contains the configuration for Electron Forge, which manages application packaging, building, and distribution.
 - `package.json` defines the Node.js project configuration, including dependencies, scripts, and metadata required for building and running the application.
 - `package-lock.json` records the exact versions of installed Node.js dependencies to ensure reproducible installations.
 - `playwright.config.ts` contains the configuration for Playwright, including browser and Electron settings, test locations, reporters, timeouts, fixtures, and other options used when executing end-to-end tests.

@@ -1,9 +1,14 @@
 import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import svelte from "eslint-plugin-svelte";
-import svelteParser from "svelte-eslint-parser";
 import { defineConfig } from "eslint/config";
 import globals from "globals";
+import svelte from "eslint-plugin-svelte";
+import svelteParser from "svelte-eslint-parser";
+import tseslint from "typescript-eslint";
+
+const typeAwareParserOptions = {
+    projectService: true,
+    tsconfigRootDir: import.meta.dirname,
+};
 
 export default defineConfig(
     {
@@ -17,21 +22,27 @@ export default defineConfig(
             "make",
             ".svelte-kit",
             "build",
-            "svelte-frontend/stats.html"
+            "svelte-frontend/stats.html",
         ],
     },
 
     {
         languageOptions: {
-            globals: {
-                ...globals.browser,
-            },
+            globals,
         },
     },
 
     js.configs.recommended,
 
-    ...tseslint.configs.recommended,
+    {
+        files: ["**/*.{ts,tsx,mts,cts}"],
+        languageOptions: {
+            parser: tseslint.parser,
+            parserOptions: typeAwareParserOptions,
+        },
+    },
+
+    ...tseslint.configs.strictTypeChecked,
 
     ...svelte.configs.recommended.map((config) => ({
         ...config,
@@ -41,6 +52,7 @@ export default defineConfig(
             parser: svelteParser,
             parserOptions: {
                 parser: tseslint.parser,
+                ...typeAwareParserOptions,
             },
         },
     })),
@@ -52,8 +64,8 @@ export default defineConfig(
         ],
         rules: {
             "@typescript-eslint/prefer-as-const": "warn",
-            'no-multiple-empty-lines': [
-                'error',
+            "no-multiple-empty-lines": [
+                "error",
                 {
                     max: 1,
                     maxEOF: 0,
@@ -62,6 +74,4 @@ export default defineConfig(
             ],
         },
     },
-
-
 );
