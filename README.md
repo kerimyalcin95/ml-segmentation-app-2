@@ -41,11 +41,12 @@
 
 ## About
 
-This side project builds on my previous work in machine learning-based image segmentation. The current focus is on enhancing software quality, maintainability, and user experience. It serves as a practical environment to improve and deepen my software engineering skills while exploring modern software development practices.
+ML-Segmentation 2 is an open-source desktop application for machine learning-based image segmentation. It combines dataset management, image annotation, image editing, model training, and inference into a single cross-platform workflow powered by Python, fastai, Electron, and Svelte.
 
-The application is designed for end-to-end image segmentation workflows using the fastai API. It enables users to create and manage segmentation datasets, annotate images, perform image editing and cropping, train neural network models, and generate segmentation predictions from trained models. By integrating dataset preparation, model training, and inference into a single application, the project provides a streamlined workflow for developing and evaluating image segmentation models.
+The project is currently in the **alpha** stage of development. While the core architecture is in place, many features are still under active development and may change significantly before the first stable release. Expect incomplete functionality, bugs, breaking changes, and limited documentation as the application continues to evolve.
 
-Recent improvements include codebase refactoring, automated unit testing, UI modernisation, performance enhancements, and the addition of new features that were missing in the previous version.
+The project also serves as a practical software engineering playground, focusing on code quality, testing, maintainability, performance, and modern desktop application development practices.
+
 
 ## Architecture
 
