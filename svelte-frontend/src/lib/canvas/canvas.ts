@@ -1,10 +1,5 @@
 import Konva from 'konva';
-
-interface Camera {
-    x: number;
-    y: number;
-    zoom: number;
-}
+import { Camera, type CameraState } from "./camera";
 
 export class CanvasManager {
     private stage: Konva.Stage;
@@ -21,11 +16,7 @@ export class CanvasManager {
         height: 0,
     };
 
-    private camera: Camera = {
-        x: 0,
-        y: 0,
-        zoom: 1,
-    };
+    private camera: Camera;
 
     private documentRotation = 0;
 
@@ -34,19 +25,9 @@ export class CanvasManager {
         vertical: false,
     };
 
-    private cameraCallback?: (
-        x: number,
-        y: number,
-        zoom: number
-    ) => void;
-
     private documentResizeCallback?: (
         width: number,
         height: number
-    ) => void;
-
-    private zoomCallback?: (
-        zoom: number
     ) => void;
 
     constructor(container: HTMLDivElement) {
@@ -79,6 +60,13 @@ export class CanvasManager {
         this.stage.add(
             this.layer
         );
+
+        this.camera = new Camera(
+            this.stage,
+            this.layer,
+            this.cameraGroup,
+            this.documentGroup
+        );
     }
 
     // Canvas, Stage
@@ -89,17 +77,7 @@ export class CanvasManager {
             height,
         });
 
-        this.clampCamera();
-
-        this.applyCamera();
-
-        this.cameraCallback?.(
-            this.camera.x,
-            this.camera.y,
-            this.camera.zoom
-        );
-
-        this.layer.batchDraw();
+        this.camera.refresh();
     }
 
     destroyStage() {
@@ -174,66 +152,12 @@ export class CanvasManager {
 
     // Camera
 
-    setCamera(camera: Camera) {
-        this.camera = camera;
-
-        this.clampCamera();
-
-        this.applyCamera();
+    setCamera(camera: CameraState) {
+        this.camera.set(camera);
     }
 
-    getCamera() {
-        return this.camera;
-    }
-
-    private clampCamera() {
-
-        const rect =
-            this.documentGroup.getClientRect({
-                relativeTo: this.cameraGroup,
-            });
-
-        const contentWidth =
-            rect.width * this.camera.zoom;
-
-        const contentHeight =
-            rect.height * this.camera.zoom;
-
-        const offsetX =
-            Math.min(0, rect.x * this.camera.zoom);
-
-        const offsetY =
-            Math.min(0, rect.y * this.camera.zoom);
-
-        const maxX =
-            Math.max(
-                0,
-                contentWidth + offsetX - this.stage.width()
-            );
-
-        const maxY =
-            Math.max(
-                0,
-                contentHeight + offsetY - this.stage.height()
-            );
-
-        this.camera.x =
-            Math.max(
-                0,
-                Math.min(
-                    this.camera.x,
-                    maxX
-                )
-            );
-
-        this.camera.y =
-            Math.max(
-                0,
-                Math.min(
-                    this.camera.y,
-                    maxY
-                )
-            );
+    getCamera(): CameraState {
+        return this.camera.get();
     }
 
     setCameraZoom(
@@ -241,63 +165,23 @@ export class CanvasManager {
         centerX: number,
         centerY: number,
     ) {
-        const oldZoom = this.camera.zoom;
-
-        const worldX =
-            (centerX + this.camera.x) / oldZoom;
-
-        const worldY =
-            (centerY + this.camera.y) / oldZoom;
-
-        this.camera.zoom = zoom;
-
-        this.camera.x =
-            worldX * zoom - centerX;
-
-        this.camera.y =
-            worldY * zoom - centerY;
-
-        this.clampCamera();
-
-        this.applyCamera();
-
-        this.cameraCallback?.(
-            this.camera.x,
-            this.camera.y,
-            this.camera.zoom
+        this.camera.setZoom(
+            zoom,
+            centerX,
+            centerY
         );
     }
 
-    private applyCamera() {
-        this.cameraGroup.scale({
-            x: this.camera.zoom,
-            y: this.camera.zoom,
-        });
-
-        this.cameraGroup.position({
-            x: -this.camera.x,
-            y: -this.camera.y,
-        });
-
-        this.layer.batchDraw();
-    }
-
     onCameraChange(
-        callback: (
-            x: number,
-            y: number,
-            zoom: number
-        ) => void
+        callback: (camera: CameraState) => void
     ) {
-        this.cameraCallback = callback;
+        this.camera.onChange(callback);
     }
 
     // Image editing
 
     loadImage(path: string) {
         const image = new Image();
-
-        console.log(path);
 
         image.onload = () => {
             this.documentSize.width = image.width;
@@ -330,9 +214,7 @@ export class CanvasManager {
                 image.height
             );
 
-            this.applyCamera();
-
-            this.layer.batchDraw();
+            this.camera.refresh();
         };
 
         image.src = `file://${path}`;
@@ -395,17 +277,7 @@ export class CanvasManager {
             this.getDocumentSize().height
         );
 
-        this.clampCamera();
-
-        this.applyCamera();
-
-        this.cameraCallback?.(
-            this.camera.x,
-            this.camera.y,
-            this.camera.zoom
-        );
-
-        this.layer.batchDraw();
+        this.camera.refresh();
     }
 
     cropImage(
@@ -443,11 +315,7 @@ export class CanvasManager {
             height
         );
 
-        this.clampCamera();
-
-        this.applyCamera();
-
-        this.layer.batchDraw();
+        this.camera.refresh();
     }
 
     rotateImage(angle: number) {
@@ -464,17 +332,7 @@ export class CanvasManager {
             this.getDocumentSize().height
         );
 
-        this.clampCamera();
-
-        this.applyCamera();
-
-        this.cameraCallback?.(
-            this.camera.x,
-            this.camera.y,
-            this.camera.zoom
-        );
-
-        this.layer.batchDraw();
+        this.camera.refresh();
     }
 
     flipImage(
@@ -493,16 +351,7 @@ export class CanvasManager {
         }
 
         this.applyDocumentTransform();
-
-        this.clampCamera();
-
-        this.cameraCallback?.(
-            this.camera.x,
-            this.camera.y,
-            this.camera.zoom
-        );
-
-        this.layer.batchDraw();
+        this.camera.refresh();
     }
 
     setImageFilterGrayscale(enabled: boolean) {
