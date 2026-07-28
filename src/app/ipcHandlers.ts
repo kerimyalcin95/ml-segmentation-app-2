@@ -6,7 +6,7 @@ import {
 
 import fs from "node:fs";
 
-import { PythonServer } from "../python/PythonServer";
+import { PythonServer } from "../python/pythonServer.js";
 
 export class IpcHandlers {
 

@@ -3,9 +3,8 @@ import WebSocket from "ws";
 
 export class PythonServer {
 
-    private webSocket?: WebSocket;
-    private pythonProcess?: ChildProcessWithoutNullStreams;
-    private readonly pythonPath: string;
+    private webSocket: WebSocket | undefined;
+    private pythonProcess: ChildProcessWithoutNullStreams | undefined;
 
     public onMessage?: (message: string) => void;
     public onConnected?: () => void;
@@ -24,16 +23,18 @@ export class PythonServer {
             return;
         }
 
-        this.pythonProcess = spawn("python", [
+        const process = spawn("python", [
             "-u",
             this.pythonPath
         ]);
+
+        this.pythonProcess = process;
 
         console.log("Python: Server started.");
 
         await new Promise<void>((resolve, reject) => {
 
-            this.pythonProcess!.stdout.on("data", (data: Buffer) => {
+            process.stdout.on("data", (data: Buffer) => {
 
                 const output = data.toString();
 
@@ -45,21 +46,21 @@ export class PythonServer {
 
             });
 
-            this.pythonProcess!.stderr.on("data", (data: Buffer) => {
-                console.error(`Python Error: ${data}`);
+            process.stderr.on("data", (data: Buffer) => {
+                console.error(`Python Error: ${data.toString()}`);
             });
 
-            this.pythonProcess!.once("error", reject);
+            process.once("error", reject);
 
-            this.pythonProcess!.once("exit", (code) => {
+            process.once("exit", (code) => {
 
-                console.log(`Python: exited with code ${code}`);
+                console.log("Python: exited with code", code);
 
                 this.pythonProcess = undefined;
 
                 reject(
                     new Error(
-                        `Python exited before becoming ready (code ${code}).`
+                        `Python exited before becoming ready (code ${String(code)}).`
                     )
                 );
 
@@ -84,13 +85,27 @@ export class PythonServer {
             return;
         }
 
-        this.webSocket = new WebSocket(url);
+        const socket = new WebSocket(url);
+
+        this.webSocket = socket;
 
         console.log(`Electron: Connecting to ${url}`);
 
         await new Promise<void>((resolve, reject) => {
 
-            this.webSocket!.once("open", () => {
+            function rawDataToString(data: WebSocket.RawData): string {
+                if (Buffer.isBuffer(data)) {
+                    return data.toString("utf8");
+                }
+
+                if (Array.isArray(data)) {
+                    return Buffer.concat(data).toString("utf8");
+                }
+
+                return Buffer.from(data).toString("utf8");
+            }
+
+            socket.once("open", () => {
 
                 console.log("Electron: Connected");
 
@@ -100,16 +115,16 @@ export class PythonServer {
 
             });
 
-            this.webSocket!.on("message", (data) => {
-                this.onMessage?.(data.toString());
+            socket.on("message", (data) => {
+                this.onMessage?.(rawDataToString(data));
             });
 
-            this.webSocket!.on("close", (code, reason) => {
+            socket.on("close", (code, reason) => {
 
                 const reasonString = reason.toString();
 
                 console.log(
-                    `WebSocket closed: ${code}${reasonString ? `, ${reasonString}` : ""}`
+                    `WebSocket closed: ${String(code)}${reasonString ? `, ${reasonString}` : ""}`
                 );
 
                 this.webSocket = undefined;
@@ -121,7 +136,7 @@ export class PythonServer {
 
             });
 
-            this.webSocket!.once("error", (error) => {
+            socket.once("error", (error) => {
 
                 this.webSocket = undefined;
 

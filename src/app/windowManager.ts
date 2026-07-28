@@ -4,12 +4,24 @@ import { fileURLToPath } from "node:url";
 
 export class WindowManager {
 
-    public static create(): BrowserWindow {
+    private readonly dirname: string;
 
-        const __filename = fileURLToPath(import.meta.url);
-        const __dirname = path.dirname(__filename);
+    private mainWindow: BrowserWindow | null = null;
 
-        const window = new BrowserWindow({
+    public constructor() {
+
+        const filename = fileURLToPath(import.meta.url);
+        this.dirname = path.dirname(filename);
+
+    }
+
+    public create(): BrowserWindow {
+
+        if (this.mainWindow !== null) {
+            return this.mainWindow;
+        }
+
+        this.mainWindow = new BrowserWindow({
 
             autoHideMenuBar: true,
 
@@ -21,7 +33,7 @@ export class WindowManager {
             webPreferences: {
 
                 preload: path.join(
-                    __dirname,
+                    this.dirname,
                     "..",
                     "preload.cjs"
                 ),
@@ -33,34 +45,41 @@ export class WindowManager {
 
         });
 
-        window.webContents.on(
+        this.mainWindow.webContents.on(
             "before-input-event",
             (_event, input) => {
 
                 if (input.key === "F12") {
-                    window.webContents.toggleDevTools();
+                    this.mainWindow?.webContents.toggleDevTools();
                 }
 
             }
         );
 
-        window.maximize();
+        this.mainWindow.on("closed", () => {
+            this.mainWindow = null;
+        });
 
-        window.loadFile(
+        this.mainWindow.maximize();
+
+        void this.mainWindow.loadFile(
             path.join(
-                __dirname,
+                this.dirname,
                 "..",
                 "..",
-                "html",
-                "../",
+                "..",
                 "svelte-frontend",
                 "dist",
                 "index.html"
             )
         );
 
-        return window;
+        return this.mainWindow;
 
+    }
+
+    public getMainWindow(): BrowserWindow | null {
+        return this.mainWindow;
     }
 
 }

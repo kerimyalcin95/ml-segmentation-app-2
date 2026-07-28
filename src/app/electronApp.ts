@@ -2,21 +2,23 @@ import { app, BrowserWindow } from "electron";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-import { PythonServer } from "../python/PythonServer";
-import { WindowManager } from "./windowManager";
-import { IpcHandlers } from "./ipcHandlers";
+import { PythonServer } from "../python/pythonServer.js";
+import { WindowManager } from "./windowManager.js";
+import { IpcHandlers } from "./ipcHandlers.js";
 
 export class ElectronApp {
 
     private readonly pythonServer: PythonServer;
+    private readonly windowManager: WindowManager;
 
     private window?: BrowserWindow;
-    private readonly windowManager = new WindowManager();
 
     public constructor() {
 
         const __filename = fileURLToPath(import.meta.url);
         const __dirname = path.dirname(__filename);
+
+        this.windowManager = new WindowManager();
 
         this.pythonServer = new PythonServer(
             app.isPackaged
@@ -30,6 +32,7 @@ export class ElectronApp {
                     __dirname,
                     "..",
                     "..",
+                    "..",
                     "python",
                     "server.py"
                 )
@@ -38,27 +41,25 @@ export class ElectronApp {
 
     public start(): void {
 
-        app.whenReady().then(async () => {
+        app.whenReady()
+            .then(async () => {
+                try {
+                    new IpcHandlers(this.pythonServer).register();
 
-            try {
+                    this.configurePython();
 
-                new IpcHandlers(this.pythonServer).register();
+                    await this.pythonServer.start();
 
-                this.configurePython();
-
-                await this.pythonServer.start();
-
-                this.window = this.windowManager.create();
-
-            } catch (error) {
-
-                console.error("Failed to start Python server:", error);
-
+                    this.window = this.windowManager.create();
+                } catch (error) {
+                    console.error("Failed to start Python server:", error);
+                    app.quit();
+                }
+            })
+            .catch((error: unknown) => {
+                console.error("Unexpected startup error:", error);
                 app.quit();
-
-            }
-
-        });
+            });
 
         app.on("window-all-closed", () => {
 
