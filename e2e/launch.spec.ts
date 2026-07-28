@@ -25,7 +25,7 @@ test.describe("Application Launch", () => {
 
         await expect(window).toHaveTitle(/.+/);
 
-        expect(await app.windows()).toHaveLength(1);
+        expect(app.windows()).toHaveLength(1);
 
     });
 

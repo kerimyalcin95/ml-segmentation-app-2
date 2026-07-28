@@ -11,7 +11,7 @@ export class ElectronApp {
     private readonly pythonServer: PythonServer;
     private readonly windowManager: WindowManager;
 
-    private window?: BrowserWindow;
+    private window?: BrowserWindow | undefined;
 
     public constructor() {
 
@@ -41,7 +41,7 @@ export class ElectronApp {
 
     public start(): void {
 
-        app.whenReady()
+        void app.whenReady()
             .then(async () => {
                 try {
                     new IpcHandlers(this.pythonServer).register();
@@ -51,6 +51,18 @@ export class ElectronApp {
                     await this.pythonServer.start();
 
                     this.window = this.windowManager.create();
+
+                    this.window.on("closed", () => {
+                        this.window = undefined;
+                    });
+
+                    app.on("activate", () => {
+
+                        if (BrowserWindow.getAllWindows().length === 0) {
+                            this.window = this.windowManager.create();
+                        }
+
+                    });
                 } catch (error) {
                     console.error("Failed to start Python server:", error);
                     app.quit();
@@ -63,11 +75,19 @@ export class ElectronApp {
 
         app.on("window-all-closed", () => {
 
-            this.pythonServer.stop();
+            void (async () => {
 
-            if (process.platform !== "darwin") {
-                app.quit();
-            }
+                try {
+                    await this.pythonServer.stop();
+                } catch (error) {
+                    console.error("Failed to stop Python server:", error);
+                }
+
+                if (process.platform !== "darwin") {
+                    app.quit();
+                }
+
+            })();
 
         });
 
@@ -79,6 +99,8 @@ export class ElectronApp {
 
             if (
                 this.window &&
+                !this.window.isDestroyed() &&
+                !this.window.webContents.isDestroyed() &&
                 !this.window.webContents.isLoading()
             ) {
                 this.window.webContents.send(

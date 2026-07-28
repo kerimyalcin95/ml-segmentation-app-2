@@ -1,5 +1,6 @@
 import { spawn, ChildProcessWithoutNullStreams } from "node:child_process";
 import WebSocket from "ws";
+import { once } from "node:events";
 
 export class PythonServer {
 
@@ -13,9 +14,7 @@ export class PythonServer {
 
     public constructor(
         private readonly pythonPath: string
-    ) {
-        this.pythonPath = pythonPath;
-    }
+    ) { }
 
     public async start(): Promise<void> {
 
@@ -152,18 +151,43 @@ export class PythonServer {
 
     }
 
-    public disconnect(): void {
+    public async disconnect(): Promise<void> {
 
-        this.webSocket?.close();
+        const socket = this.webSocket;
+
+        if (!socket) {
+            return;
+        }
+
         this.webSocket = undefined;
+
+        if (
+            socket.readyState === WebSocket.CLOSED ||
+            socket.readyState === WebSocket.CLOSING
+        ) {
+            return;
+        }
+
+        socket.close();
+
+        await once(socket, "close");
     }
 
-    public stop(): void {
+    public async stop(): Promise<void> {
 
-        this.disconnect();
+        await this.disconnect();
 
-        this.pythonProcess?.kill();
+        const process = this.pythonProcess;
+
+        if (!process) {
+            return;
+        }
+
         this.pythonProcess = undefined;
+
+        process.kill();
+
+        await once(process, "exit");
     }
 
     public send(message: string): void {

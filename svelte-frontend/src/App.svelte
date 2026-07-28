@@ -35,7 +35,7 @@ onMount(() => {
         <Separator orientation="vertical" />
         <CanvasView
             bind:mode
-            onCanvasReady={(canvasManager) => (canvas = canvasManager)}
+            onCanvasReady={(canvasManager: CanvasManager) => (canvas = canvasManager)}
         />
     </div>
 

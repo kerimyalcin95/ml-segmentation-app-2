@@ -14,10 +14,10 @@ describe("PythonServer integration", () => {
 
     });
 
-    afterEach(() => {
+    afterEach(async () => {
 
-        server.disconnect();
-        server.stop();
+        await server.disconnect();
+        await server.stop();
 
     });
 

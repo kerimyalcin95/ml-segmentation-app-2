@@ -10,19 +10,10 @@ const typeAwareParserOptions = {
     tsconfigRootDir: import.meta.dirname,
 };
 
-export default tseslint.config(
+export default defineConfig(
     {
         ignores: [
-            "node_modules",
-            "svelte-frontend/node_modules",
-            "dist",
-            "svelte-frontend/dist",
-            "svelte-frontend/public",
-            "assets",
-            "make",
-            ".svelte-kit",
-            "build",
-            "svelte-frontend/stats.html",
+            // ...
         ],
     },
 
@@ -51,27 +42,29 @@ export default tseslint.config(
             ...config.languageOptions,
             parser: svelteParser,
             parserOptions: {
+                ...(config.languageOptions?.parserOptions ?? {}),
                 parser: tseslint.parser,
-                ...typeAwareParserOptions,
+                projectService: true,
+                tsconfigRootDir: import.meta.dirname,
+                extraFileExtensions: [".svelte"],
             },
         },
     })),
 
     {
         files: [
-            "src/**/*.{ts,svelte}",
-            "svelte-frontend/**/*.{ts,svelte}",
+            "src/**/*.ts",
+            "svelte-frontend/**/*.ts",
         ],
         rules: {
-            "@typescript-eslint/prefer-as-const": "warn",
-            "no-multiple-empty-lines": [
-                "error",
-                {
-                    max: 1,
-                    maxEOF: 0,
-                    maxBOF: 0,
-                },
-            ],
+
         },
     },
+    {
+
+        files: ["svelte-frontend/**/*.svelte"],
+        rules: {
+            "@typescript-eslint/no-useless-default-assignment": "off",
+        },
+    }
 );

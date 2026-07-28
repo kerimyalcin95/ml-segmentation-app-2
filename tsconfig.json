@@ -27,6 +27,7 @@
     "src/**/*.d.ts",
     "src/**/*.cts",
     "src/**/*.d.cts",
+    "e2e/**/*.ts",
     "eslint.config.ts",
     "vitest.config.ts"
   ]
