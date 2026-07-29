@@ -1,5 +1,5 @@
 import Konva from 'konva';
-import { Camera, type CameraState } from "./camera";
+import { Camera } from "./camera";
 
 export class CanvasManager {
     private stage: Konva.Stage;
@@ -16,7 +16,11 @@ export class CanvasManager {
         height: 0,
     };
 
-    private camera: Camera;
+    private readonly _camera: Camera;
+
+    get camera(): Camera {
+        return this._camera;
+    }
 
     private documentRotation = 0;
 
@@ -61,7 +65,7 @@ export class CanvasManager {
             this.layer
         );
 
-        this.camera = new Camera(
+        this._camera = new Camera(
             this.stage,
             this.layer,
             this.cameraGroup,
@@ -71,7 +75,7 @@ export class CanvasManager {
 
     // Canvas, Stage
 
-    resizeCanvas(width: number, height: number) {
+    resize(width: number, height: number) {
         this.stage.size({
             width,
             height,
@@ -80,7 +84,7 @@ export class CanvasManager {
         this.camera.refresh();
     }
 
-    destroyStage() {
+    destroy() {
         this.stage.destroy();
     }
 
@@ -148,34 +152,6 @@ export class CanvasManager {
         callback: (width: number, height: number) => void
     ) {
         this.documentResizeCallback = callback;
-    }
-
-    // Camera
-
-    setCamera(camera: CameraState) {
-        this.camera.set(camera);
-    }
-
-    getCamera(): CameraState {
-        return this.camera.get();
-    }
-
-    setCameraZoom(
-        zoom: number,
-        centerX: number,
-        centerY: number,
-    ) {
-        this.camera.setZoom(
-            zoom,
-            centerX,
-            centerY
-        );
-    }
-
-    onCameraChange(
-        callback: (camera: CameraState) => void
-    ) {
-        this.camera.onChange(callback);
     }
 
     // Image editing

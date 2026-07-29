@@ -8,11 +8,21 @@ export interface CameraState {
 
 export class Camera {
 
-    private state: CameraState = {
+    private _state: CameraState = {
         x: 0,
         y: 0,
         zoom: 1,
     };
+
+    get state(): CameraState {
+        return this._state;
+    }
+
+    set(state: CameraState): void {
+        this._state = { ...state };
+
+        this.refresh();
+    }
 
     private callback?: (
         camera: CameraState
@@ -24,16 +34,6 @@ export class Camera {
         private cameraGroup: Konva.Group,
         private documentGroup: Konva.Group
     ) { }
-
-    set(state: CameraState): void {
-        this.state = { ...state };
-
-        this.refresh();
-    }
-
-    get(): CameraState {
-        return { ...this.state };
-    }
 
     private clamp(): void {
 
@@ -124,7 +124,7 @@ export class Camera {
     }
 
     private notify(): void {
-        this.callback?.(this.get());
+        this.callback?.(this.state);
     }
 
     refresh(): void {
