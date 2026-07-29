@@ -17,7 +17,7 @@ let { onCanvasReady }: Props = $props();
 let viewport: HTMLDivElement;
 let canvasElement: HTMLDivElement;
 
-let canvas: CanvasManager;
+let canvas!: CanvasManager;
 
 let viewportSize = $state({
     width: 0,
@@ -51,14 +51,14 @@ function updateViewport() {
     viewportSize.width = width;
     viewportSize.height = height;
 
-    canvas?.resizeCanvas(width, height);
+    canvas.resizeCanvas(width, height);
 
-    scroll.x = canvas?.getCamera().x ?? 0;
-    scroll.y = canvas?.getCamera().y ?? 0;
+    scroll.x = canvas.getCamera().x;
+    scroll.y = canvas.getCamera().y;
 }
 
 function updateCamera() {
-    canvas?.setCamera({
+    canvas.setCamera({
         x: scroll.x,
         y: scroll.y,
         zoom,
@@ -81,7 +81,7 @@ function handleWheel(event: WheelEvent) {
             ? Math.min(5, zoom * factor)
             : Math.max(0.1, zoom / factor);
 
-    canvas?.setCameraZoom(newZoom, centerX, centerY);
+    canvas.setCameraZoom(newZoom, centerX, centerY);
 }
 
 onMount(() => {
@@ -154,7 +154,7 @@ onMount(() => {
             viewportSize={viewportSize.width}
             contentSize={contentWidth}
             position={scroll.x}
-            onChange={(x) => {
+            onChange={(x: number) => {
                 scroll.x = x;
                 updateCamera();
             }}
@@ -167,7 +167,7 @@ onMount(() => {
             viewportSize={viewportSize.height}
             contentSize={contentHeight}
             position={scroll.y}
-            onChange={(y) => {
+            onChange={(y: number) => {
                 scroll.y = y;
                 updateCamera();
             }}
