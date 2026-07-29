@@ -10,6 +10,20 @@ export enum DocumentChange {
     Camera
 }
 
+interface CropState {
+    x: number;
+    y: number;
+    width: number;
+    height: number;
+}
+
+interface ImageState {
+    width: number;
+    height: number;
+    crop: CropState;
+    grayscale: boolean;
+}
+
 export class Document {
     private readonly _group: Konva.Group;
     readonly events = mitt<CanvasEvents>();
@@ -24,7 +38,7 @@ export class Document {
     private readonly renderCanvas = document.createElement("canvas");
     private readonly renderContext;
 
-    private imageState = {
+    private imageState: ImageState = {
         width: 0,
         height: 0,
 
@@ -135,7 +149,18 @@ export class Document {
         this.updateDocumentTransformOrigin();
     }
 
-    // Image utility helpers
+    private updateDocumentSize(
+        width: number,
+        height: number,
+    ): void {
+        this.imageState.width = width;
+        this.imageState.height = height;
+
+        this.documentSize.width = width;
+        this.documentSize.height = height;
+    }
+
+    // Rendering
 
     private prepareRenderCanvas(): void {
         this.renderCanvas.width = this.imageState.width;
@@ -162,8 +187,6 @@ export class Document {
         this.imageNode.offsetX(this.imageState.width / 2);
         this.imageNode.offsetY(this.imageState.height / 2);
     }
-
-    // Image editing
 
     private renderImage(): void {
         if (!this.originalImage) return;
@@ -214,6 +237,8 @@ export class Document {
         this.imageNode.filters(filters);
         this.imageNode.cache();
     }
+
+    // Image operations
 
     loadImage(path: string) {
         const image = new window.Image();
@@ -308,11 +333,7 @@ export class Document {
     }
 
     resizeImage(width: number, height: number) {
-        this.imageState.width = width;
-        this.imageState.height = height;
-
-        this.documentSize.width = width;
-        this.documentSize.height = height;
+        this.updateDocumentSize(width, height);
 
         this.renderImage();
 
@@ -343,11 +364,7 @@ export class Document {
             height,
         };
 
-        this.imageState.width = width;
-        this.imageState.height = height;
-
-        this.documentSize.width = width;
-        this.documentSize.height = height;
+        this.updateDocumentSize(width, height);
 
         this.renderImage();
 
