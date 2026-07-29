@@ -8,3 +8,4 @@ make/
 .pytest_cache/
 playwright-report/
 test-results/
+.code

@@ -14,6 +14,8 @@ export class Camera {
         zoom: 1,
     };
 
+    private _group: Konva.Group;
+
     get state(): CameraState {
         return this._state;
     }
@@ -24,6 +26,10 @@ export class Camera {
         this.refresh();
     }
 
+    get group(): Konva.Group {
+        return this._group;
+    }
+
     private callback?: (
         camera: CameraState
     ) => void;
@@ -31,15 +37,20 @@ export class Camera {
     constructor(
         private stage: Konva.Stage,
         private layer: Konva.Layer,
-        private cameraGroup: Konva.Group,
         private documentGroup: Konva.Group
-    ) { }
+    ) {
+        this._group = new Konva.Group();
+
+        this._group.add(
+            documentGroup
+        );
+     }
 
     private clamp(): void {
 
         const rect =
             this.documentGroup.getClientRect({
-                relativeTo: this.cameraGroup,
+                relativeTo: this._group,
             });
 
         const contentWidth =
@@ -110,12 +121,12 @@ export class Camera {
     }
 
     private apply(): void {
-        this.cameraGroup.scale({
+        this._group.scale({
             x: this.state.zoom,
             y: this.state.zoom,
         });
 
-        this.cameraGroup.position({
+        this._group.position({
             x: -this.state.x,
             y: -this.state.y,
         });

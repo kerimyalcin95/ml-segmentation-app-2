@@ -21,7 +21,7 @@ $effect(() => {
 });
 
 function resize() {
-    canvas.resizeImage(Number(width), Number(height));
+    canvas.document.resizeImage(width, height);
 }
 </script>
 

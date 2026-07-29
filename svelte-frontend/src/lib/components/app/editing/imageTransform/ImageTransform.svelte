@@ -16,11 +16,11 @@ interface Props {
 let { canvas }: Props = $props();
 
 function rotate(angle: number) {
-    canvas.rotateImage(angle);
+    canvas.document.rotateImage(angle);
 }
 
 function flip(horizontal: boolean, vertical: boolean) {
-    canvas.flipImage(horizontal, vertical);
+    canvas.document.flipImage(horizontal, vertical);
 }
 </script>
 

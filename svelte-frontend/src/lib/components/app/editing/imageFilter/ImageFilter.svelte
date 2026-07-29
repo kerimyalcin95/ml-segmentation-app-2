@@ -25,8 +25,8 @@ let currentFilter = $derived(
     activeFilters.find((filter) => filter.id === selectedFilterId),
 );
 
-function applyFilters() {
-    canvas.setImageFilterGrayscale(true);
+function applyFilters(): void {
+    canvas.document.setFilterGrayscale(true);
 }
 </script>
 

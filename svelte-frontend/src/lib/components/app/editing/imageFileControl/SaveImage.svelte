@@ -16,7 +16,7 @@ async function saveImage() {
         return;
     }
 
-    const imageData = canvas.saveImage();
+    const imageData = canvas.document.saveImage();
 
     const path = await window.electronAPI.saveImage(imageData);
 

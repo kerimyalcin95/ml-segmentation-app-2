@@ -28,7 +28,7 @@ $effect(() => {
 });
 
 function crop() {
-    canvas.cropImage(x, y, width, height);
+    canvas.document.cropImage(x, y, width, height);
 }
 </script>
 

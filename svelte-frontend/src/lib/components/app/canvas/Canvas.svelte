@@ -104,11 +104,11 @@ onMount(() => {
         scroll.y = Math.round(Math.max(0, Math.min(state.y, newMaxScrollY)));
     });
 
-    canvas.onDocumentResize((width, height) => {
+    canvas.document.events.on('documentResize', ({ width, height }) => {
         documentSize.width = width;
         documentSize.height = height;
 
-        transformedDocumentSize = canvas.getDocumentSize();
+        transformedDocumentSize = canvas.document.getDocumentSize();
     });
 
     const observer = new ResizeObserver(() => {

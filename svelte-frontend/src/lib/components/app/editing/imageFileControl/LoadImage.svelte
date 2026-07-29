@@ -20,7 +20,7 @@ async function loadImage() {
 
     if (!path) return;
 
-    canvas.loadImage(path);
+    canvas.document.loadImage(path);
 }
 </script>
 

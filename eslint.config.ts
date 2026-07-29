@@ -57,7 +57,7 @@ export default defineConfig(
             "svelte-frontend/**/*.ts",
         ],
         rules: {
-
+            "@typescript-eslint/no-unnecessary-type-parameters": "off",
         },
     },
     {
