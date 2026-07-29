@@ -246,9 +246,6 @@ export class Document {
         image.onload = () => {
             this.originalImage = image;
 
-            this.imageState.width = image.width;
-            this.imageState.height = image.height;
-
             this.imageState.crop = {
                 x: 0,
                 y: 0,
@@ -256,8 +253,7 @@ export class Document {
                 height: image.height,
             };
 
-            this.documentSize.width = image.width;
-            this.documentSize.height = image.height;
+            this.updateDocumentSize(image.width, image.height);
 
             this._group.destroyChildren();
 
