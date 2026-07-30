@@ -3,16 +3,15 @@ import { Button } from '$lib/components/ui/button';
 import * as Select from '$lib/components/ui/select';
 import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
 
-import { FilterType, type FilterState } from '$lib/types/filter';
+import {
+    FilterType,
+    type FilterState,
+    type ActiveFilter,
+} from '$lib/types/filter';
 
 interface Props {
     activeFilters: ActiveFilter[];
 }
-
-type ActiveFilter = {
-    id: number;
-    state: FilterState;
-};
 
 let { activeFilters }: Props = $props();
 
@@ -168,7 +167,7 @@ function addFilter() {
 
     activeFilters.push({
         id: Date.now(),
-        state: filter.create(),
+        ...filter.create(),
     });
 
     selectedFilter = '';

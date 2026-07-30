@@ -4,6 +4,10 @@ export type Filter = {
     value: number;
 };
 
+export type ActiveFilter = {
+    id: number;
+} & FilterState;
+
 export enum FilterType {
     Blur,
     Brighten,

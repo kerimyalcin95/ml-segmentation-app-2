@@ -2,20 +2,17 @@
 import { Button } from '$lib/components/ui/button';
 import { Card } from '$lib/components/ui/card';
 import { dndzone } from 'svelte-dnd-action';
+import type { DndEvent } from 'svelte-dnd-action';
 
-type Filter = {
-    id: number;
-    name: string;
-    value: number;
-};
+import { type ActiveFilter, FilterType } from '$lib/types/filter';
 
 interface Props {
-    activeFilters: Filter[];
+    activeFilters: ActiveFilter[];
     selectedFilterId: number | null;
 
-    onSelectFilter: (id: number) => void;
-    onFiltersChanged: (filters: Filter[]) => void;
-    onReorder: (filters: Filter[]) => void;
+    onSelectFilter: (id: number | null) => void;
+    onFiltersChanged: (filters: ActiveFilter[]) => void;
+    onReorder: (filters: ActiveFilter[]) => void;
 }
 
 let {
@@ -26,7 +23,7 @@ let {
     onReorder,
 }: Props = $props();
 
-function handleFilterReorder(event: CustomEvent) {
+function handleFilterReorder(event: CustomEvent<DndEvent<ActiveFilter>>): void {
     onReorder(event.detail.items);
 }
 
@@ -36,7 +33,7 @@ function removeFilter(id: number) {
     onFiltersChanged(newFilters);
 
     if (selectedFilterId === id) {
-        onSelectFilter(null as any);
+        onSelectFilter(null);
     }
 }
 </script>
@@ -61,7 +58,9 @@ function removeFilter(id: number) {
             hover:bg-accent
             {selectedFilterId === filter.id ? 'bg-accent' : ''}
             "
-            onclick={() => onSelectFilter(filter.id)}
+            onclick={() => {
+                onSelectFilter(filter.id);
+            }}
         >
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -70,14 +69,14 @@ function removeFilter(id: number) {
                     </span>
 
                     <span class="font-medium">
-                        {filter.name}
+                        {FilterType[filter.type]}
                     </span>
                 </div>
 
                 <Button
                     size="icon"
                     variant="destructive"
-                    onclick={(event) => {
+                    onclick={(event: MouseEvent) => {
                         event.stopPropagation();
                         removeFilter(filter.id);
                     }}

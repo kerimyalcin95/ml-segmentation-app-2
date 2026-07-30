@@ -6,7 +6,7 @@ import FilterSelect from '$lib/components/app/editing/imageFilter/FilterSelect.s
 import FilterDragList from '$lib/components/app/editing/imageFilter/FilterDragList.svelte';
 import FilterSettings from '$lib/components/app/editing/imageFilter/FilterSettings.svelte';
 
-import type { Filter } from '$lib/types/filter';
+import type { ActiveFilter } from '$lib/types/filter';
 import { CanvasManager } from '$lib/canvas/canvas';
 
 import CircleHalfIcon from 'phosphor-svelte/lib/CircleHalfIcon';
@@ -17,7 +17,7 @@ interface Props {
 
 let { canvas }: Props = $props();
 
-let activeFilters = $state<Filter[]>([]);
+let activeFilters = $state<ActiveFilter[]>([]);
 
 let selectedFilterId = $state<number | null>(null);
 
@@ -25,8 +25,12 @@ let currentFilter = $derived(
     activeFilters.find((filter) => filter.id === selectedFilterId),
 );
 
+
 function applyFilters(): void {
-    canvas.document.setFilterGrayscale(true);
+    canvas.document.setFilters(
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        activeFilters.map(({ id, ...filter }) => filter),
+    );
 }
 </script>
 
@@ -38,9 +42,15 @@ function applyFilters(): void {
         <FilterDragList
             {activeFilters}
             {selectedFilterId}
-            onSelectFilter={(id) => (selectedFilterId = id)}
-            onFiltersChanged={(filters) => (activeFilters = filters)}
-            onReorder={(filters) => (activeFilters = filters)}
+            onSelectFilter={(id: number | null) => {
+                selectedFilterId = id;
+            }}
+            onFiltersChanged={(filters: ActiveFilter[]) => {
+                activeFilters = filters;
+            }}
+            onReorder={(filters: ActiveFilter[]) => {
+                activeFilters = filters;
+            }}
         />
 
         <FilterSettings {currentFilter} />
