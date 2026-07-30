@@ -44,11 +44,11 @@ export class CanvasManager {
             this.layer
         );
 
-        this.document.events.on("refreshCamera", () => {
+        this.document._events.on("refreshCamera", () => {
             this.camera.refresh();
         });
 
-        this.document.events.on("redrawLayer", () => {
+        this.document._events.on("redrawLayer", () => {
             this.layer.batchDraw();
         });
 

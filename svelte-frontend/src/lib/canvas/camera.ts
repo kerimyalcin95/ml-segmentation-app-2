@@ -1,4 +1,6 @@
 import Konva from "konva";
+import mitt from "mitt";
+import { type CanvasEvents } from "./events";
 
 import { Workspace } from "./workspace";
 
@@ -15,8 +17,10 @@ export class Camera {
         y: 0,
         zoom: 1,
     };
-    
+
     private _group: Konva.Group;
+    
+    readonly events = mitt<CanvasEvents>();
 
     get state(): CameraState {
         return this._state;
@@ -128,18 +132,13 @@ export class Camera {
     }
 
     private notify(): void {
-        this.callback?.(this.state);
+        this.events.emit("cameraChange", {state: this._state});
     }
 
     refresh(): void {
         this.clamp();
         this.apply();
         this.notify();
-    }
-
-    onChange(
-        callback: (camera: CameraState) => void
-    ): void {
-        this.callback = callback;
+        
     }
 }

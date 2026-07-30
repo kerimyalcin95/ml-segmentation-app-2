@@ -1,4 +1,7 @@
+import { type CameraState } from "./camera";
+
 export type CanvasEvents = {
+    cameraChange: {state: CameraState};
     refreshCamera: undefined;
     redrawLayer: undefined;
 
@@ -6,4 +9,6 @@ export type CanvasEvents = {
         width: number;
         height: number;
     };
+
+    documentChange: undefined;
 };

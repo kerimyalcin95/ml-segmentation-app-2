@@ -42,9 +42,11 @@ interface DocumentState {
 type ImageFilters = Parameters<Konva.Image["filters"]>[0];
 
 export class Document {
+
+    // Getter/Setter variables
     private readonly _group: Konva.Group;
     private _workspace: Workspace;
-
+    readonly _events = mitt<CanvasEvents>();
 
     get group(): Konva.Group {
         return this._group;
@@ -54,8 +56,12 @@ export class Document {
         return this._workspace;
     }
 
+    get events() {
+        return this._events;
+    }
+
+    // Private member variables
     private imageNode?: Konva.Image;
-    readonly events = mitt<CanvasEvents>();
 
     private originalImage?: HTMLImageElement;
     private readonly documentCanvas = document.createElement("canvas");
@@ -100,18 +106,6 @@ export class Document {
 
         this.documentContext = context;
         this._workspace = new Workspace();
-    }
-
-    // Callbacks
-
-    private changeCallback?: (change: DocumentChange) => void;
-
-    private notifyChange(change: DocumentChange): void {
-        this.changeCallback?.(change);
-    }
-
-    onChange(callback: (change: DocumentChange) => void): void {
-        this.changeCallback = callback;
     }
 
     // Functions
@@ -239,7 +233,7 @@ export class Document {
 
         this.applyImageFilters();
 
-        this.events.emit("redrawLayer");
+        this._events.emit("redrawLayer");
     }
 
     private drawImage(): void {
@@ -305,12 +299,12 @@ export class Document {
             this.applyDocumentTransform();
             this.updateWorkspace();
 
-            this.events.emit("documentResize", {
+            this._events.emit("documentResize", {
                 width: image.width,
                 height: image.height,
             });
 
-            this.notifyChange(DocumentChange.Camera);
+            this._events.emit("documentChange");
         };
 
         image.src = `file://${path}`;
@@ -349,7 +343,7 @@ export class Document {
         camera.group.scale(oldScale);
         camera.group.position(oldPosition);
 
-        this.events.emit("redrawLayer");
+        this._events.emit("redrawLayer");
 
         return data;
     }
@@ -364,12 +358,12 @@ export class Document {
 
         const size = this.getDocumentBoundsSize();
 
-        this.events.emit("documentResize", {
+        this._events.emit("documentResize", {
             width: size.width,
             height: size.height,
         });
 
-        this.events.emit("refreshCamera");
+        this._events.emit("refreshCamera");
     }
 
     cropImage(
@@ -394,12 +388,12 @@ export class Document {
         this.applyDocumentTransform();
         this.updateWorkspace();
 
-        this.events.emit("documentResize", {
+        this._events.emit("documentResize", {
             width: width,
             height: height,
         });
 
-        this.events.emit("refreshCamera");
+        this._events.emit("refreshCamera");
     }
 
     rotateImage(angle: number) {
@@ -412,12 +406,12 @@ export class Document {
         this.applyDocumentTransform();
         this.updateWorkspace();
 
-        this.events.emit("documentResize", {
+        this._events.emit("documentResize", {
             width: this.getDocumentBoundsSize().width,
             height: this.getDocumentBoundsSize().height
         });
 
-        this.notifyChange(DocumentChange.Camera);
+        this._events.emit("documentChange");
     }
 
     flipImage(
@@ -440,7 +434,7 @@ export class Document {
         this.updateWorkspace();
 
         this.imageNode.cache();
-        this.events.emit("refreshCamera");
+        this._events.emit("refreshCamera");
     }
 
     // Filter
