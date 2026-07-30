@@ -2,7 +2,10 @@
 import { onMount } from 'svelte';
 
 import { CanvasManager } from '$lib/canvas/canvas';
-import { documentSize, workspaceSize } from '$lib/components/stores/canvasStore.svelte';
+import {
+    documentSize,
+    workspaceSize,
+} from '$lib/components/stores/canvasStore.svelte';
 
 import HorizontalScrollBar from './HorizontalScrollBar.svelte';
 import VerticalScrollBar from './VerticalScrollBar.svelte';
@@ -89,23 +92,11 @@ onMount(() => {
     canvas.camera.events.on('cameraChange', ({ state }) => {
         zoom = state.zoom;
 
-        const newMaxScrollX = Math.max(
-            0,
-            workspaceSize.width * zoom - viewportSize.width,
-        );
-
-        const newMaxScrollY = Math.max(
-            0,
-            workspaceSize.height * zoom - viewportSize.height,
-        );
-
-        scroll.x = Math.round(Math.max(0, Math.min(state.x, newMaxScrollX)));
-        scroll.y = Math.round(Math.max(0, Math.min(state.y, newMaxScrollY)));
-
-        console.log("scroll", scroll.x, scroll.y);
+        scroll.x = state.x;
+        scroll.y = state.y;
     });
 
-    canvas.document.events.on('workspaceChange', ({width, height}) => {
+    canvas.document.events.on('workspaceChange', ({ width, height }) => {
         workspaceSize.width = width;
         workspaceSize.height = height;
     });

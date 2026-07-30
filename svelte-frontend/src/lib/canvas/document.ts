@@ -193,15 +193,6 @@ export class Document {
             height: bounds.height + 2 * this.workspace.margin
         })
 
-        console.log(this.getDocumentBounds());
-
-        console.log({
-            left: this.workspace.left,
-            right: this.workspace.right,
-            top: this.workspace.top,
-            bottom: this.workspace.bottom,
-        });
-
         this._events.emit("workspaceChange", { width: this.workspace.width, height: this.workspace.height });
     }
 

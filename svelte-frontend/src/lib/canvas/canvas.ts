@@ -32,9 +32,10 @@ export class CanvasManager {
         this._camera = new Camera(
             this.stage,
             this.layer,
-            this.document.group,
             this.document.workspace
         )
+
+        this._camera.group.add(this._document.group);
 
         this.layer.add(
             this.camera.group
@@ -54,17 +55,9 @@ export class CanvasManager {
 
         this.document.events.on("documentChange", () => {
             this.camera.center();
-
-            console.log(this.camera.state);
-            console.log(this.camera.group.position());
-            console.log(this.stage.width(), this.stage.height());
         })
 
         this.camera.events.on("cameraChange", () => {
-            console.log("camera.state",this.camera.state);
-            console.log("camera.group.position",this.camera.group.position());
-            console.log("document.group.position",this.document.group.position());
-            console.log("canvas.state",this.stage.width(), this.stage.height());
         })
 
         contextContainer.register(CONTEXT.MainStage, this.stage);

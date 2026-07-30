@@ -36,61 +36,37 @@ export class Camera {
         return this._group;
     }
 
-    private callback?: (
-        camera: CameraState
-    ) => void;
-
     constructor(
         private stage: Konva.Stage,
         private layer: Konva.Layer,
-        private documentGroup: Konva.Group,
         private workspace: Workspace,
     ) {
         this._group = new Konva.Group();
-
-        this._group.add(
-            documentGroup
-        );
     }
 
     private clamp(): void {
+        const viewportWidth = this.stage.width();
+        const viewportHeight = this.stage.height();
 
-        const viewportWidth =
-            this.stage.width() /
-            this.state.zoom;
+        const maxX = Math.max(
+            0,
+            this.workspace.width * this.state.zoom - viewportWidth,
+        );
 
-        const viewportHeight =
-            this.stage.height() /
-            this.state.zoom;
+        const maxY = Math.max(
+            0,
+            this.workspace.height * this.state.zoom - viewportHeight,
+        );
 
-        const left = this.workspace.left;
-        const top = this.workspace.top;
-        const right = this.workspace.right;
-        const bottom = this.workspace.bottom;
+        this.state.x = Math.max(
+            0,
+            Math.min(this.state.x, maxX),
+        );
 
-        const maxX =
-            right - viewportWidth;
-
-        const maxY =
-            bottom - viewportHeight;
-
-        this.state.x =
-            Math.max(
-                left,
-                Math.min(
-                    this.state.x,
-                    maxX
-                )
-            );
-
-        this.state.y =
-            Math.max(
-                top,
-                Math.min(
-                    this.state.y,
-                    maxY
-                )
-            );
+        this.state.y = Math.max(
+            0,
+            Math.min(this.state.y, maxY),
+        );
     }
 
     center(): void {
@@ -101,11 +77,9 @@ export class Camera {
             this.stage.height() / this.state.zoom;
 
         this.state.x =
-            this.workspace.left +
             (this.workspace.width - viewportWidth) / 2;
 
         this.state.y =
-            this.workspace.top +
             (this.workspace.height - viewportHeight) / 2;
 
         this.refresh();
@@ -154,7 +128,7 @@ export class Camera {
     }
 
     refresh(): void {
-        //this.clamp();
+        this.clamp();
         this.apply();
         this.notify();
 
