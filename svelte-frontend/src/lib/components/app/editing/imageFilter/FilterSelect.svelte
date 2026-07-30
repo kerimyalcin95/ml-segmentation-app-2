@@ -1,36 +1,159 @@
 <script lang="ts">
 import { Button } from '$lib/components/ui/button';
 import * as Select from '$lib/components/ui/select';
-import PlusIcon from "phosphor-svelte/lib/PlusIcon";
+import PlusIcon from 'phosphor-svelte/lib/PlusIcon';
 
-type Filter = {
-    id: number;
-    name: string;
-    value: number;
-};
+import { FilterType, type FilterState } from '$lib/types/filter';
 
 interface Props {
-    activeFilters: Filter[];
+    activeFilters: ActiveFilter[];
 }
+
+type ActiveFilter = {
+    id: number;
+    state: FilterState;
+};
 
 let { activeFilters }: Props = $props();
 
-const availableFilters = [
-    {
-        name: 'Brightness',
-        defaultValue: 0,
-    },
+const availableFilters: {
+    name: string;
+    create: () => FilterState;
+}[] = [
     {
         name: 'Blur',
-        defaultValue: 10,
+        create: () => ({
+            type: FilterType.Blur,
+            blurRadius: 10,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Brighten',
+        create: () => ({
+            type: FilterType.Brighten,
+            brightness: 0,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
     },
     {
         name: 'Contrast',
-        defaultValue: 0,
+        create: () => ({
+            type: FilterType.Contrast,
+            contrast: 0,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Enhance',
+        create: () => ({
+            type: FilterType.Enhance,
+            enhance: 0,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
     },
     {
         name: 'Grayscale',
-        defaultValue: 100,
+        create: () => ({
+            type: FilterType.Grayscale,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'HSL',
+        create: () => ({
+            type: FilterType.HSL,
+            hue: 0,
+            saturation: 0,
+            luminance: 0,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Invert',
+        create: () => ({
+            type: FilterType.Invert,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Mask',
+        create: () => ({
+            type: FilterType.Mask,
+            threshold: 0.5,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Noise',
+        create: () => ({
+            type: FilterType.Noise,
+            noise: 0,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Pixelate',
+        create: () => ({
+            type: FilterType.Pixelate,
+            pixelSize: 8,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Posterize',
+        create: () => ({
+            type: FilterType.Posterize,
+            levels: 0.5,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'RGB',
+        create: () => ({
+            type: FilterType.RGB,
+            red: 0,
+            green: 0,
+            blue: 0,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Sepia',
+        create: () => ({
+            type: FilterType.Sepia,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Solarize',
+        create: () => ({
+            type: FilterType.Solarize,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
+    },
+    {
+        name: 'Threshold',
+        create: () => ({
+            type: FilterType.Threshold,
+            threshold: 0.5,
+            opacity: 1,
+            blendMode: 'source-over',
+        }),
     },
 ];
 
@@ -45,8 +168,7 @@ function addFilter() {
 
     activeFilters.push({
         id: Date.now(),
-        name: filter.name,
-        value: filter.defaultValue,
+        state: filter.create(),
     });
 
     selectedFilter = '';
@@ -70,7 +192,7 @@ function addFilter() {
         </Select.Root>
 
         <Button size="icon" onclick={addFilter}>
-            <PlusIcon weight="bold"/>
+            <PlusIcon weight="bold" />
         </Button>
     </div>
 </div>
