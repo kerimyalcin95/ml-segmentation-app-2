@@ -5,6 +5,7 @@ import type { CanvasEvents } from "./events";
 import { CONTEXT, contextContainer } from "./container"
 import { Camera } from "./camera";
 import { type FilterState, FilterType } from '$lib/types/filter';
+import { Workspace } from './workspace';
 
 export enum DocumentChange {
     Layer,
@@ -42,13 +43,19 @@ type ImageFilters = Parameters<Konva.Image["filters"]>[0];
 
 export class Document {
     private readonly _group: Konva.Group;
-    readonly events = mitt<CanvasEvents>();
+    private _workspace: Workspace;
+
 
     get group(): Konva.Group {
         return this._group;
     }
 
+    get workspace(): Workspace {
+        return this._workspace;
+    }
+
     private imageNode?: Konva.Image;
+    readonly events = mitt<CanvasEvents>();
 
     private originalImage?: HTMLImageElement;
     private readonly documentCanvas = document.createElement("canvas");
@@ -92,6 +99,7 @@ export class Document {
         }
 
         this.documentContext = context;
+        this._workspace = new Workspace();
     }
 
     // Callbacks
@@ -123,7 +131,7 @@ export class Document {
         };
     }
 
-    getdocumentBoundsSize() {
+    getDocumentBoundsSize() {
         const bounds = this.getDocumentBounds();
 
         return {
@@ -176,6 +184,19 @@ export class Document {
 
         this.state.size.width = width;
         this.state.size.height = height;
+    }
+
+    private updateWorkspace(): void {
+        this.workspace.setBounds(
+            this.getDocumentBounds()
+        );
+    }
+
+    getWorkspaceBoundsSize() {
+        return {
+            width: this._workspace.width,
+            height: this._workspace.height
+        }
     }
 
     // Rendering
@@ -281,6 +302,8 @@ export class Document {
             );
 
             this.renderImage();
+            this.applyDocumentTransform();
+            this.updateWorkspace();
 
             this.events.emit("documentResize", {
                 width: image.width,
@@ -337,8 +360,9 @@ export class Document {
         this.renderImage();
 
         this.applyDocumentTransform();
+        this.updateWorkspace()
 
-        const size = this.getdocumentBoundsSize();
+        const size = this.getDocumentBoundsSize();
 
         this.events.emit("documentResize", {
             width: size.width,
@@ -368,6 +392,7 @@ export class Document {
         this.renderImage();
 
         this.applyDocumentTransform();
+        this.updateWorkspace();
 
         this.events.emit("documentResize", {
             width: width,
@@ -385,10 +410,11 @@ export class Document {
             ) % 360;
 
         this.applyDocumentTransform();
+        this.updateWorkspace();
 
         this.events.emit("documentResize", {
-            width: this.getdocumentBoundsSize().width,
-            height: this.getdocumentBoundsSize().height
+            width: this.getDocumentBoundsSize().width,
+            height: this.getDocumentBoundsSize().height
         });
 
         this.notifyChange(DocumentChange.Camera);
@@ -411,6 +437,8 @@ export class Document {
         }
 
         this.applyDocumentTransform();
+        this.updateWorkspace();
+
         this.imageNode.cache();
         this.events.emit("refreshCamera");
     }

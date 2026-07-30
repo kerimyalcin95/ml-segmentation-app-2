@@ -108,7 +108,7 @@ onMount(() => {
         documentSize.width = width;
         documentSize.height = height;
 
-        transformedDocumentSize = canvas.document.getDocumentSize();
+        transformedDocumentSize = canvas.document.getWorkspaceBoundsSize();
     });
 
     const observer = new ResizeObserver(() => {

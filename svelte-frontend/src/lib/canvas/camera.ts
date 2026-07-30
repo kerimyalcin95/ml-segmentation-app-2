@@ -1,5 +1,7 @@
 import Konva from "konva";
 
+import { Workspace } from "./workspace";
+
 export interface CameraState {
     x: number;
     y: number;
@@ -13,7 +15,7 @@ export class Camera {
         y: 0,
         zoom: 1,
     };
-
+    
     private _group: Konva.Group;
 
     get state(): CameraState {
@@ -37,49 +39,40 @@ export class Camera {
     constructor(
         private stage: Konva.Stage,
         private layer: Konva.Layer,
-        private documentGroup: Konva.Group
+        private documentGroup: Konva.Group,
+        private workspace: Workspace,
     ) {
         this._group = new Konva.Group();
 
         this._group.add(
             documentGroup
         );
-     }
+    }
 
     private clamp(): void {
 
-        const rect =
-            this.documentGroup.getClientRect({
-                relativeTo: this._group,
-            });
+        const viewportWidth =
+            this.stage.width() /
+            this.state.zoom;
 
-        const contentWidth =
-            rect.width * this.state.zoom;
+        const viewportHeight =
+            this.stage.height() /
+            this.state.zoom;
 
-        const contentHeight =
-            rect.height * this.state.zoom;
-
-        const offsetX =
-            Math.min(0, rect.x * this.state.zoom);
-
-        const offsetY =
-            Math.min(0, rect.y * this.state.zoom);
+        const left = this.workspace.left;
+        const top = this.workspace.top;
+        const right = this.workspace.right;
+        const bottom = this.workspace.bottom;
 
         const maxX =
-            Math.max(
-                0,
-                contentWidth + offsetX - this.stage.width()
-            );
+            right - viewportWidth;
 
         const maxY =
-            Math.max(
-                0,
-                contentHeight + offsetY - this.stage.height()
-            );
+            bottom - viewportHeight;
 
         this.state.x =
             Math.max(
-                0,
+                left,
                 Math.min(
                     this.state.x,
                     maxX
@@ -88,7 +81,7 @@ export class Camera {
 
         this.state.y =
             Math.max(
-                0,
+                top,
                 Math.min(
                     this.state.y,
                     maxY

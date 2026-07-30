@@ -32,8 +32,9 @@ export class CanvasManager {
         this._camera = new Camera(
             this.stage,
             this.layer,
-            this.document.group
-        );
+            this.document.group,
+            this.document.workspace
+        )
 
         this.layer.add(
             this.camera.group
