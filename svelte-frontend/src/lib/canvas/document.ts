@@ -4,6 +4,7 @@ import mitt from "mitt";
 import type { CanvasEvents } from "./events";
 import { CONTEXT, contextContainer } from "./container"
 import { Camera } from "./camera";
+import { type FilterState, FilterType } from '$lib/types/filter';
 
 export enum DocumentChange {
     Layer,
@@ -21,8 +22,23 @@ interface ImageState {
     width: number;
     height: number;
     crop: CropState;
-    grayscale: boolean;
+    filters: FilterState[];
 }
+
+interface DocumentState {
+    size: {
+        width: number;
+        height: number;
+    };
+    rotation: number;
+
+    flip: {
+        horizontal: boolean;
+        vertical: boolean;
+    };
+}
+
+type ImageFilters = Parameters<Konva.Image["filters"]>[0];
 
 export class Document {
     private readonly _group: Konva.Group;
@@ -35,8 +51,8 @@ export class Document {
     private imageNode?: Konva.Image;
 
     private originalImage?: HTMLImageElement;
-    private readonly renderCanvas = document.createElement("canvas");
-    private readonly renderContext;
+    private readonly documentCanvas = document.createElement("canvas");
+    private readonly documentContext;
 
     private imageState: ImageState = {
         width: 0,
@@ -49,31 +65,33 @@ export class Document {
             height: 0,
         },
 
-        grayscale: false,
+        filters: [],
     };
 
-    private documentSize = {
-        width: 0,
-        height: 0,
-    };
+    private state: DocumentState = {
+        size: {
+            width: 0,
+            height: 0,
+        },
 
-    private documentRotation = 0;
+        rotation: 0,
 
-    private documentFlip = {
-        horizontal: false,
-        vertical: false,
+        flip: {
+            horizontal: false,
+            vertical: false,
+        },
     };
 
     constructor() {
         this._group = new Konva.Group();
 
-        const context = this.renderCanvas.getContext("2d");
+        const context = this.documentCanvas.getContext("2d");
 
         if (!context) {
             throw new Error("Failed to create 2D rendering context.");
         }
 
-        this.renderContext = context;
+        this.documentContext = context;
     }
 
     // Callbacks
@@ -105,7 +123,7 @@ export class Document {
         };
     }
 
-    getDocumentSize() {
+    getdocumentBoundsSize() {
         const bounds = this.getDocumentBounds();
 
         return {
@@ -117,7 +135,7 @@ export class Document {
     private updateDocumentTransformOrigin() {
 
         const rotated =
-            Math.abs(this.documentRotation) % 180 === 90;
+            Math.abs(this.state.rotation) % 180 === 90;
 
         const width =
             rotated
@@ -138,39 +156,39 @@ export class Document {
     private applyDocumentTransform() {
 
         this._group.rotation(
-            this.documentRotation
+            this.state.rotation
         );
 
         this._group.scale({
-            x: this.documentFlip.horizontal ? -1 : 1,
-            y: this.documentFlip.vertical ? -1 : 1,
+            x: this.state.flip.horizontal ? -1 : 1,
+            y: this.state.flip.vertical ? -1 : 1,
         });
 
         this.updateDocumentTransformOrigin();
     }
 
-    private updateDocumentSize(
+    private updateDocumentState(
         width: number,
         height: number,
     ): void {
         this.imageState.width = width;
         this.imageState.height = height;
 
-        this.documentSize.width = width;
-        this.documentSize.height = height;
+        this.state.size.width = width;
+        this.state.size.height = height;
     }
 
     // Rendering
 
     private prepareRenderCanvas(): void {
-        this.renderCanvas.width = this.imageState.width;
-        this.renderCanvas.height = this.imageState.height;
+        this.documentCanvas.width = this.imageState.width;
+        this.documentCanvas.height = this.imageState.height;
 
-        this.renderContext.clearRect(
+        this.documentContext.clearRect(
             0,
             0,
-            this.renderCanvas.width,
-            this.renderCanvas.height,
+            this.documentCanvas.width,
+            this.documentCanvas.height,
         );
     }
 
@@ -179,7 +197,7 @@ export class Document {
             return;
         }
 
-        this.imageNode.image(this.renderCanvas);
+        this.imageNode.image(this.documentCanvas);
 
         this.imageNode.width(this.imageState.width);
         this.imageNode.height(this.imageState.height);
@@ -210,7 +228,7 @@ export class Document {
 
         const crop = this.imageState.crop;
 
-        this.renderContext.drawImage(
+        this.documentContext.drawImage(
             this.originalImage,
             crop.x,
             crop.y,
@@ -221,21 +239,6 @@ export class Document {
             this.imageState.width,
             this.imageState.height,
         );
-    }
-
-    private applyImageFilters(): void {
-        if (!this.imageNode) {
-            return;
-        }
-
-        const filters = [];
-
-        if (this.imageState.grayscale) {
-            filters.push(Konva.Filters.Grayscale);
-        }
-
-        this.imageNode.filters(filters);
-        this.imageNode.cache();
     }
 
     // Image operations
@@ -253,12 +256,12 @@ export class Document {
                 height: image.height,
             };
 
-            this.updateDocumentSize(image.width, image.height);
+            this.updateDocumentState(image.width, image.height);
 
             this._group.destroyChildren();
 
             this.imageNode = new Konva.Image({
-                image: this.renderCanvas,
+                image: this.documentCanvas,
                 x: 0,
                 y: 0,
                 width: image.width,
@@ -329,13 +332,13 @@ export class Document {
     }
 
     resizeImage(width: number, height: number) {
-        this.updateDocumentSize(width, height);
+        this.updateDocumentState(width, height);
 
         this.renderImage();
 
         this.applyDocumentTransform();
 
-        const size = this.getDocumentSize();
+        const size = this.getdocumentBoundsSize();
 
         this.events.emit("documentResize", {
             width: size.width,
@@ -360,7 +363,7 @@ export class Document {
             height,
         };
 
-        this.updateDocumentSize(width, height);
+        this.updateDocumentState(width, height);
 
         this.renderImage();
 
@@ -376,16 +379,16 @@ export class Document {
 
     rotateImage(angle: number) {
 
-        this.documentRotation =
+        this.state.rotation =
             (
-                this.documentRotation + angle
+                this.state.rotation + angle
             ) % 360;
 
         this.applyDocumentTransform();
 
         this.events.emit("documentResize", {
-            width: this.getDocumentSize().width,
-            height: this.getDocumentSize().height
+            width: this.getdocumentBoundsSize().width,
+            height: this.getdocumentBoundsSize().height
         });
 
         this.notifyChange(DocumentChange.Camera);
@@ -398,13 +401,13 @@ export class Document {
         if (!this.imageNode) return;
 
         if (horizontal) {
-            this.documentFlip.horizontal =
-                !this.documentFlip.horizontal;
+            this.state.flip.horizontal =
+                !this.state.flip.horizontal;
         }
 
         if (vertical) {
-            this.documentFlip.vertical =
-                !this.documentFlip.vertical;
+            this.state.flip.vertical =
+                !this.state.flip.vertical;
         }
 
         this.applyDocumentTransform();
@@ -412,9 +415,107 @@ export class Document {
         this.events.emit("refreshCamera");
     }
 
-    setFilterGrayscale(enabled: boolean) {
-        this.imageState.grayscale = enabled;
+    // Filter
+
+    addFilter(filter: FilterState): void {
+        this.imageState.filters.push(filter);
 
         this.renderImage();
+    }
+
+    setFilters(filters: FilterState[]): void {
+        this.imageState.filters = [...filters];
+
+        this.renderImage();
+    }
+
+    private applyImageFilters(): void {
+        if (!this.imageNode) {
+            return;
+        }
+
+        const filters: NonNullable<ImageFilters> = [];
+
+        for (const filter of this.imageState.filters) {
+            switch (filter.type) {
+                case FilterType.Blur:
+                    this.imageNode.blurRadius(filter.blurRadius);
+                    filters.push(Konva.Filters.Blur);
+                    break;
+
+                case FilterType.Brighten:
+                    this.imageNode.brightness(filter.brightness);
+                    filters.push(Konva.Filters.Brighten);
+                    break;
+
+                case FilterType.Contrast:
+                    this.imageNode.contrast(filter.contrast);
+                    filters.push(Konva.Filters.Contrast);
+                    break;
+
+                case FilterType.Enhance:
+                    this.imageNode.enhance(filter.enhance);
+                    filters.push(Konva.Filters.Enhance);
+                    break;
+
+                case FilterType.Grayscale:
+                    filters.push(Konva.Filters.Grayscale);
+                    break;
+
+                case FilterType.HSL:
+                    this.imageNode.hue(filter.hue);
+                    this.imageNode.saturation(filter.saturation);
+                    this.imageNode.luminance(filter.luminance);
+                    filters.push(Konva.Filters.HSL);
+                    break;
+
+                case FilterType.Invert:
+                    filters.push(Konva.Filters.Invert);
+                    break;
+
+                case FilterType.Mask:
+                    this.imageNode.threshold(filter.threshold);
+                    filters.push(Konva.Filters.Mask);
+                    break;
+
+                case FilterType.Noise:
+                    this.imageNode.noise(filter.noise);
+                    filters.push(Konva.Filters.Noise);
+                    break;
+
+                case FilterType.Pixelate:
+                    this.imageNode.pixelSize(filter.pixelSize);
+                    filters.push(Konva.Filters.Pixelate);
+                    break;
+
+                case FilterType.Posterize:
+                    this.imageNode.levels(filter.levels);
+                    filters.push(Konva.Filters.Posterize);
+                    break;
+
+                case FilterType.RGB:
+                    this.imageNode.red(filter.red);
+                    this.imageNode.green(filter.green);
+                    this.imageNode.blue(filter.blue);
+                    filters.push(Konva.Filters.RGB);
+                    break;
+
+                case FilterType.Sepia:
+                    filters.push(Konva.Filters.Sepia);
+                    break;
+
+                case FilterType.Solarize:
+                    filters.push(Konva.Filters.Solarize);
+                    break;
+
+                case FilterType.Threshold:
+                    this.imageNode.threshold(filter.threshold);
+                    filters.push(Konva.Filters.Threshold);
+                    break;
+            }
+        }
+
+        this.imageNode.filters(filters);
+        this.imageNode.cache();
     }
 }
