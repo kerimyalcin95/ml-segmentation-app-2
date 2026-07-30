@@ -19,7 +19,7 @@ export class Camera {
     };
 
     private _group: Konva.Group;
-    
+
     readonly events = mitt<CanvasEvents>();
 
     get state(): CameraState {
@@ -93,6 +93,24 @@ export class Camera {
             );
     }
 
+    center(): void {
+        const viewportWidth =
+            this.stage.width() / this.state.zoom;
+
+        const viewportHeight =
+            this.stage.height() / this.state.zoom;
+
+        this.state.x =
+            this.workspace.left +
+            (this.workspace.width - viewportWidth) / 2;
+
+        this.state.y =
+            this.workspace.top +
+            (this.workspace.height - viewportHeight) / 2;
+
+        this.refresh();
+    }
+
     setZoom(
         zoom: number,
         centerX: number,
@@ -132,13 +150,13 @@ export class Camera {
     }
 
     private notify(): void {
-        this.events.emit("cameraChange", {state: this._state});
+        this.events.emit("cameraChange", { state: this._state });
     }
 
     refresh(): void {
         this.clamp();
         this.apply();
         this.notify();
-        
+
     }
 }

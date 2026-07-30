@@ -109,7 +109,6 @@ export class Document {
     }
 
     // Functions
-
     private getDocumentBounds() {
         const camera = contextContainer.resolve<Camera>(CONTEXT.Camera);
         const rect =
@@ -134,7 +133,7 @@ export class Document {
         };
     }
 
-    private updateDocumentTransformOrigin() {
+    private updateDocumentTransformOrigin(): void {
 
         const rotated =
             Math.abs(this.state.rotation) % 180 === 90;
@@ -149,7 +148,11 @@ export class Document {
                 ? this.imageState.width
                 : this.imageState.height;
 
-        this._group.position({
+        if (!this.imageNode) {
+            return;
+        }
+
+        this.imageNode.offset({
             x: width / 2,
             y: height / 2,
         });
@@ -184,6 +187,24 @@ export class Document {
         this.workspace.setBounds(
             this.getDocumentBounds()
         );
+
+        console.log(this.getDocumentBounds());
+
+        console.log({
+            left: this.workspace.left,
+            right: this.workspace.right,
+            top: this.workspace.top,
+            bottom: this.workspace.bottom,
+        });
+
+        this._events.emit("documentChange");
+    }
+
+    private centerInWorkspace(): void {
+        this._group.position({
+            x: this.workspace.left + this.workspace.width / 2,
+            y: this.workspace.top + this.workspace.height / 2,
+        });
     }
 
     getWorkspaceBoundsSize() {
@@ -298,6 +319,7 @@ export class Document {
             this.renderImage();
             this.applyDocumentTransform();
             this.updateWorkspace();
+            this.centerInWorkspace();
 
             this._events.emit("documentResize", {
                 width: image.width,
@@ -354,7 +376,8 @@ export class Document {
         this.renderImage();
 
         this.applyDocumentTransform();
-        this.updateWorkspace()
+        this.updateWorkspace();
+        this.centerInWorkspace();
 
         const size = this.getDocumentBoundsSize();
 
@@ -387,6 +410,7 @@ export class Document {
 
         this.applyDocumentTransform();
         this.updateWorkspace();
+        this.centerInWorkspace();
 
         this._events.emit("documentResize", {
             width: width,
@@ -405,6 +429,7 @@ export class Document {
 
         this.applyDocumentTransform();
         this.updateWorkspace();
+        this.centerInWorkspace();
 
         this._events.emit("documentResize", {
             width: this.getDocumentBoundsSize().width,
@@ -432,6 +457,7 @@ export class Document {
 
         this.applyDocumentTransform();
         this.updateWorkspace();
+        this.centerInWorkspace();
 
         this.imageNode.cache();
         this._events.emit("refreshCamera");

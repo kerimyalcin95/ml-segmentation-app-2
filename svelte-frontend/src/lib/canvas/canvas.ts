@@ -52,6 +52,14 @@ export class CanvasManager {
             this.layer.batchDraw();
         });
 
+        this.document._events.on("documentChange", () => {
+            this.camera.center();
+
+            console.log(this.camera.state);
+            console.log(this.camera.group.position());
+            console.log(this.stage.width(), this.stage.height());
+        })
+
         contextContainer.register(CONTEXT.MainStage, this.stage);
         contextContainer.register(CONTEXT.Camera, this._camera);
         contextContainer.register(CONTEXT.Document, this._document);
