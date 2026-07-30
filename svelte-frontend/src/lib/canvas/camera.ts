@@ -154,7 +154,7 @@ export class Camera {
     }
 
     refresh(): void {
-        this.clamp();
+        //this.clamp();
         this.apply();
         this.notify();
 

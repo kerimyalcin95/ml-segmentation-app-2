@@ -46,7 +46,7 @@ export class Document {
     // Getter/Setter variables
     private readonly _group: Konva.Group;
     private _workspace: Workspace;
-    readonly _events = mitt<CanvasEvents>();
+    private readonly _events = mitt<CanvasEvents>();
 
     get group(): Konva.Group {
         return this._group;
@@ -184,9 +184,14 @@ export class Document {
     }
 
     private updateWorkspace(): void {
-        this.workspace.setBounds(
-            this.getDocumentBounds()
-        );
+        const bounds = this.getDocumentBoundsSize();
+
+        this.workspace.setBounds({
+            x: 0,
+            y: 0,
+            width: bounds.width + 2 * this.workspace.margin,
+            height: bounds.height + 2 * this.workspace.margin
+        })
 
         console.log(this.getDocumentBounds());
 
@@ -197,13 +202,13 @@ export class Document {
             bottom: this.workspace.bottom,
         });
 
-        this._events.emit("documentChange");
+        this._events.emit("workspaceChange", { width: this.workspace.width, height: this.workspace.height });
     }
 
     private centerInWorkspace(): void {
         this._group.position({
-            x: this.workspace.left + this.workspace.width / 2,
-            y: this.workspace.top + this.workspace.height / 2,
+            x: this.workspace.width / 2,
+            y: this.workspace.height / 2,
         });
     }
 

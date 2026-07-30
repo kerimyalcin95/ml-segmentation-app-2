@@ -44,20 +44,27 @@ export class CanvasManager {
             this.layer
         );
 
-        this.document._events.on("refreshCamera", () => {
+        this.document.events.on("refreshCamera", () => {
             this.camera.refresh();
         });
 
-        this.document._events.on("redrawLayer", () => {
+        this.document.events.on("redrawLayer", () => {
             this.layer.batchDraw();
         });
 
-        this.document._events.on("documentChange", () => {
+        this.document.events.on("documentChange", () => {
             this.camera.center();
 
             console.log(this.camera.state);
             console.log(this.camera.group.position());
             console.log(this.stage.width(), this.stage.height());
+        })
+
+        this.camera.events.on("cameraChange", () => {
+            console.log("camera.state",this.camera.state);
+            console.log("camera.group.position",this.camera.group.position());
+            console.log("document.group.position",this.document.group.position());
+            console.log("canvas.state",this.stage.width(), this.stage.height());
         })
 
         contextContainer.register(CONTEXT.MainStage, this.stage);

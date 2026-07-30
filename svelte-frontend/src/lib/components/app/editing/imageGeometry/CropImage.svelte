@@ -49,9 +49,19 @@ function crop() {
         </ToggleGroup.Item>
     </ToggleGroup.Root>
     <div class="grid grid-cols-2 gap-2">
-        <Input type="number" placeholder="Width" bind:value={width} disabled={!cropMode}/>
+        <Input
+            type="number"
+            placeholder="Width"
+            bind:value={width}
+            disabled={!cropMode}
+        />
 
-        <Input type="number" placeholder="Height" bind:value={height} disabled={!cropMode}/>
+        <Input
+            type="number"
+            placeholder="Height"
+            bind:value={height}
+            disabled={!cropMode}
+        />
     </div>
     <Button onclick={crop}>Apply Crop</Button>
 </div>

@@ -4,7 +4,7 @@ import { Input } from '$lib/components/ui/input';
 import { CanvasManager } from '$lib/canvas/canvas';
 import { documentSize } from '$lib/components/stores/canvasStore.svelte';
 
-import ResizeIcon from "phosphor-svelte/lib/ResizeIcon";
+import ResizeIcon from 'phosphor-svelte/lib/ResizeIcon';
 
 interface Props {
     canvas: CanvasManager;

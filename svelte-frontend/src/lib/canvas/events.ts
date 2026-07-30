@@ -11,4 +11,11 @@ export type CanvasEvents = {
     };
 
     documentChange: undefined;
+
+    workspaceChange: {
+        width: number;
+        height: number;
+    }
+
+    wheel: undefined;
 };

@@ -13,7 +13,11 @@ export class Workspace {
         height: 0,
     };
 
-    private margin = 2000;
+    private _margin = 500;
+
+    get margin() {
+        return this._margin;
+    }
 
     left = 0;
     top = 0;
@@ -21,7 +25,7 @@ export class Workspace {
     bottom = 0;
 
     setMargin(margin: number): void {
-        this.margin = margin;
+        this._margin = margin;
         this.update();
     }
 
@@ -31,10 +35,10 @@ export class Workspace {
     }
 
     private update(): void {
-        this.left = this.bounds.x - this.margin;
-        this.top = this.bounds.y - this.margin;
-        this.right = this.bounds.x + this.bounds.width + this.margin;
-        this.bottom = this.bounds.y + this.bounds.height + this.margin;
+        this.left = this.bounds.x - this._margin;
+        this.top = this.bounds.y - this._margin;
+        this.right = this.bounds.x + this.bounds.width + this._margin;
+        this.bottom = this.bounds.y + this.bounds.height + this._margin;
     }
 
     get width(): number {

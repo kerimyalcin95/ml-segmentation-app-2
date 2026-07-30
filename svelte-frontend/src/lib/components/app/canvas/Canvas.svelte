@@ -2,7 +2,7 @@
 import { onMount } from 'svelte';
 
 import { CanvasManager } from '$lib/canvas/canvas';
-import { documentSize } from '$lib/components/stores/canvasStore.svelte';
+import { documentSize, workspaceSize } from '$lib/components/stores/canvasStore.svelte';
 
 import HorizontalScrollBar from './HorizontalScrollBar.svelte';
 import VerticalScrollBar from './VerticalScrollBar.svelte';
@@ -73,7 +73,7 @@ function handleWheel(event: WheelEvent) {
 
     const centerY = event.clientY - rect.top;
 
-    const factor = 1.1;
+    const factor = 1.05;
 
     const newZoom =
         event.deltaY < 0
@@ -91,19 +91,26 @@ onMount(() => {
 
         const newMaxScrollX = Math.max(
             0,
-            documentSize.width * zoom - viewportSize.width,
+            workspaceSize.width * zoom - viewportSize.width,
         );
 
         const newMaxScrollY = Math.max(
             0,
-            documentSize.height * zoom - viewportSize.height,
+            workspaceSize.height * zoom - viewportSize.height,
         );
 
         scroll.x = Math.round(Math.max(0, Math.min(state.x, newMaxScrollX)));
         scroll.y = Math.round(Math.max(0, Math.min(state.y, newMaxScrollY)));
+
+        console.log("scroll", scroll.x, scroll.y);
     });
 
-    canvas.document._events.on('documentResize', ({ width, height }) => {
+    canvas.document.events.on('workspaceChange', ({width, height}) => {
+        workspaceSize.width = width;
+        workspaceSize.height = height;
+    });
+
+    canvas.document.events.on('documentResize', ({ width, height }) => {
         documentSize.width = width;
         documentSize.height = height;
 
