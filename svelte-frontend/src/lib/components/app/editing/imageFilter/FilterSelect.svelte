@@ -15,6 +15,11 @@ interface Props {
 
 let { activeFilters }: Props = $props();
 
+const defaultFilterSettings = {
+    opacity: 1,
+    blendMode: 'source-over' as const,
+};
+
 const availableFilters: {
     name: string;
     create: () => FilterState;
@@ -24,8 +29,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Blur,
             blurRadius: 10,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -33,8 +37,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Brighten,
             brightness: 0,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -42,8 +45,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Contrast,
             contrast: 0,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -51,16 +53,14 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Enhance,
             enhance: 0,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
         name: 'Grayscale',
         create: () => ({
             type: FilterType.Grayscale,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -70,16 +70,14 @@ const availableFilters: {
             hue: 0,
             saturation: 0,
             luminance: 0,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
         name: 'Invert',
         create: () => ({
             type: FilterType.Invert,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -87,8 +85,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Mask,
             threshold: 0.5,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -96,8 +93,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Noise,
             noise: 0,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -105,8 +101,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Pixelate,
             pixelSize: 8,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -114,8 +109,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Posterize,
             levels: 0.5,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -125,24 +119,21 @@ const availableFilters: {
             red: 0,
             green: 0,
             blue: 0,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
         name: 'Sepia',
         create: () => ({
             type: FilterType.Sepia,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
         name: 'Solarize',
         create: () => ({
             type: FilterType.Solarize,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings
         }),
     },
     {
@@ -150,8 +141,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Threshold,
             threshold: 0.5,
-            opacity: 1,
-            blendMode: 'source-over',
+            ...defaultFilterSettings    
         }),
     },
 ];
