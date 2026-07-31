@@ -36,6 +36,7 @@
     - [Run Unit Tests](#run-unit-tests)
     - [Integration Tests](#integration-tests)
     - [Run End-to-End (E2E) Tests](#run-end-to-end-e2e-tests)
+  - [How to Debug the App in VS Code](#how-to-debug-the-app-in-vs-code)
   - [Manual](#manual)
   - [License](#license)
 
@@ -358,34 +359,38 @@ pip3 uninstall -r packages.txt -y
 
 The project uses npm scripts defined in two `package.json` files:
 
-- The root `package.json` contains Electron, backend, and release commands.
-- The `svelte-frontend/package.json` contains Svelte frontend development commands.
+- The root `package.json` contains Electron, backend, testing, debugging, and release commands.
+- The `svelte-frontend/package.json` contains Svelte frontend development and build commands.
 
 #### Root Project Commands (`package.json`)
 
 | Command | Description |
 | --- | --- |
 | `npm install` | Installs all project dependencies. |
-| `npm run verify` | Runs all tests, compiles the Electron application, and builds the Svelte frontend to verify the project is ready for distribution. |
-| `npm run build` | Compiles the Electron TypeScript source code and builds the Svelte frontend. |
-| `npm start` | Builds the application and launches the Electron desktop application. |
-| `npm run make` | Builds the application and creates platform-specific distributable packages using Electron Builder. |
+| `npm run verify` | Runs the complete test suite, compiles the Electron application, and builds the Svelte frontend in debug mode to verify the project. |
+| `npm run build:debug` | Compiles the Electron TypeScript source code and builds the Svelte frontend in debug mode (unminified with source maps). |
+| `npm run build:release` | Compiles the Electron TypeScript source code and builds the Svelte frontend for release. |
+| `npm start` | Builds the application in debug mode and launches the Electron desktop application. |
+| `npm run debug` | Builds the application in debug mode and launches Electron with the Node.js and Chromium remote debuggers enabled. |
+| `npm run make` | Cleans previous build artifacts, builds the release version, and creates platform-specific distributable packages using Electron Builder. |
 | `npm test` | Runs the complete test suite, including Electron, Svelte, and Python tests. |
 | `npm run test:electron` | Runs the Electron unit tests using Vitest. |
 | `npm run test:svelte` | Runs the Svelte frontend unit tests using Vitest. |
 | `npm run test:python` | Runs the Python backend tests using pytest. |
-| `npm run test:e2e` | Builds the application and runs the Playwright end-to-end test suite. |
+| `npm run test:e2e` | Builds the application in debug mode and runs the Playwright end-to-end test suite. |
 | `npm run test:e2e:ui` | Opens the Playwright interactive test runner. |
 | `npm run test:e2e:headed` | Runs the Playwright end-to-end tests with a visible browser window. |
 | `npm run test:e2e:debug` | Runs the Playwright end-to-end tests in debug mode. |
 | `npm run test:e2e:report` | Opens the most recent Playwright HTML test report. |
-| `npm run clean` | Removes generated build files from the `dist` directory. |
+| `npm run clean:dist` | Removes the generated Electron build output from the `dist` directory. |
+| `npm run clean:make` | Removes generated installer and package artifacts from the `make` directory. |
 | `npm run package` | Packages the application without creating an installer. |
-| `npm run make:package` | Builds and packages the application without creating an installer. |
+| `npm run make:package` | Builds the release version and packages the application without creating an installer. |
 | `npm run make:standalone` | Alias for `npm run make:package`. |
-| `npm run make:setup` | Builds the application and creates a platform-specific installer. |
+| `npm run make:setup` | Builds the release version and creates a platform-specific installer. |
 | `npm run make-installer` | Alias for `npm run make:setup`. |
-| `npm run fe:build` | Builds the Svelte frontend. |
+| `npm run fe:build:debug` | Builds the Svelte frontend in debug mode. |
+| `npm run fe:build:release` | Builds the Svelte frontend for release. |
 | `npm run fe:preview` | Starts the Svelte production preview server. |
 | `npm run fe:start` | Alias for `npm run fe:preview`. |
 | `npm run fe:dev` | Starts the Svelte development server. |
@@ -399,8 +404,10 @@ The project uses npm scripts defined in two `package.json` files:
 | --- | --- |
 | `npm install` | Installs the frontend dependencies. |
 | `npm run dev` | Starts the Vite development server. |
-| `npm run build` | Builds the Svelte application for production. |
-| `npm run verify` | Runs the frontend test suite and builds the production application. |
+| `npm run build` | Builds the Svelte frontend using Vite's default production mode. |
+| `npm run build:debug` | Builds the Svelte frontend in debug mode (typically unminified with source maps). |
+| `npm run build:release` | Builds the optimized production version of the Svelte frontend. |
+| `npm run verify` | Runs the frontend unit tests and builds the frontend in debug mode. |
 | `npm run preview` | Starts a local preview server for the production build. |
 | `npm test` | Runs the frontend unit tests using Vitest. |
 | `npm run check` | Checks Svelte components and TypeScript configuration for errors. |
@@ -660,6 +667,24 @@ npm run test:e2e:report
 Opens the HTML report generated after the most recent test run.
 
 During execution, Playwright generates temporary test artifacts in the `test-results` directory. HTML reports are written to the `playwright-report` directory.
+
+## How to Debug the App in VS Code
+
+The project includes Visual Studio Code launch configurations for debugging the Electron application.
+
+Start the application in debug mode:
+
+```bash
+npm run debug
+```
+
+Open **Run and Debug** (`Ctrl + Shift + D`) and select one of the following configurations:
+
+- **Attach Electron** – Attaches to both the Electron main process and renderer process (recommended).
+- **Attach Electron Main** – Attaches only to the Electron main process (Node.js).
+- **Attach Electron Renderer** – Attaches only to the Electron renderer process (Chromium/Svelte).
+
+After attaching, breakpoints can be placed directly in the TypeScript source code, allowing inspection of variables, the call stack, and application state.
 
 ## Manual
 
