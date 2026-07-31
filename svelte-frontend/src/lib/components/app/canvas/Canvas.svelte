@@ -33,6 +33,16 @@ let scroll = $state({
     y: 0,
 });
 
+const wheelConfig = {
+    scrollSpeed: 1,
+
+    zoom: {
+        factor: 1.05,
+        min: 0.1,
+        max: 5,
+    },
+} as const;
+
 let transformedDocumentSize = $state({
     width: 0,
     height: 0,
@@ -70,20 +80,63 @@ function updateCamera() {
 function handleWheel(event: WheelEvent) {
     event.preventDefault();
 
+    if (event.shiftKey) {
+        handleHorizontalWheel(event);
+        return;
+    }
+
+    if (event.altKey) {
+        handleVerticalWheel(event);
+        return;
+    }
+
+    handleZoomWheel(event);
+}
+
+function handleHorizontalWheel(event: WheelEvent) {
+    scroll.x = Math.max(
+        0,
+        Math.min(
+            maxScrollX,
+            scroll.x + event.deltaY * wheelConfig.scrollSpeed,
+        ),
+    );
+
+    updateCamera();
+}
+
+function handleVerticalWheel(event: WheelEvent) {
+    scroll.y = Math.max(
+        0,
+        Math.min(
+            maxScrollY,
+            scroll.y + event.deltaY * wheelConfig.scrollSpeed,
+        ),
+    );
+
+    updateCamera();
+}
+
+function handleZoomWheel(event: WheelEvent) {
     const rect = viewport.getBoundingClientRect();
 
     const centerX = event.clientX - rect.left;
-
     const centerY = event.clientY - rect.top;
 
-    const factor = 1.05;
+    const max = wheelConfig.zoom.max;
+    const min = wheelConfig.zoom.min;
+    const factor = wheelConfig.zoom.factor;
 
     const newZoom =
         event.deltaY < 0
-            ? Math.min(5, zoom * factor)
-            : Math.max(0.1, zoom / factor);
+            ? Math.min(max, zoom * factor)
+            : Math.max(min, zoom / factor);
 
-    canvas.camera.setZoom(newZoom, centerX, centerY);
+    canvas.camera.setZoom(
+        newZoom,
+        centerX,
+        centerY,
+    );
 }
 
 onMount(() => {
