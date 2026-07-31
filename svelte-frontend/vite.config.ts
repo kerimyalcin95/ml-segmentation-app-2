@@ -9,12 +9,16 @@ import { visualizer } from "rollup-plugin-visualizer";
 // import { listModules } from './vite-plugins/listModules';
 // import { analyzeModules } from './vite-plugins/analyzeModules';
 
+interface PackageJson {
+    version: string;
+}
+
 const packageJson = JSON.parse(
-    readFileSync('./../package.json', 'utf-8')
-);
+    readFileSync("./../package.json", "utf-8")
+) as PackageJson;
 
 // https://vite.dev/config/
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
     plugins: [
         tailwindcss(),
         svelte(),
@@ -38,6 +42,8 @@ export default defineConfig({
         outDir: './dist',
         assetsDir: './assets',
         chunkSizeWarningLimit: 1000,
+        sourcemap: mode !== "production",
+        minify: mode === "production",
     },
     resolve: {
         alias: {
@@ -55,4 +61,4 @@ export default defineConfig({
             interval: 100
         }
     }
-});
+}));

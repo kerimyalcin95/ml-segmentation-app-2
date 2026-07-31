@@ -133,6 +133,20 @@ export class Document {
         };
     }
 
+    private apply() {
+
+        this._group.rotation(
+            this.state.rotation
+        );
+
+        this._group.scale({
+            x: this.state.flip.horizontal ? -1 : 1,
+            y: this.state.flip.vertical ? -1 : 1,
+        });
+
+        this.updateDocumentTransformOrigin();
+    }
+
     private updateDocumentTransformOrigin(): void {
 
         const rotated =
@@ -156,20 +170,12 @@ export class Document {
             x: width / 2,
             y: height / 2,
         });
-    }
 
-    private applyDocumentTransform() {
-
-        this._group.rotation(
-            this.state.rotation
-        );
-
-        this._group.scale({
-            x: this.state.flip.horizontal ? -1 : 1,
-            y: this.state.flip.vertical ? -1 : 1,
-        });
-
-        this.updateDocumentTransformOrigin();
+        console.log("updateDocumentTransformOrigin:state.rotation", this.state.rotation);
+        console.log("updateDocumentTransformOrigin:width", width);
+        console.log("updateDocumentTransformOrigin:height", height);
+        console.log("updateDocumentTransformOrigin:image.offset.x", width / 2);
+        console.log("updateDocumentTransformOrigin:image.offset.y", height / 2);
     }
 
     private updateDocumentState(
@@ -328,7 +334,7 @@ export class Document {
                 );
 
                 this.renderImage();
-                this.applyDocumentTransform();
+                this.apply();
                 this.updateWorkspace();
                 this.centerInWorkspace();
 
@@ -436,7 +442,7 @@ export class Document {
 
         this.renderImage();
 
-        this.applyDocumentTransform();
+        this.apply();
         this.updateWorkspace();
         this.centerInWorkspace();
 
@@ -469,7 +475,7 @@ export class Document {
 
         this.renderImage();
 
-        this.applyDocumentTransform();
+        this.apply();
         this.updateWorkspace();
         this.centerInWorkspace();
 
@@ -488,7 +494,7 @@ export class Document {
                 this.state.rotation + angle
             ) % 360;
 
-        this.applyDocumentTransform();
+        this.apply();
         this.updateWorkspace();
         this.centerInWorkspace();
 
@@ -516,7 +522,7 @@ export class Document {
                 !this.state.flip.vertical;
         }
 
-        this.applyDocumentTransform();
+        this.apply();
         this.updateWorkspace();
         this.centerInWorkspace();
 
