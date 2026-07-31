@@ -46,4 +46,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
             filePath,
             imageBytes,
         ),
+
+    readImage: (
+        filePath: string,
+    ) =>
+        ipcRenderer.invoke(
+            "read-image",
+            filePath,
+        ),
 });

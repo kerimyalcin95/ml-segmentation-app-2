@@ -13,11 +13,6 @@ interface Props {
 let { canvas }: Props = $props();
 
 async function loadImage() {
-    if (!window.electronAPI) {
-        console.error('electronAPI is not available');
-        return;
-    }
-
     const filePath = await window.electronAPI.openImage(
         sessionStore.lastDirectory,
     );
@@ -28,7 +23,9 @@ async function loadImage() {
 
     sessionStore.lastDirectory = dirname(filePath);
 
-    canvas.document.loadImage(filePath);
+    const imageBytes = await window.electronAPI.readImage(filePath);
+
+    await canvas.document.loadImage(imageBytes);
 }
 </script>
 

@@ -275,60 +275,81 @@ export class Document {
 
     // Image operations
 
-    loadImage(path: string) {
-        const image = new window.Image();
+    public loadImage(
+        imageBytes: Uint8Array,
+    ): Promise<void> {
 
-        image.onload = () => {
-            this.originalImage = image;
+        return new Promise((resolve, reject) => {
 
-            this.imageState.crop = {
-                x: 0,
-                y: 0,
-                width: image.width,
-                height: image.height,
+            const blob = new Blob([
+                imageBytes.buffer as ArrayBuffer,
+            ]);
+
+            const url = URL.createObjectURL(blob);
+
+            const image = new window.Image();
+
+            image.onload = () => {
+                URL.revokeObjectURL(url);
+
+                this.originalImage = image;
+
+                this.imageState.crop = {
+                    x: 0,
+                    y: 0,
+                    width: image.width,
+                    height: image.height,
+                };
+
+                this.updateDocumentState(image.width, image.height);
+
+                this._group.destroyChildren();
+
+                this.imageNode = new Konva.Image({
+                    image: this.documentCanvas,
+                    x: 0,
+                    y: 0,
+                    width: image.width,
+                    height: image.height,
+                    offsetX: image.width / 2,
+                    offsetY: image.height / 2,
+                    listening: false,
+                });
+
+                this._group.position({
+                    x: image.width / 2,
+                    y: image.height / 2,
+                });
+
+                this._group.add(
+                    this.imageNode
+                );
+
+                this.renderImage();
+                this.applyDocumentTransform();
+                this.updateWorkspace();
+                this.centerInWorkspace();
+
+                this._events.emit("documentResize", {
+                    width: image.width,
+                    height: image.height,
+                });
+
+                this._events.emit("documentChange");
+
+                resolve();
             };
 
-            this.updateDocumentState(image.width, image.height);
+            image.onerror = () => {
+                URL.revokeObjectURL(url);
+                reject(new Error("Failed to load image."));
+            };
 
-            this._group.destroyChildren();
-
-            this.imageNode = new Konva.Image({
-                image: this.documentCanvas,
-                x: 0,
-                y: 0,
-                width: image.width,
-                height: image.height,
-                offsetX: image.width / 2,
-                offsetY: image.height / 2,
-                listening: false,
-            });
-
-            this._group.position({
-                x: image.width / 2,
-                y: image.height / 2,
-            });
-
-            this._group.add(
-                this.imageNode
-            );
-
-            this.renderImage();
-            this.applyDocumentTransform();
-            this.updateWorkspace();
-            this.centerInWorkspace();
-
-            this._events.emit("documentResize", {
-                width: image.width,
-                height: image.height,
-            });
-
-            this._events.emit("documentChange");
-        };
-
-        image.src = `file://${path}`;
+            image.src = url;
+        });
     }
 
-    public async saveImage(
+    async saveImage(
         mimeType: string = "image/png",
         quality?: number,
     ): Promise<Uint8Array> {

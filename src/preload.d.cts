@@ -12,6 +12,9 @@ export interface ElectronAPI {
         filePath: string,
         imageBytes: Uint8Array,
     ) => Promise<string>;
+    readImage: (
+        filePath: string,
+    ) => Promise<Uint8Array>;
 }
 
 export interface SaveImageDialogResult {

@@ -150,6 +150,17 @@ export class IpcHandlers {
             }
         );
 
+        ipcMain.handle(
+            "read-image",
+            (
+                _event,
+                filePath: string,
+            ) => {
+                return new Uint8Array(
+                    fs.readFileSync(filePath),
+                );
+            },
+        );
     }
 
 }

@@ -21,6 +21,10 @@ declare global {
             filePath: string,
             imageBytes: Uint8Array,
         ): Promise<string>;
+
+        readImage(
+            filePath: string,
+        ): Promise<Uint8Array>;
     }
 
     interface Window {
@@ -30,7 +34,7 @@ declare global {
             electron(): string;
         };
 
-        electronAPI?: ElectronAPI;
+        electronAPI: ElectronAPI;
     }
 }
 

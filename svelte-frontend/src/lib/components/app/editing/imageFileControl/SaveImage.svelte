@@ -14,10 +14,6 @@ interface Props {
 let { canvas }: Props = $props();
 
 async function saveImage() {
-    if (!window.electronAPI) {
-        console.error('electronAPI is not available');
-        return;
-    }
 
     const result = await window.electronAPI.showSaveImageDialog(
         sessionStore.lastDirectory,
