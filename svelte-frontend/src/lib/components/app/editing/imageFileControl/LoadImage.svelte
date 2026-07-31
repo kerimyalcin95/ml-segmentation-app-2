@@ -1,6 +1,8 @@
 <script lang="ts">
 import { Button } from '$lib/components/ui/button';
 import { CanvasManager } from '$lib/canvas/canvas';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import { dirname } from '$lib/utils/path';
 
 import ImageSquareIcon from 'phosphor-svelte/lib/ImageSquareIcon';
 
@@ -11,16 +13,19 @@ interface Props {
 let { canvas }: Props = $props();
 
 async function loadImage() {
-    if (!window.electronAPI) {
-        console.error('electronAPI is not available');
+    const filePath = await window.electronAPI.openImage(
+        sessionStore.lastDirectory,
+    );
+
+    if (!filePath) {
         return;
     }
 
-    const path = await window.electronAPI.openImage();
+    sessionStore.lastDirectory = dirname(filePath);
 
-    if (!path) return;
+    const imageBytes = await window.electronAPI.readImage(filePath);
 
-    canvas.document.loadImage(path);
+    await canvas.document.loadImage(imageBytes);
 }
 </script>
 

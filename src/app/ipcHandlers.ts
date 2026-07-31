@@ -5,6 +5,7 @@ import {
 } from "electron";
 
 import fs from "node:fs";
+import path from "node:path";
 
 import { PythonServer } from "../python/pythonServer.js";
 
@@ -12,7 +13,7 @@ export class IpcHandlers {
 
     public constructor(
         private readonly pythonServer: PythonServer
-    ) {}
+    ) { }
 
     public register(): void {
 
@@ -36,9 +37,14 @@ export class IpcHandlers {
 
         ipcMain.handle(
             "open-image",
-            async () => {
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
 
                 const result = await dialog.showOpenDialog({
+
+                    ...(defaultPath && { defaultPath }),
 
                     properties: ["openFile"],
 
@@ -70,25 +76,41 @@ export class IpcHandlers {
         );
 
         ipcMain.handle(
-            "save-image",
-            async (_event, imageData: string) => {
+            "show-save-image-dialog",
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
 
-                const result = await dialog.showSaveDialog({
-
+                const options: Electron.SaveDialogOptions = {
                     title: "Save Image",
-
                     defaultPath: "image.png",
 
                     filters: [
-
                         {
                             name: "PNG Image",
-                            extensions: ["png"]
-                        }
+                            extensions: ["png"],
+                        },
+                        {
+                            name: "JPEG Image",
+                            extensions: ["jpg", "jpeg"],
+                        },
+                        {
+                            name: "WebP Image",
+                            extensions: ["webp"],
+                        },
+                    ],
+                };
 
-                    ]
+                if (defaultPath) {
+                    options.defaultPath = path.join(
+                        defaultPath,
+                        "image.png",
+                    );
+                }
 
-                });
+                const result =
+                    await dialog.showSaveDialog(options);
 
                 if (
                     result.canceled ||
@@ -97,21 +119,48 @@ export class IpcHandlers {
                     return null;
                 }
 
-                const base64Data = imageData.replace(
-                    /^data:image\/png;base64,/,
-                    ""
-                );
+                const extension =
+                    path.extname(result.filePath)
+                        .slice(1)
+                        .toLowerCase() || "png";
+
+                return {
+                    filePath: result.filePath,
+                    extension,
+                };
+
+            },
+        );
+
+        ipcMain.handle(
+            "write-image",
+            (
+                _event,
+                filePath: string,
+                imageBytes: Uint8Array,
+            ) => {
 
                 fs.writeFileSync(
-                    result.filePath,
-                    Buffer.from(base64Data, "base64")
+                    filePath,
+                    Buffer.from(imageBytes),
                 );
 
-                return result.filePath;
+                return filePath;
 
             }
         );
 
+        ipcMain.handle(
+            "read-image",
+            (
+                _event,
+                filePath: string,
+            ) => {
+                return new Uint8Array(
+                    fs.readFileSync(filePath),
+                );
+            },
+        );
     }
 
 }

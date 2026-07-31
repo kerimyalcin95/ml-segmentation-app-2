@@ -275,63 +275,98 @@ export class Document {
 
     // Image operations
 
-    loadImage(path: string) {
-        const image = new window.Image();
+    public loadImage(
+        imageBytes: Uint8Array,
+    ): Promise<void> {
 
-        image.onload = () => {
-            this.originalImage = image;
+        return new Promise<void>((resolve, reject) => {
 
-            this.imageState.crop = {
-                x: 0,
-                y: 0,
-                width: image.width,
-                height: image.height,
+            const blob = new Blob([
+                imageBytes.buffer as ArrayBuffer,
+            ]);
+
+            const cleanup = () => {
+                URL.revokeObjectURL(url);
             };
 
-            this.updateDocumentState(image.width, image.height);
+            const url = URL.createObjectURL(blob);
 
-            this._group.destroyChildren();
+            const image = new window.Image();
 
-            this.imageNode = new Konva.Image({
-                image: this.documentCanvas,
-                x: 0,
-                y: 0,
-                width: image.width,
-                height: image.height,
-                offsetX: image.width / 2,
-                offsetY: image.height / 2,
-                listening: false,
-            });
+            image.onload = () => {
+                this.originalImage = image;
 
-            this._group.position({
-                x: image.width / 2,
-                y: image.height / 2,
-            });
+                this.imageState.crop = {
+                    x: 0,
+                    y: 0,
+                    width: image.width,
+                    height: image.height,
+                };
 
-            this._group.add(
-                this.imageNode
-            );
+                this.updateDocumentState(image.width, image.height);
 
-            this.renderImage();
-            this.applyDocumentTransform();
-            this.updateWorkspace();
-            this.centerInWorkspace();
+                this._group.destroyChildren();
 
-            this._events.emit("documentResize", {
-                width: image.width,
-                height: image.height,
-            });
+                this.imageNode = new Konva.Image({
+                    image: this.documentCanvas,
+                    x: 0,
+                    y: 0,
+                    width: image.width,
+                    height: image.height,
+                    offsetX: image.width / 2,
+                    offsetY: image.height / 2,
+                    listening: false,
+                });
 
-            this._events.emit("documentChange");
-        };
+                this._group.position({
+                    x: image.width / 2,
+                    y: image.height / 2,
+                });
 
-        image.src = `file://${path}`;
+                this._group.add(
+                    this.imageNode
+                );
+
+                this.renderImage();
+                this.applyDocumentTransform();
+                this.updateWorkspace();
+                this.centerInWorkspace();
+
+                this._events.emit("documentResize", {
+                    width: image.width,
+                    height: image.height,
+                });
+
+                this._events.emit("documentChange");
+
+                cleanup();
+                resolve();
+            };
+
+            image.onerror = (_event) => {
+                cleanup();
+                reject(
+                    new Error(
+                        "Failed to load image from blob."
+                    )
+                );
+            };
+
+            image.src = url;
+        });
     }
 
-    saveImage() {
+    async saveImage(
+        mimeType: string = "image/png",
+        quality?: number,
+    ): Promise<Uint8Array> {
 
-        const camera = contextContainer.resolve<Camera>(CONTEXT.Camera);
-        const stage = contextContainer.resolve<Konva.Stage>(CONTEXT.MainStage);
+        const camera =
+            contextContainer.resolve<Camera>(CONTEXT.Camera);
+
+        const stage =
+            contextContainer.resolve<Konva.Stage>(CONTEXT.MainStage);
+
         const oldScale = camera.group.scale();
         const oldPosition = camera.group.position();
 
@@ -348,13 +383,12 @@ export class Document {
         const bounds =
             this._group.getClientRect();
 
-        const data =
-            stage.toDataURL({
+        const canvas =
+            stage.toCanvas({
                 x: bounds.x,
                 y: bounds.y,
                 width: bounds.width,
                 height: bounds.height,
-                mimeType: 'image/png',
                 pixelRatio: 1,
             });
 
@@ -363,7 +397,38 @@ export class Document {
 
         this._events.emit("redrawLayer");
 
-        return data;
+        const blob =
+            await new Promise<Blob>((resolve, reject) => {
+
+                canvas.toBlob(
+
+                    (blob) => {
+
+                        if (!blob) {
+                            reject(
+                                new Error(
+                                    "Failed to create image blob."
+                                )
+                            );
+
+                            return;
+                        }
+
+                        resolve(blob);
+
+                    },
+
+                    mimeType,
+                    quality,
+
+                );
+
+            });
+
+        return new Uint8Array(
+            await blob.arrayBuffer()
+        );
+
     }
 
     resizeImage(width: number, height: number) {

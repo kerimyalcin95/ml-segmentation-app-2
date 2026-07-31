@@ -24,7 +24,34 @@ contextBridge.exposeInMainWorld('electronAPI', {
     log: (...args: unknown[]) => {
         ipcRenderer.send("renderer-log", ...args);
     },
-    openImage: () => ipcRenderer.invoke("open-image"),
-    saveImage: (imageData: string) =>
-    ipcRenderer.invoke("save-image", imageData),
+    openImage: (defaultPath?: string) =>
+        ipcRenderer.invoke(
+            "open-image",
+            defaultPath,
+        ),
+    showSaveImageDialog: (
+        defaultPath?: string,
+    ) =>
+        ipcRenderer.invoke(
+            "show-save-image-dialog",
+            defaultPath,
+        ),
+
+    writeImage: (
+        filePath: string,
+        imageBytes: Uint8Array,
+    ) =>
+        ipcRenderer.invoke(
+            "write-image",
+            filePath,
+            imageBytes,
+        ),
+
+    readImage: (
+        filePath: string,
+    ) =>
+        ipcRenderer.invoke(
+            "read-image",
+            filePath,
+        ),
 });

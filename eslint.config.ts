@@ -58,6 +58,14 @@ export default defineConfig(
         ],
         rules: {
             "@typescript-eslint/no-unnecessary-type-parameters": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    argsIgnorePattern: "^_",
+                    varsIgnorePattern: "^_",
+                    caughtErrorsIgnorePattern: "^_",
+                },
+            ],
         },
     },
     {
@@ -65,6 +73,14 @@ export default defineConfig(
         files: ["svelte-frontend/**/*.svelte"],
         rules: {
             "@typescript-eslint/no-useless-default-assignment": "off",
+            "@typescript-eslint/no-unused-vars": [
+                "error",
+                {
+                    argsIgnorePattern: "^_",
+                    varsIgnorePattern: "^_",
+                    caughtErrorsIgnorePattern: "^_",
+                },
+            ],
         },
     }
 );

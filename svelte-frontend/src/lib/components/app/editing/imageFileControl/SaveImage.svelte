@@ -2,7 +2,10 @@
 import { Button } from '$lib/components/ui/button';
 import { CanvasManager } from '$lib/canvas/canvas';
 
-import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon'
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import { dirname } from '$lib/utils/path';
+
+import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon';
 
 interface Props {
     canvas: CanvasManager;
@@ -11,18 +14,38 @@ interface Props {
 let { canvas }: Props = $props();
 
 async function saveImage() {
-    if (!window.electronAPI) {
-        console.error("electronAPI is not available");
+
+    const result = await window.electronAPI.showSaveImageDialog(
+        sessionStore.lastDirectory,
+    );
+
+    if (!result) {
         return;
     }
 
-    const imageData = canvas.document.saveImage();
+    sessionStore.lastDirectory = dirname(result.filePath);
 
-    const path = await window.electronAPI.saveImage(imageData);
+    let mimeType = 'image/png';
+    let quality: number | undefined;
 
-    if (path) {
-        console.log("Saved:", path);
+    switch (result.extension) {
+        case 'jpg':
+        case 'jpeg':
+            mimeType = 'image/jpeg';
+            quality = 0.95;
+            break;
+
+        case 'webp':
+            mimeType = 'image/webp';
+            quality = 0.95;
+            break;
     }
+
+    const imageBytes = await canvas.document.saveImage(mimeType, quality);
+
+    await window.electronAPI.writeImage(result.filePath, imageBytes);
+
+    console.log('Saved:', result.filePath);
 }
 </script>
 
