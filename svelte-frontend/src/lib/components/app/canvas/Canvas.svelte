@@ -43,6 +43,22 @@ const wheelConfig = {
     },
 } as const;
 
+const panConfig = {
+    speed: 1,
+} as const;
+
+let panning = $state(false);
+
+let panStart = {
+    x: 0,
+    y: 0,
+};
+
+let cameraStart = {
+    x: 0,
+    y: 0,
+};
+
 let transformedDocumentSize = $state({
     width: 0,
     height: 0,
@@ -96,10 +112,7 @@ function handleWheel(event: WheelEvent) {
 function handleHorizontalWheel(event: WheelEvent) {
     scroll.x = Math.max(
         0,
-        Math.min(
-            maxScrollX,
-            scroll.x + event.deltaY * wheelConfig.scrollSpeed,
-        ),
+        Math.min(maxScrollX, scroll.x + event.deltaY * wheelConfig.scrollSpeed),
     );
 
     updateCamera();
@@ -108,10 +121,7 @@ function handleHorizontalWheel(event: WheelEvent) {
 function handleVerticalWheel(event: WheelEvent) {
     scroll.y = Math.max(
         0,
-        Math.min(
-            maxScrollY,
-            scroll.y + event.deltaY * wheelConfig.scrollSpeed,
-        ),
+        Math.min(maxScrollY, scroll.y + event.deltaY * wheelConfig.scrollSpeed),
     );
 
     updateCamera();
@@ -132,11 +142,62 @@ function handleZoomWheel(event: WheelEvent) {
             ? Math.min(max, zoom * factor)
             : Math.max(min, zoom / factor);
 
-    canvas.camera.setZoom(
-        newZoom,
-        centerX,
-        centerY,
+    canvas.camera.setZoom(newZoom, centerX, centerY);
+}
+
+function handlePointerDown(event: PointerEvent) {
+    if (event.button !== 1) {
+        return;
+    }
+
+    event.preventDefault();
+
+    panning = true;
+
+    panStart.x = event.clientX;
+    panStart.y = event.clientY;
+
+    cameraStart.x = scroll.x;
+    cameraStart.y = scroll.y;
+
+    viewport.setPointerCapture(event.pointerId);
+}
+
+function handlePointerMove(event: PointerEvent) {
+    if (!panning) {
+        return;
+    }
+
+    const dx = (event.clientX - panStart.x) * panConfig.speed;
+
+    const dy = (event.clientY - panStart.y) * panConfig.speed;
+
+    setScroll(
+        Math.max(0, Math.min(maxScrollX, cameraStart.x - dx)),
+        Math.max(0, Math.min(maxScrollY, cameraStart.y - dy))
     );
+
+    updateCamera();
+}
+
+function handlePointerUp(event: PointerEvent) {
+    if (!panning) {
+        return;
+    }
+
+    panning = false;
+
+    if (viewport.hasPointerCapture(event.pointerId)) {
+        viewport.releasePointerCapture(event.pointerId);
+    }
+}
+
+function setScroll(x: number, y: number) {
+    scroll.x = Math.max(0, Math.min(maxScrollX, x));
+
+    scroll.y = Math.max(0, Math.min(maxScrollY, y));
+
+    updateCamera();
 }
 
 onMount(() => {
@@ -171,6 +232,14 @@ onMount(() => {
         passive: false,
     });
 
+    viewport.addEventListener('pointerdown', handlePointerDown);
+
+    viewport.addEventListener('pointermove', handlePointerMove);
+
+    viewport.addEventListener('pointerup', handlePointerUp);
+
+    viewport.addEventListener('pointercancel', handlePointerUp);
+
     updateViewport();
 
     onCanvasReady?.(canvas);
@@ -179,6 +248,10 @@ onMount(() => {
         observer.disconnect();
 
         viewport.removeEventListener('wheel', handleWheel);
+        viewport.removeEventListener('pointerdown', handlePointerDown);
+        viewport.removeEventListener('pointermove', handlePointerMove);
+        viewport.removeEventListener('pointerup', handlePointerUp);
+        viewport.removeEventListener('pointercancel', handlePointerUp);
 
         canvas.destroy();
     };
@@ -189,11 +262,12 @@ onMount(() => {
     <div
         bind:this={viewport}
         id="canvas-viewport"
-        class="
-            absolute
-            inset-0
-            overflow-hidden
-        "
+        class={[
+            'absolute',
+            'inset-0',
+            'overflow-hidden',
+            panning ? 'cursor-grabbing' : 'cursor-default',
+        ].join(' ')}
     >
         <div bind:this={canvasElement}></div>
     </div>
