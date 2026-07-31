@@ -279,19 +279,21 @@ export class Document {
         imageBytes: Uint8Array,
     ): Promise<void> {
 
-        return new Promise((resolve, reject) => {
+        return new Promise<void>((resolve, reject) => {
 
             const blob = new Blob([
                 imageBytes.buffer as ArrayBuffer,
             ]);
+
+            const cleanup = () => {
+                URL.revokeObjectURL(url);
+            };
 
             const url = URL.createObjectURL(blob);
 
             const image = new window.Image();
 
             image.onload = () => {
-                URL.revokeObjectURL(url);
-
                 this.originalImage = image;
 
                 this.imageState.crop = {
@@ -337,12 +339,17 @@ export class Document {
 
                 this._events.emit("documentChange");
 
+                cleanup();
                 resolve();
             };
 
-            image.onerror = () => {
-                URL.revokeObjectURL(url);
-                reject(new Error("Failed to load image."));
+            image.onerror = (_event) => {
+                cleanup();
+                reject(
+                    new Error(
+                        "Failed to load image from blob."
+                    )
+                );
             };
 
             image.src = url;
