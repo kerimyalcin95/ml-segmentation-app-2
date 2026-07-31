@@ -33,20 +33,6 @@ let scroll = $state({
     y: 0,
 });
 
-const wheelConfig = {
-    scrollSpeed: 1,
-
-    zoom: {
-        factor: 1.05,
-        min: 0.1,
-        max: 5,
-    },
-} as const;
-
-const panConfig = {
-    speed: 1,
-} as const;
-
 let panning = $state(false);
 
 let panStart = {
@@ -63,6 +49,20 @@ let transformedDocumentSize = $state({
     width: 0,
     height: 0,
 });
+
+const wheelConfig = {
+    scrollSpeed: 1,
+
+    zoom: {
+        factor: 1.05,
+        min: 0.1,
+        max: 5,
+    },
+} as const;
+
+const panConfig = {
+    speed: 1,
+} as const;
 
 const contentWidth = $derived(transformedDocumentSize.width * zoom);
 
@@ -91,6 +91,14 @@ function setCamera() {
         y: scroll.y,
         zoom,
     });
+}
+
+function setScroll(x: number, y: number) {
+    scroll.x = Math.max(0, Math.min(maxScrollX, x));
+
+    scroll.y = Math.max(0, Math.min(maxScrollY, y));
+
+    setCamera();
 }
 
 function handleWheel(event: WheelEvent) {
@@ -181,14 +189,6 @@ function handleLostPointerCapture() {
 
 function stopPanning() {
     panning = false;
-}
-
-function setScroll(x: number, y: number) {
-    scroll.x = Math.max(0, Math.min(maxScrollX, x));
-
-    scroll.y = Math.max(0, Math.min(maxScrollY, y));
-
-    setCamera();
 }
 
 onMount(() => {
