@@ -328,10 +328,17 @@ export class Document {
         image.src = `file://${path}`;
     }
 
-    saveImage() {
+    public async saveImage(
+        mimeType: string = "image/png",
+        quality?: number,
+    ): Promise<Uint8Array> {
 
-        const camera = contextContainer.resolve<Camera>(CONTEXT.Camera);
-        const stage = contextContainer.resolve<Konva.Stage>(CONTEXT.MainStage);
+        const camera =
+            contextContainer.resolve<Camera>(CONTEXT.Camera);
+
+        const stage =
+            contextContainer.resolve<Konva.Stage>(CONTEXT.MainStage);
+
         const oldScale = camera.group.scale();
         const oldPosition = camera.group.position();
 
@@ -348,13 +355,12 @@ export class Document {
         const bounds =
             this._group.getClientRect();
 
-        const data =
-            stage.toDataURL({
+        const canvas =
+            stage.toCanvas({
                 x: bounds.x,
                 y: bounds.y,
                 width: bounds.width,
                 height: bounds.height,
-                mimeType: 'image/png',
                 pixelRatio: 1,
             });
 
@@ -363,7 +369,38 @@ export class Document {
 
         this._events.emit("redrawLayer");
 
-        return data;
+        const blob =
+            await new Promise<Blob>((resolve, reject) => {
+
+                canvas.toBlob(
+
+                    (blob) => {
+
+                        if (!blob) {
+                            reject(
+                                new Error(
+                                    "Failed to create image blob."
+                                )
+                            );
+
+                            return;
+                        }
+
+                        resolve(blob);
+
+                    },
+
+                    mimeType,
+                    quality,
+
+                );
+
+            });
+
+        return new Uint8Array(
+            await blob.arrayBuffer()
+        );
+
     }
 
     resizeImage(width: number, height: number) {

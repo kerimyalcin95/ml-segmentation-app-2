@@ -70,8 +70,8 @@ export class IpcHandlers {
         );
 
         ipcMain.handle(
-            "save-image",
-            async (_event, imageData: string) => {
+            "show-save-image-dialog",
+            async () => {
 
                 const result = await dialog.showSaveDialog({
 
@@ -80,37 +80,22 @@ export class IpcHandlers {
                     defaultPath: "image.png",
 
                     filters: [
-                        {
-                            name: "Supported Images",
-                            extensions: [
-                                "png",
-                                "jpg",
-                                "jpeg",
-                                "webp",
-                                "bmp",
-                                "tiff"
-                            ]
-                        },
+
                         {
                             name: "PNG Image",
                             extensions: ["png"]
                         },
+
                         {
                             name: "JPEG Image",
                             extensions: ["jpg", "jpeg"]
                         },
+
                         {
                             name: "WebP Image",
                             extensions: ["webp"]
-                        },
-                        {
-                            name: "Bitmap Image",
-                            extensions: ["bmp"]
-                        },
-                        {
-                            name: "TIFF Image",
-                            extensions: ["tiff"]
                         }
+
                     ]
 
                 });
@@ -122,17 +107,34 @@ export class IpcHandlers {
                     return null;
                 }
 
-                const base64Data = imageData.replace(
-                    /^data:image\/[a-zA-Z0-9.+-]+;base64,/,
-                    ""
-                );
+                const extension =
+                    result.filePath
+                        .split(".")
+                        .pop()
+                        ?.toLowerCase() ?? "png";
+
+                return {
+                    filePath: result.filePath,
+                    extension,
+                };
+
+            }
+        );
+
+        ipcMain.handle(
+            "write-image",
+            (
+                _event,
+                filePath: string,
+                imageBytes: Uint8Array,
+            ) => {
 
                 fs.writeFileSync(
-                    result.filePath,
-                    Buffer.from(base64Data, "base64")
+                    filePath,
+                    Buffer.from(imageBytes),
                 );
 
-                return result.filePath;
+                return filePath;
 
             }
         );
