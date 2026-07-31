@@ -67,6 +67,8 @@ export class Document {
     private readonly documentCanvas = document.createElement("canvas");
     private readonly documentContext;
 
+    __camera: Camera | null; // DEBUG
+
     private imageState: ImageState = {
         width: 0,
         height: 0,
@@ -104,6 +106,7 @@ export class Document {
             throw new Error("Failed to create 2D rendering context.");
         }
 
+        this.__camera = null; // DEBUG
         this.documentContext = context;
         this._workspace = new Workspace();
     }
@@ -170,12 +173,6 @@ export class Document {
             x: width / 2,
             y: height / 2,
         });
-
-        console.log("updateDocumentTransformOrigin:state.rotation", this.state.rotation);
-        console.log("updateDocumentTransformOrigin:width", width);
-        console.log("updateDocumentTransformOrigin:height", height);
-        console.log("updateDocumentTransformOrigin:image.offset.x", width / 2);
-        console.log("updateDocumentTransformOrigin:image.offset.y", height / 2);
     }
 
     private updateDocumentState(
