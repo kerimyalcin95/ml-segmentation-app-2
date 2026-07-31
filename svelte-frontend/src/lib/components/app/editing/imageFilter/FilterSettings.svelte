@@ -78,7 +78,7 @@ let { currentFilter }: Props = $props();
                 {:else if currentFilter.type === FilterType.Brighten}
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm">Brightness</span>
+                            <span class="text-sm">Value</span>
                             <span class="text-xs text-muted-foreground">
                                 {currentFilter.brightness.toFixed(2)}
                             </span>
@@ -95,7 +95,7 @@ let { currentFilter }: Props = $props();
                 {:else if currentFilter.type === FilterType.Contrast}
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm">Contrast</span>
+                            <span class="text-sm">Value</span>
                             <span class="text-xs text-muted-foreground">
                                 {currentFilter.contrast.toFixed(0)}
                             </span>
@@ -112,7 +112,7 @@ let { currentFilter }: Props = $props();
                 {:else if currentFilter.type === FilterType.Enhance}
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm">Enhance</span>
+                            <span class="text-sm">Value</span>
                             <span class="text-xs text-muted-foreground">
                                 {currentFilter.enhance.toFixed(2)}
                             </span>
@@ -127,8 +127,8 @@ let { currentFilter }: Props = $props();
                         />
                     </div>
                 {:else if currentFilter.type === FilterType.Grayscale}
-                    <p class="text-sm text-muted-foreground">
-                        Grayscale has no adjustable parameters.
+                    <p class="text-sm text-muted-foreground italic">
+                        No paramers available
                     </p>
                 {:else if currentFilter.type === FilterType.HSL}
                     <div class="space-y-3">
@@ -184,8 +184,8 @@ let { currentFilter }: Props = $props();
                         </div>
                     </div>
                 {:else if currentFilter.type === FilterType.Invert}
-                    <p class="text-sm text-muted-foreground">
-                        Invert has no adjustable parameters.
+                    <p class="text-sm text-muted-foreground italic">
+                        No paramers available
                     </p>
                 {:else if currentFilter.type === FilterType.Mask}
                     <div>
@@ -207,7 +207,7 @@ let { currentFilter }: Props = $props();
                 {:else if currentFilter.type === FilterType.Noise}
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm">Noise</span>
+                            <span class="text-sm">Amount</span>
                             <span class="text-xs text-muted-foreground">
                                 {currentFilter.noise.toFixed(2)}
                             </span>
@@ -309,17 +309,17 @@ let { currentFilter }: Props = $props();
                         </div>
                     </div>
                 {:else if currentFilter.type === FilterType.Sepia}
-                    <p class="text-sm text-muted-foreground">
-                        Sepia has no adjustable parameters.
+                    <p class="text-sm text-muted-foreground italic">
+                        No paramers available
                     </p>
                 {:else if currentFilter.type === FilterType.Solarize}
-                    <p class="text-sm text-muted-foreground">
-                        Solarize has no adjustable parameters.
+                    <p class="text-sm text-muted-foreground italic">
+                        No paramers available
                     </p>
                 {:else if currentFilter.type === FilterType.Threshold}
                     <div>
                         <div class="flex justify-between items-center mb-1">
-                            <span class="text-sm">Threshold</span>
+                            <span class="text-sm">Value</span>
                             <span class="text-xs text-muted-foreground">
                                 {currentFilter.threshold.toFixed(2)}
                             </span>
@@ -341,7 +341,7 @@ let { currentFilter }: Props = $props();
             <div class="text-sm font-medium">Opacity</div>
 
             <div class="flex justify-between items-center mb-1">
-                <span class="text-sm">Blur Radius</span>
+                <span class="text-sm">Value</span>
                 <span class="text-xs text-muted-foreground">
                     {currentFilter.opacity}
                 </span>
@@ -374,6 +374,6 @@ let { currentFilter }: Props = $props();
             </Select.Root>
         </div>
     {:else}
-        <p class="text-sm text-muted-foreground">Select a filter.</p>
+        <p class="text-sm text-muted-foreground italic">Select a filter.</p>
     {/if}
 </Card>
