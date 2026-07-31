@@ -85,7 +85,7 @@ function updateViewport() {
     scroll.y = canvas.camera.state.y;
 }
 
-function updateCamera() {
+function setCamera() {
     canvas.camera.set({
         x: scroll.x,
         y: scroll.y,
@@ -110,21 +110,11 @@ function handleWheel(event: WheelEvent) {
 }
 
 function handleHorizontalWheel(event: WheelEvent) {
-    scroll.x = Math.max(
-        0,
-        Math.min(maxScrollX, scroll.x + event.deltaY * wheelConfig.scrollSpeed),
-    );
-
-    updateCamera();
+    setScroll(scroll.x + event.deltaY * wheelConfig.scrollSpeed, scroll.y);
 }
 
 function handleVerticalWheel(event: WheelEvent) {
-    scroll.y = Math.max(
-        0,
-        Math.min(maxScrollY, scroll.y + event.deltaY * wheelConfig.scrollSpeed),
-    );
-
-    updateCamera();
+    setScroll(scroll.x, scroll.y + event.deltaY * wheelConfig.scrollSpeed);
 }
 
 function handleZoomWheel(event: WheelEvent) {
@@ -133,9 +123,7 @@ function handleZoomWheel(event: WheelEvent) {
     const centerX = event.clientX - rect.left;
     const centerY = event.clientY - rect.top;
 
-    const max = wheelConfig.zoom.max;
-    const min = wheelConfig.zoom.min;
-    const factor = wheelConfig.zoom.factor;
+    const { min, max, factor } = wheelConfig.zoom;
 
     const newZoom =
         event.deltaY < 0
@@ -172,12 +160,7 @@ function handlePointerMove(event: PointerEvent) {
 
     const dy = (event.clientY - panStart.y) * panConfig.speed;
 
-    setScroll(
-        Math.max(0, Math.min(maxScrollX, cameraStart.x - dx)),
-        Math.max(0, Math.min(maxScrollY, cameraStart.y - dy))
-    );
-
-    updateCamera();
+    setScroll(cameraStart.x - dx, cameraStart.y - dy);
 }
 
 function handlePointerUp(event: PointerEvent) {
@@ -185,11 +168,19 @@ function handlePointerUp(event: PointerEvent) {
         return;
     }
 
-    panning = false;
-
     if (viewport.hasPointerCapture(event.pointerId)) {
         viewport.releasePointerCapture(event.pointerId);
     }
+
+    stopPanning();
+}
+
+function handleLostPointerCapture() {
+    stopPanning();
+}
+
+function stopPanning() {
+    panning = false;
 }
 
 function setScroll(x: number, y: number) {
@@ -197,7 +188,7 @@ function setScroll(x: number, y: number) {
 
     scroll.y = Math.max(0, Math.min(maxScrollY, y));
 
-    updateCamera();
+    setCamera();
 }
 
 onMount(() => {
@@ -233,12 +224,10 @@ onMount(() => {
     });
 
     viewport.addEventListener('pointerdown', handlePointerDown);
-
     viewport.addEventListener('pointermove', handlePointerMove);
-
     viewport.addEventListener('pointerup', handlePointerUp);
-
     viewport.addEventListener('pointercancel', handlePointerUp);
+    viewport.addEventListener('lostpointercapture', handleLostPointerCapture);
 
     updateViewport();
 
@@ -252,6 +241,10 @@ onMount(() => {
         viewport.removeEventListener('pointermove', handlePointerMove);
         viewport.removeEventListener('pointerup', handlePointerUp);
         viewport.removeEventListener('pointercancel', handlePointerUp);
+        viewport.removeEventListener(
+            'lostpointercapture',
+            handleLostPointerCapture,
+        );
 
         canvas.destroy();
     };
@@ -280,7 +273,7 @@ onMount(() => {
             position={scroll.x}
             onChange={(x: number) => {
                 scroll.x = x;
-                updateCamera();
+                setCamera();
             }}
         />
     {/if}
@@ -293,7 +286,7 @@ onMount(() => {
             position={scroll.y}
             onChange={(y: number) => {
                 scroll.y = y;
-                updateCamera();
+                setCamera();
             }}
         />
     {/if}
