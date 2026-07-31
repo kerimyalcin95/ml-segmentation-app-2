@@ -23,7 +23,7 @@ export class WindowManager {
 
         this.mainWindow = new BrowserWindow({
 
-            autoHideMenuBar: true,
+            autoHideMenuBar: false,
 
             title: "ML-Segmentation",
 
@@ -40,10 +40,11 @@ export class WindowManager {
 
                 contextIsolation: true,
                 nodeIntegration: false
-
             }
 
         });
+
+        this.mainWindow.removeMenu();
 
         this.mainWindow.webContents.on(
             "before-input-event",
@@ -52,7 +53,6 @@ export class WindowManager {
                 if (input.key === "F12") {
                     this.mainWindow?.webContents.toggleDevTools();
                 }
-
             }
         );
 
