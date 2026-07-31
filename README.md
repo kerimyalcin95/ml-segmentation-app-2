@@ -1,6 +1,6 @@
 # Segmentation App 2
 
-![Application screenshot](assets/snapshot-1.png)
+![Application screenshot](snapshots/snapshot-1.png)
 
 ## Table of Contents
 
