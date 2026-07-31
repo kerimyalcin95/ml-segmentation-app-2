@@ -12,7 +12,7 @@ export class IpcHandlers {
 
     public constructor(
         private readonly pythonServer: PythonServer
-    ) {}
+    ) { }
 
     public register(): void {
 
@@ -80,12 +80,37 @@ export class IpcHandlers {
                     defaultPath: "image.png",
 
                     filters: [
-
+                        {
+                            name: "Supported Images",
+                            extensions: [
+                                "png",
+                                "jpg",
+                                "jpeg",
+                                "webp",
+                                "bmp",
+                                "tiff"
+                            ]
+                        },
                         {
                             name: "PNG Image",
                             extensions: ["png"]
+                        },
+                        {
+                            name: "JPEG Image",
+                            extensions: ["jpg", "jpeg"]
+                        },
+                        {
+                            name: "WebP Image",
+                            extensions: ["webp"]
+                        },
+                        {
+                            name: "Bitmap Image",
+                            extensions: ["bmp"]
+                        },
+                        {
+                            name: "TIFF Image",
+                            extensions: ["tiff"]
                         }
-
                     ]
 
                 });
@@ -98,7 +123,7 @@ export class IpcHandlers {
                 }
 
                 const base64Data = imageData.replace(
-                    /^data:image\/png;base64,/,
+                    /^data:image\/[a-zA-Z0-9.+-]+;base64,/,
                     ""
                 );
 
