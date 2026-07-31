@@ -5,6 +5,7 @@ import {
 } from "electron";
 
 import fs from "node:fs";
+import path from "node:path";
 
 import { PythonServer } from "../python/pythonServer.js";
 
@@ -36,9 +37,14 @@ export class IpcHandlers {
 
         ipcMain.handle(
             "open-image",
-            async () => {
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
 
                 const result = await dialog.showOpenDialog({
+
+                    ...(defaultPath && { defaultPath }),
 
                     properties: ["openFile"],
 
@@ -71,34 +77,40 @@ export class IpcHandlers {
 
         ipcMain.handle(
             "show-save-image-dialog",
-            async () => {
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
 
-                const result = await dialog.showSaveDialog({
-
+                const options: Electron.SaveDialogOptions = {
                     title: "Save Image",
-
                     defaultPath: "image.png",
 
                     filters: [
-
                         {
                             name: "PNG Image",
-                            extensions: ["png"]
+                            extensions: ["png"],
                         },
-
                         {
                             name: "JPEG Image",
-                            extensions: ["jpg", "jpeg"]
+                            extensions: ["jpg", "jpeg"],
                         },
-
                         {
                             name: "WebP Image",
-                            extensions: ["webp"]
-                        }
+                            extensions: ["webp"],
+                        },
+                    ],
+                };
 
-                    ]
+                if (defaultPath) {
+                    options.defaultPath = path.join(
+                        defaultPath,
+                        "image.png",
+                    );
+                }
 
-                });
+                const result =
+                    await dialog.showSaveDialog(options);
 
                 if (
                     result.canceled ||
@@ -108,17 +120,16 @@ export class IpcHandlers {
                 }
 
                 const extension =
-                    result.filePath
-                        .split(".")
-                        .pop()
-                        ?.toLowerCase() ?? "png";
+                    path.extname(result.filePath)
+                        .slice(1)
+                        .toLowerCase() || "png";
 
                 return {
                     filePath: result.filePath,
                     extension,
                 };
 
-            }
+            },
         );
 
         ipcMain.handle(

@@ -9,9 +9,13 @@ declare global {
         sendMessage(message: string): void;
         log(...args: unknown[]): void;
 
-        openImage(): Promise<string | null>;
+        openImage(
+            defaultPath?: string,
+        ): Promise<string | null>;
 
-        showSaveImageDialog(): Promise<SaveImageDialogResult | null>;
+        showSaveImageDialog(
+            defaultPath?: string,
+        ): Promise<SaveImageDialogResult | null>;
 
         writeImage(
             filePath: string,
@@ -30,4 +34,4 @@ declare global {
     }
 }
 
-export {};
+export { };

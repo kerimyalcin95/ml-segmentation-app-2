@@ -2,6 +2,9 @@
 import { Button } from '$lib/components/ui/button';
 import { CanvasManager } from '$lib/canvas/canvas';
 
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import { dirname } from '$lib/utils/path';
+
 import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon';
 
 interface Props {
@@ -16,11 +19,15 @@ async function saveImage() {
         return;
     }
 
-    const result = await window.electronAPI.showSaveImageDialog();
+    const result = await window.electronAPI.showSaveImageDialog(
+        sessionStore.lastDirectory,
+    );
 
     if (!result) {
         return;
     }
+
+    sessionStore.lastDirectory = dirname(result.filePath);
 
     let mimeType = 'image/png';
     let quality: number | undefined;
