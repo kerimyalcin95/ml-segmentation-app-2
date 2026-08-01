@@ -34,6 +34,12 @@ interface DocumentState {
     };
 }
 
+interface KonvaCanvasCache {
+    scene: {
+        _canvas: HTMLCanvasElement;
+    };
+}
+
 type ImageFilters = Parameters<Konva.Image["filters"]>[0];
 type ImageFilter = NonNullable<ImageFilters>[number];
 
@@ -662,24 +668,15 @@ export class Document {
             this.image.filters([konvaFilter]);
             this.image.cache();
 
-            // TODO: Replace with the correct cache canvas for your Konva version.
-            // Example:
-            //
-            // const filteredCanvas =
-            //     (this.image as any)._cache.scene._canvas;
-            //
-            // or
-            //
-            // const filteredCanvas =
-            //     (this.image as any)._getCanvasCache().scene._canvas;
-            //
-            // console.dir(this.image) after cache() to find the correct property.
-            const filteredCanvas = null as HTMLCanvasElement | null;
+            const cache = (
+                this.image as unknown as {
+                    _cache: Map<string, unknown>;
+                }
+            )._cache;
 
-            if (!filteredCanvas) {
-                console.dir(this.image);
-                continue;
-            }
+            const canvasCache = cache.get("canvas") as KonvaCanvasCache;
+
+            const filteredCanvas = canvasCache.scene._canvas;
 
             this.documentContext.save();
 
