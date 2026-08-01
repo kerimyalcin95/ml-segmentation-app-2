@@ -663,8 +663,10 @@ export class Document {
                 continue;
             }
 
+            // Use the current document as the source image.
             this.image.image(this.documentCanvas);
 
+            // Apply exactly one filter.
             this.image.filters([konvaFilter]);
             this.image.cache();
 
@@ -674,14 +676,29 @@ export class Document {
                 }
             )._cache;
 
-            const canvasCache = cache.get("canvas") as KonvaCanvasCache;
+            const canvasCache =
+                cache.get("canvas") as KonvaCanvasCache;
 
-            const filteredCanvas = canvasCache.scene._canvas;
+            const filteredCanvas =
+                canvasCache.scene._canvas;
 
-            this.documentContext.save();
+            // -----------------------------------------------------------------
+            // Temporary implementation:
+            // Replace the document with the filtered result.
+            // (No opacity / blend mode yet.)
+            // -----------------------------------------------------------------
 
-            this.documentContext.globalAlpha = filter.opacity;
-            this.documentContext.globalCompositeOperation = filter.blendMode;
+            this.documentContext.setTransform(
+                1,
+                0,
+                0,
+                1,
+                0,
+                0,
+            );
+
+            this.documentContext.globalAlpha = 1;
+            this.documentContext.globalCompositeOperation = "source-over";
 
             this.documentContext.clearRect(
                 0,
@@ -695,8 +712,6 @@ export class Document {
                 0,
                 0,
             );
-
-            this.documentContext.restore();
 
             this.image.clearCache();
             this.image.filters([]);
