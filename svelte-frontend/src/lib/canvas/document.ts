@@ -317,6 +317,22 @@ export class Document {
             this.imageState.width,
             this.imageState.height,
         );
+
+        console.log({
+            source: {
+                width: this.htmlImage.width,
+                height: this.htmlImage.height,
+            },
+            crop: this.imageState.crop,
+            destination: {
+                width: this.imageState.width,
+                height: this.imageState.height,
+            },
+            node: {
+                width: this.image?.width(),
+                height: this.image?.height(),
+            },
+        });
     }
 
     // Image operations
@@ -473,6 +489,13 @@ export class Document {
         this.renderImage();
 
         await this.commitDocumentCanvas();
+
+        this.setImageCrop({
+            x: 0,
+            y: 0,
+            width: width,
+            height: height
+        });
 
         this.apply();
         this.applyWorkspace();
