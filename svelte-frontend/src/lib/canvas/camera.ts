@@ -124,7 +124,7 @@ export class Camera {
     }
 
     private notify(): void {
-        this.events.emit("cameraChange", { state: this._state });
+        this.events.emit("cameraState", { state: this._state });
     }
 
     refresh(): void {

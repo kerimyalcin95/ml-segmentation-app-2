@@ -192,14 +192,14 @@ function stopPanning() {
 onMount(() => {
     canvas = new CanvasManager(canvasElement);
 
-    canvas.camera.events.on('cameraChange', ({ state }) => {
+    canvas.camera.events.on('cameraState', ({ state }) => {
         zoom = state.zoom;
 
         scroll.x = state.x;
         scroll.y = state.y;
     });
 
-    canvas.document.events.on('workspaceChange', ({ width, height }) => {
+    canvas.document.events.on('workspaceResize', ({ width, height }) => {
         workspaceSize.width = width;
         workspaceSize.height = height;
     });

@@ -45,19 +45,16 @@ export class CanvasManager {
             this.layer
         );
 
-        this.document.events.on("refreshCamera", () => {
+        this.document.events.on("cameraRefresh", () => {
             this.camera.refresh();
         });
 
-        this.document.events.on("redrawLayer", () => {
+        this.document.events.on("layerRedraw", () => {
             this.layer.batchDraw();
         });
 
-        this.document.events.on("documentChange", () => {
+        this.document.events.on("cameraCenter", () => {
             this.camera.center();
-        })
-
-        this.camera.events.on("cameraChange", () => {
         })
 
         contextContainer.register(CONTEXT.MainStage, this.stage);

@@ -1,18 +1,18 @@
 import { type CameraState } from "./camera";
 
 export type CanvasEvents = {
-    cameraChange: {state: CameraState};
-    refreshCamera: undefined;
-    redrawLayer: undefined;
+    cameraState: {state: CameraState};
+    cameraRefresh: undefined;
+    layerRedraw: undefined;
 
     documentResize: {
         width: number;
         height: number;
     };
 
-    documentChange: undefined;
+    cameraCenter: undefined;
 
-    workspaceChange: {
+    workspaceResize: {
         width: number;
         height: number;
     }

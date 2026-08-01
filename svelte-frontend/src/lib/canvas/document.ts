@@ -7,11 +7,6 @@ import { Camera } from "./camera";
 import { type FilterState, FilterType } from '$lib/types/filter';
 import { Workspace } from './workspace';
 
-export enum DocumentChange {
-    Layer,
-    Camera
-}
-
 interface CropState {
     x: number;
     y: number;
@@ -196,7 +191,7 @@ export class Document {
             height: bounds.height + 2 * this.workspace.margin
         })
 
-        this._events.emit("workspaceChange", { width: this.workspace.width, height: this.workspace.height });
+        this._events.emit("workspaceResize", { width: this.workspace.width, height: this.workspace.height });
     }
 
     private centerInWorkspace(): void {
@@ -253,7 +248,7 @@ export class Document {
 
         this.applyImageFilters();
 
-        this._events.emit("redrawLayer");
+        this._events.emit("layerRedraw");
     }
 
     private drawImage(): void {
@@ -340,7 +335,7 @@ export class Document {
                     height: image.height,
                 });
 
-                this._events.emit("documentChange");
+                this._events.emit("cameraCenter");
 
                 cleanup();
                 resolve();
@@ -398,7 +393,7 @@ export class Document {
         camera.group.scale(oldScale);
         camera.group.position(oldPosition);
 
-        this._events.emit("redrawLayer");
+        this._events.emit("layerRedraw");
 
         const blob =
             await new Promise<Blob>((resolve, reject) => {
@@ -450,7 +445,7 @@ export class Document {
             height: size.height,
         });
 
-        this._events.emit("refreshCamera");
+        this._events.emit("cameraRefresh");
     }
 
     cropImage(
@@ -481,7 +476,7 @@ export class Document {
             height: height,
         });
 
-        this._events.emit("refreshCamera");
+        this._events.emit("cameraRefresh");
     }
 
     rotateImage(angle: number) {
@@ -500,7 +495,7 @@ export class Document {
             height: this.getDocumentBoundsSize().height
         });
 
-        // this._events.emit("documentChange");
+        this._events.emit("cameraCenter");
     }
 
     flipImage(
@@ -524,7 +519,7 @@ export class Document {
         this.centerInWorkspace();
 
         this.imageNode.cache();
-        this._events.emit("refreshCamera");
+        this._events.emit("cameraRefresh");
     }
 
     // Filter
