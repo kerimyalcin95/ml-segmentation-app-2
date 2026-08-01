@@ -60,8 +60,6 @@ export class CanvasManager {
         contextContainer.register(CONTEXT.MainStage, this.stage);
         contextContainer.register(CONTEXT.Camera, this._camera);
         contextContainer.register(CONTEXT.Document, this._document);
-
-        this.document.__camera = this._camera; // DEBUG
     }
 
     // Canvas, Stage

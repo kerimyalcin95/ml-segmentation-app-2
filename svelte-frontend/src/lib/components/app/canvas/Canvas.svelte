@@ -194,7 +194,7 @@ onMount(() => {
         scroll.y = state.y;
     });
 
-    canvas.document.events.on('workspaceResize', ({ width, height }) => {
+    canvas.document.workspace.events.on('workspaceResize', ({ width, height }) => {
         workspaceSize.width = width;
         workspaceSize.height = height;
 

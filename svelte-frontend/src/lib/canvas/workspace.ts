@@ -1,3 +1,6 @@
+import mitt from "mitt";
+import { type CanvasEvents } from "./events";
+
 export interface Bounds {
     x: number;
     y: number;
@@ -6,6 +9,13 @@ export interface Bounds {
 }
 
 export class Workspace {
+
+    private readonly _events = mitt<CanvasEvents>();
+
+    get events() {
+        return this._events;
+    }
+
     private bounds: Bounds = {
         x: 0,
         y: 0,
@@ -39,6 +49,11 @@ export class Workspace {
         this.top = this.bounds.y - this._margin;
         this.right = this.bounds.x + this.bounds.width + this._margin;
         this.bottom = this.bounds.y + this.bounds.height + this._margin;
+
+        this._events.emit("workspaceResize", {
+            width: this.width,
+            height: this.height
+        })
     }
 
     get width(): number {

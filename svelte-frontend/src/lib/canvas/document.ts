@@ -62,8 +62,6 @@ export class Document {
     private readonly documentCanvas = document.createElement("canvas");
     private readonly documentContext;
 
-    __camera: Camera | null; // DEBUG
-
     private imageState: ImageState = {
         width: 0,
         height: 0,
@@ -101,8 +99,8 @@ export class Document {
             throw new Error("Failed to create 2D rendering context.");
         }
 
-        this.__camera = null; // DEBUG
         this.documentContext = context;
+
         this._workspace = new Workspace();
     }
 
@@ -146,10 +144,10 @@ export class Document {
             y: height / 2,
         });
 
-        this.updateDocumentState(width, height);
+        this.setDocumentSize(width, height);
     }
 
-    private updateImageState(
+    private setImageSize(
         width: number,
         height: number,
     ): void {
@@ -157,15 +155,20 @@ export class Document {
         this.imageState.height = height;
     }
 
-    private updateDocumentState(
+    private setDocumentSize(
         width: number,
         height: number,
     ): void {
         this.state.size.width = width;
         this.state.size.height = height;
+
+        this._events.emit("documentResize", {
+            width: width,
+            height: height
+        })
     }
 
-    private updateWorkspace(): void {
+    private applyWorkspace(): void {
 
         // insert the size of the document (bounds)
         this.workspace.setBounds({
@@ -174,8 +177,6 @@ export class Document {
             width: this.state.size.width,
             height: this.state.size.height
         })
-
-        this._events.emit("workspaceResize", { width: this.workspace.width, height: this.workspace.height });
     }
 
     private centerInWorkspace(): void {
@@ -225,11 +226,8 @@ export class Document {
         if (!this.imageNode) return;
 
         this.prepareRenderCanvas();
-
         this.drawImage();
-
         this.updateImageNode();
-
         this.applyImageFilters();
 
         this._events.emit("layerRedraw");
@@ -284,9 +282,8 @@ export class Document {
                     width: image.width,
                     height: image.height,
                 };
-                
-                this.updateImageState(image.width, image.height);
-                this.updateDocumentState(image.width, image.height);
+
+                this.setImageSize(image.width, image.height);
 
                 this._group.destroyChildren();
 
@@ -312,14 +309,10 @@ export class Document {
 
                 this.renderImage();
                 this.apply();
-                this.updateWorkspace();
+                this.applyWorkspace();
                 this.centerInWorkspace();
 
-                this._events.emit("documentResize", {
-                    width: image.width,
-                    height: image.height,
-                });
-
+                this._events.emit("cameraRefresh");
                 this._events.emit("cameraCenter");
 
                 cleanup();
@@ -415,21 +408,15 @@ export class Document {
     }
 
     resizeImage(width: number, height: number) {
-        this.updateDocumentState(width, height);
-
+        this.setImageSize(width, height);
         this.renderImage();
 
         this.apply();
-        this.updateWorkspace();
-        this.updateDocumentState(width, height);
+        this.applyWorkspace();
         this.centerInWorkspace();
 
-        this._events.emit("documentResize", {
-            width: this.state.size.width,
-            height: this.state.size.height,
-        });
-
         this._events.emit("cameraRefresh");
+        this._events.emit("cameraCenter");
     }
 
     cropImage(
@@ -449,17 +436,13 @@ export class Document {
 
         this.renderImage();
 
+        this.setImageSize(width, height);
         this.apply();
-        this.updateDocumentState(width, height);
-        this.updateWorkspace();
+        this.applyWorkspace();
         this.centerInWorkspace();
 
-        this._events.emit("documentResize", {
-            width: width,
-            height: height,
-        });
-
         this._events.emit("cameraRefresh");
+        this._events.emit("cameraCenter");
     }
 
     rotateImage(angle: number) {
@@ -470,16 +453,10 @@ export class Document {
             ) % 360;
 
         this.apply();
-        this.updateWorkspace();
+        this.applyWorkspace();
         this.centerInWorkspace();
 
-        this._events.emit("documentResize", {
-            width: this.state.size.width,
-            height: this.state.size.height
-        });
-
         this._events.emit("cameraRefresh");
-        this._events.emit("cameraCenter");
     }
 
     flipImage(
@@ -499,7 +476,7 @@ export class Document {
         }
 
         this.apply();
-        this.updateWorkspace();
+        this.applyWorkspace();
         this.centerInWorkspace();
 
         this.imageNode.cache();
