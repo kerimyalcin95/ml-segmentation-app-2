@@ -317,22 +317,6 @@ export class Document {
             this.imageState.width,
             this.imageState.height,
         );
-
-        console.log({
-            source: {
-                width: this.htmlImage.width,
-                height: this.htmlImage.height,
-            },
-            crop: this.imageState.crop,
-            destination: {
-                width: this.imageState.width,
-                height: this.imageState.height,
-            },
-            node: {
-                width: this.image?.width(),
-                height: this.image?.height(),
-            },
-        });
     }
 
     // Image operations
