@@ -468,9 +468,11 @@ export class Document {
 
     }
 
-    resizeImage(width: number, height: number) {
+    async resizeImage(width: number, height: number) {
         this.setImageSize(width, height);
         this.renderImage();
+
+        await this.commitDocumentCanvas();
 
         this.apply();
         this.applyWorkspace();
@@ -496,7 +498,7 @@ export class Document {
         })
         this.setImageSize(width, height);
         this.renderImage();
-        
+
         await this.commitDocumentCanvas();
 
         this.apply();

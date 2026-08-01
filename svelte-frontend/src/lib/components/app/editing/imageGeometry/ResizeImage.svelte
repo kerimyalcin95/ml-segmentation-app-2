@@ -20,8 +20,8 @@ $effect(() => {
     height = documentSize.height;
 });
 
-function resize() {
-    canvas.document.resizeImage(width, height);
+async function resize() {
+    await canvas.document.resizeImage(width, height);
 }
 </script>
 
