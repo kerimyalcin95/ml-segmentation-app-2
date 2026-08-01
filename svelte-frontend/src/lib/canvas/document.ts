@@ -56,9 +56,9 @@ export class Document {
     }
 
     // Private member variables
-    private imageNode?: Konva.Image;
+    private image?: Konva.Image;
 
-    private originalImage?: HTMLImageElement;
+    private htmlImage?: HTMLImageElement;
     private readonly documentCanvas = document.createElement("canvas");
     private readonly documentContext;
 
@@ -145,16 +145,16 @@ export class Document {
         this.imageState.width = width;
         this.imageState.height = height;
 
-        if (!this.imageNode) {
+        if (!this.image) {
             return;
         }
 
-        this.imageNode.setSize({
+        this.image.setSize({
             width: width,
             height: height
         });
 
-        this.imageNode.offset({
+        this.image.offset({
             x: width / 2,
             y: height / 2,
         });
@@ -221,22 +221,22 @@ export class Document {
     }
 
     private updateImageNode(): void {
-        if (!this.imageNode) {
+        if (!this.image) {
             return;
         }
 
-        this.imageNode.image(this.documentCanvas);
+        this.image.image(this.documentCanvas);
 
-        this.imageNode.width(this.imageState.width);
-        this.imageNode.height(this.imageState.height);
+        this.image.width(this.imageState.width);
+        this.image.height(this.imageState.height);
 
-        this.imageNode.offsetX(this.imageState.width / 2);
-        this.imageNode.offsetY(this.imageState.height / 2);
+        this.image.offsetX(this.imageState.width / 2);
+        this.image.offsetY(this.imageState.height / 2);
     }
 
     private renderImage(): void {
-        if (!this.originalImage) return;
-        if (!this.imageNode) return;
+        if (!this.htmlImage) return;
+        if (!this.image) return;
 
         this.prepareRenderCanvas();
         this.drawImage();
@@ -247,14 +247,14 @@ export class Document {
     }
 
     private drawImage(): void {
-        if (!this.originalImage) {
+        if (!this.htmlImage) {
             return;
         }
 
         const crop = this.imageState.crop;
 
         this.documentContext.drawImage(
-            this.originalImage,
+            this.htmlImage,
             crop.x,
             crop.y,
             crop.width,
@@ -287,7 +287,7 @@ export class Document {
             const image = new window.Image();
 
             image.onload = () => {
-                this.originalImage = image;
+                this.htmlImage = image;
 
                 this.imageState.crop = {
                     x: 0,
@@ -298,7 +298,7 @@ export class Document {
 
                 this._group.destroyChildren();
 
-                this.imageNode = new Konva.Image({
+                this.image = new Konva.Image({
                     image: this.documentCanvas,
                     x: 0,
                     y: 0,
@@ -312,7 +312,7 @@ export class Document {
                 this.setImageSize(image.width, image.height);
 
                 this._group.add(
-                    this.imageNode
+                    this.image
                 );
 
                 this.renderImage();
@@ -433,7 +433,7 @@ export class Document {
         width: number,
         height: number
     ) {
-        if (!this.imageNode) return;
+        if (!this.image) return;
 
         this.imageState.crop = {
             x,
@@ -471,7 +471,7 @@ export class Document {
         horizontal: boolean,
         vertical: boolean,
     ) {
-        if (!this.imageNode) return;
+        if (!this.image) return;
 
         if (horizontal) {
             this.state.flip.horizontal =
@@ -487,7 +487,7 @@ export class Document {
         this.applyWorkspace();
         this.centerInWorkspace();
 
-        this.imageNode.cache();
+        this.image.cache();
         this._events.emit("cameraRefresh");
     }
 
@@ -506,7 +506,7 @@ export class Document {
     }
 
     private applyImageFilters(): void {
-        if (!this.imageNode) {
+        if (!this.image) {
             return;
         }
 
@@ -515,22 +515,22 @@ export class Document {
         for (const filter of this.imageState.filters) {
             switch (filter.type) {
                 case FilterType.Blur:
-                    this.imageNode.blurRadius(filter.blurRadius);
+                    this.image.blurRadius(filter.blurRadius);
                     filters.push(Konva.Filters.Blur);
                     break;
 
                 case FilterType.Brighten:
-                    this.imageNode.brightness(filter.brightness);
+                    this.image.brightness(filter.brightness);
                     filters.push(Konva.Filters.Brighten);
                     break;
 
                 case FilterType.Contrast:
-                    this.imageNode.contrast(filter.contrast);
+                    this.image.contrast(filter.contrast);
                     filters.push(Konva.Filters.Contrast);
                     break;
 
                 case FilterType.Enhance:
-                    this.imageNode.enhance(filter.enhance);
+                    this.image.enhance(filter.enhance);
                     filters.push(Konva.Filters.Enhance);
                     break;
 
@@ -539,9 +539,9 @@ export class Document {
                     break;
 
                 case FilterType.HSL:
-                    this.imageNode.hue(filter.hue);
-                    this.imageNode.saturation(filter.saturation);
-                    this.imageNode.luminance(filter.luminance);
+                    this.image.hue(filter.hue);
+                    this.image.saturation(filter.saturation);
+                    this.image.luminance(filter.luminance);
                     filters.push(Konva.Filters.HSL);
                     break;
 
@@ -550,29 +550,29 @@ export class Document {
                     break;
 
                 case FilterType.Mask:
-                    this.imageNode.threshold(filter.threshold);
+                    this.image.threshold(filter.threshold);
                     filters.push(Konva.Filters.Mask);
                     break;
 
                 case FilterType.Noise:
-                    this.imageNode.noise(filter.noise);
+                    this.image.noise(filter.noise);
                     filters.push(Konva.Filters.Noise);
                     break;
 
                 case FilterType.Pixelate:
-                    this.imageNode.pixelSize(filter.pixelSize);
+                    this.image.pixelSize(filter.pixelSize);
                     filters.push(Konva.Filters.Pixelate);
                     break;
 
                 case FilterType.Posterize:
-                    this.imageNode.levels(filter.levels);
+                    this.image.levels(filter.levels);
                     filters.push(Konva.Filters.Posterize);
                     break;
 
                 case FilterType.RGB:
-                    this.imageNode.red(filter.red);
-                    this.imageNode.green(filter.green);
-                    this.imageNode.blue(filter.blue);
+                    this.image.red(filter.red);
+                    this.image.green(filter.green);
+                    this.image.blue(filter.blue);
                     filters.push(Konva.Filters.RGB);
                     break;
 
@@ -585,13 +585,13 @@ export class Document {
                     break;
 
                 case FilterType.Threshold:
-                    this.imageNode.threshold(filter.threshold);
+                    this.image.threshold(filter.threshold);
                     filters.push(Konva.Filters.Threshold);
                     break;
             }
         }
 
-        this.imageNode.filters(filters);
-        this.imageNode.cache();
+        this.image.filters(filters);
+        this.image.cache();
     }
 }
