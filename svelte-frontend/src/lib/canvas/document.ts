@@ -64,6 +64,7 @@ export class Document {
 
     // Private member variables
     private image?: Konva.Image;
+    private readonly filterImage = new Konva.Image();
 
     private htmlImage?: HTMLImageElement;
     private readonly documentCanvas = document.createElement("canvas");
@@ -576,61 +577,59 @@ export class Document {
     }
 
     private configureFilter(
+        image: Konva.Image,
         filter: FilterState,
     ): ImageFilter | null {
-        if (!this.image) {
-            return null;
-        }
 
         switch (filter.type) {
             case FilterType.Blur:
-                this.image.blurRadius(filter.blurRadius);
+                image.blurRadius(filter.blurRadius);
                 return Konva.Filters.Blur;
 
             case FilterType.Brighten:
-                this.image.brightness(filter.brightness);
+                image.brightness(filter.brightness);
                 return Konva.Filters.Brighten;
 
             case FilterType.Contrast:
-                this.image.contrast(filter.contrast);
+                image.contrast(filter.contrast);
                 return Konva.Filters.Contrast;
 
             case FilterType.Enhance:
-                this.image.enhance(filter.enhance);
+                image.enhance(filter.enhance);
                 return Konva.Filters.Enhance;
 
             case FilterType.Grayscale:
                 return Konva.Filters.Grayscale;
 
             case FilterType.HSL:
-                this.image.hue(filter.hue);
-                this.image.saturation(filter.saturation);
-                this.image.luminance(filter.luminance);
+                image.hue(filter.hue);
+                image.saturation(filter.saturation);
+                image.luminance(filter.luminance);
                 return Konva.Filters.HSL;
 
             case FilterType.Invert:
                 return Konva.Filters.Invert;
 
             case FilterType.Mask:
-                this.image.threshold(filter.threshold);
+                image.threshold(filter.threshold);
                 return Konva.Filters.Mask;
 
             case FilterType.Noise:
-                this.image.noise(filter.noise);
+                image.noise(filter.noise);
                 return Konva.Filters.Noise;
 
             case FilterType.Pixelate:
-                this.image.pixelSize(filter.pixelSize);
+                image.pixelSize(filter.pixelSize);
                 return Konva.Filters.Pixelate;
 
             case FilterType.Posterize:
-                this.image.levels(filter.levels);
+                image.levels(filter.levels);
                 return Konva.Filters.Posterize;
 
             case FilterType.RGB:
-                this.image.red(filter.red);
-                this.image.green(filter.green);
-                this.image.blue(filter.blue);
+                image.red(filter.red);
+                image.green(filter.green);
+                image.blue(filter.blue);
                 return Konva.Filters.RGB;
 
             case FilterType.Sepia:
@@ -640,7 +639,7 @@ export class Document {
                 return Konva.Filters.Solarize;
 
             case FilterType.Threshold:
-                this.image.threshold(filter.threshold);
+                image.threshold(filter.threshold);
                 return Konva.Filters.Threshold;
 
             default:
@@ -653,25 +652,26 @@ export class Document {
             return;
         }
 
-        this.image.filters([]);
-        this.image.clearCache();
+        this.filterImage.filters([]);
+        this.filterImage.clearCache();
 
         for (const filter of this.imageState.filters) {
-            const konvaFilter = this.configureFilter(filter);
+            const konvaFilter = this.configureFilter(
+                this.filterImage,
+                filter,
+            );
 
             if (!konvaFilter) {
                 continue;
             }
 
-            // Use the current document as the source image.
-            this.image.image(this.documentCanvas);
+            this.filterImage.image(this.documentCanvas);
 
-            // Apply exactly one filter.
-            this.image.filters([konvaFilter]);
-            this.image.cache();
+            this.filterImage.filters([konvaFilter]);
+            this.filterImage.cache();
 
             const cache = (
-                this.image as unknown as {
+                this.filterImage as unknown as {
                     _cache: Map<string, unknown>;
                 }
             )._cache;
@@ -713,8 +713,8 @@ export class Document {
                 0,
             );
 
-            this.image.clearCache();
-            this.image.filters([]);
+            this.filterImage.clearCache();
+            this.filterImage.filters([]);
         }
 
         this.image.image(this.documentCanvas);
