@@ -35,6 +35,7 @@ interface DocumentState {
 }
 
 type ImageFilters = Parameters<Konva.Image["filters"]>[0];
+type ImageFilter = NonNullable<ImageFilters>[number];
 
 export class Document {
 
@@ -566,6 +567,79 @@ export class Document {
         this.imageState.filters = [...filters];
 
         this.renderImage();
+    }
+
+    private configureFilter(
+        filter: FilterState,
+    ): ImageFilter | null {
+        if (!this.image) {
+            return null;
+        }
+
+        switch (filter.type) {
+            case FilterType.Blur:
+                this.image.blurRadius(filter.blurRadius);
+                return Konva.Filters.Blur;
+
+            case FilterType.Brighten:
+                this.image.brightness(filter.brightness);
+                return Konva.Filters.Brighten;
+
+            case FilterType.Contrast:
+                this.image.contrast(filter.contrast);
+                return Konva.Filters.Contrast;
+
+            case FilterType.Enhance:
+                this.image.enhance(filter.enhance);
+                return Konva.Filters.Enhance;
+
+            case FilterType.Grayscale:
+                return Konva.Filters.Grayscale;
+
+            case FilterType.HSL:
+                this.image.hue(filter.hue);
+                this.image.saturation(filter.saturation);
+                this.image.luminance(filter.luminance);
+                return Konva.Filters.HSL;
+
+            case FilterType.Invert:
+                return Konva.Filters.Invert;
+
+            case FilterType.Mask:
+                this.image.threshold(filter.threshold);
+                return Konva.Filters.Mask;
+
+            case FilterType.Noise:
+                this.image.noise(filter.noise);
+                return Konva.Filters.Noise;
+
+            case FilterType.Pixelate:
+                this.image.pixelSize(filter.pixelSize);
+                return Konva.Filters.Pixelate;
+
+            case FilterType.Posterize:
+                this.image.levels(filter.levels);
+                return Konva.Filters.Posterize;
+
+            case FilterType.RGB:
+                this.image.red(filter.red);
+                this.image.green(filter.green);
+                this.image.blue(filter.blue);
+                return Konva.Filters.RGB;
+
+            case FilterType.Sepia:
+                return Konva.Filters.Sepia;
+
+            case FilterType.Solarize:
+                return Konva.Filters.Solarize;
+
+            case FilterType.Threshold:
+                this.image.threshold(filter.threshold);
+                return Konva.Filters.Threshold;
+
+            default:
+                return null;
+        }
     }
 
     private applyImageFilters(): void {
