@@ -310,11 +310,23 @@ export class Document {
         this.image.offsetY(this.imageState.height / 2);
     }
 
-    private async renderImage(): Promise<void> {
+    private renderImage(
+        options: {
+            applyFilters?: boolean;
+        } = {},
+    ): void {
+
+        const {
+            applyFilters = true,
+        } = options;
+
         this.prepareRenderCanvas();
         this.drawImage();
         this.updateImageNode();
-        await this.applyImageFilters();
+
+        if (applyFilters) {
+            this.applyImageFilters();
+        }
 
         this._events.emit("layerRedraw");
     }
@@ -359,7 +371,7 @@ export class Document {
 
             const image = new window.Image();
 
-            image.onload = async () => {
+            image.onload = () => {
                 this.htmlImage = image;
 
                 this.imageState.crop = {
@@ -388,7 +400,7 @@ export class Document {
                     this.image
                 );
 
-                await this.renderImage();
+                this.renderImage();
                 this.apply();
                 this.applyWorkspace();
                 this.centerInWorkspace();
@@ -488,10 +500,10 @@ export class Document {
 
     }
 
-    async resizeImage(width: number, height: number) {
+    async resizeImage(width: number, height: number): Promise<void> {
         this.setImageSize(width, height);
-        await this.renderImage();
 
+        this.renderImage({applyFilters: false});
         await this.commitDocumentCanvas();
 
         this.setImageCrop({
@@ -504,6 +516,8 @@ export class Document {
         this.apply();
         this.applyWorkspace();
         this.centerInWorkspace();
+
+        this.applyImageFilters()
 
         this._events.emit("cameraRefresh");
         this._events.emit("cameraCenter");
@@ -524,13 +538,15 @@ export class Document {
             height: height
         })
         this.setImageSize(width, height);
-        await this.renderImage();
 
+        this.renderImage({applyFilters: false});
         await this.commitDocumentCanvas();
 
         this.apply();
         this.applyWorkspace();
         this.centerInWorkspace();
+
+        this.applyImageFilters();
 
         this._events.emit("cameraRefresh");
         this._events.emit("cameraCenter");
@@ -576,16 +592,16 @@ export class Document {
 
     // Filter
 
-    async addFilter(filter: FilterState): Promise<void> {
+    addFilter(filter: FilterState): void {
         this.imageState.filters.push(filter);
 
-        await this.renderImage();
+        this.renderImage();
     }
 
-    async setFilters(filters: FilterState[]): Promise<void> {
+    setFilters(filters: FilterState[]): void {
         this.imageState.filters = [...filters];
 
-        await this.renderImage();
+        this.renderImage();
     }
 
     private configureFilter(
@@ -659,7 +675,7 @@ export class Document {
         }
     }
 
-    private async applyImageFilters() {
+    private applyImageFilters(): void {
         if (!this.image) {
             return;
         }
@@ -690,17 +706,12 @@ export class Document {
             this.filterSourceCanvas.height,
         );
 
-        destinationContext.clearRect(
-            0,
-            0,
-            this.filterDestinationCanvas.width,
-            this.filterDestinationCanvas.height,
-        );
-
         sourceContext.drawImage(
             this.documentCanvas,
             0,
             0,
+            this.filterSourceCanvas.width,
+            this.filterSourceCanvas.height,
         );
 
         for (const filter of this.imageState.filters) {
@@ -732,13 +743,35 @@ export class Document {
                 this.filterDestinationCanvas.height,
             );
 
+            // Draw the previous image.
+            destinationContext.globalAlpha = 1;
+            destinationContext.globalCompositeOperation = "source-over";
+
+            destinationContext.drawImage(
+                this.filterSourceCanvas,
+                0,
+                0,
+                this.filterSourceCanvas.width,
+                this.filterSourceCanvas.height,
+            );
+
+            // Blend the filtered image over it.
+            destinationContext.globalAlpha = filter.opacity;
+            destinationContext.globalCompositeOperation =
+                filter.blendMode;
+
             destinationContext.drawImage(
                 this.image.toCanvas({
                     pixelRatio: 1,
                 }),
                 0,
                 0,
+                this.filterSourceCanvas.width,
+                this.filterSourceCanvas.height,
             );
+
+            destinationContext.globalAlpha = 1;
+            destinationContext.globalCompositeOperation = "source-over";
 
             this.image.filters([]);
             this.image.clearCache();
@@ -754,6 +787,8 @@ export class Document {
                 this.filterDestinationCanvas,
                 0,
                 0,
+                this.filterSourceCanvas.width,
+                this.filterSourceCanvas.height
             );
         }
 
@@ -771,9 +806,5 @@ export class Document {
         );
 
         this.image.image(this.documentCanvas);
-
-        await new Promise<void>((resolve) => {
-            requestAnimationFrame(() => {resolve()});
-        });
     }
 }

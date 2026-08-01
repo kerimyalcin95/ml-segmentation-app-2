@@ -26,8 +26,8 @@ let currentFilter = $derived(
 );
 
 
-async function applyFilters(): Promise<void> {
-    await canvas.document.setFilters(
+function applyFilters(): void {
+    canvas.document.setFilters(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         activeFilters.map(({ id, ...filter }) => filter),
     );
