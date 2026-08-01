@@ -364,7 +364,7 @@ let { currentFilter }: Props = $props();
                     {currentFilter.blendMode}
                 </Select.Trigger>
 
-                <Select.Content>
+                <Select.Content class="max-h-50">
                     {#each blendModes as mode (mode)}
                         <Select.Item value={mode}>
                             {mode}

@@ -171,7 +171,7 @@ function addFilter() {
                 {selectedFilter || 'Select filter'}
             </Select.Trigger>
 
-            <Select.Content>
+            <Select.Content class="max-h-50">
                 {#each availableFilters as filter (filter.name)}
                     <Select.Item value={filter.name}>
                         {filter.name}
