@@ -25,6 +25,11 @@ $effect(() => {
         width = documentSize.width;
         height = documentSize.height;
     }
+
+    canvas.document.events.on("documentResize", ({width: newWidth, height: newHeight}) => {
+        width = newWidth;
+        height = newHeight;
+    });
 });
 
 function crop() {
