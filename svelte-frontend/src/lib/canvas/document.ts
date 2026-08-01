@@ -138,6 +138,53 @@ export class Document {
         this.setDocumentSize(width, height);
     }
 
+    private async commitDocumentCanvas(): Promise<void> {
+
+        const blob = await new Promise<Blob>((resolve, reject) => {
+
+            this.documentCanvas.toBlob((blob) => {
+
+                if (!blob) {
+                    reject(new Error("Failed to create image blob."));
+                    return;
+                }
+
+                resolve(blob);
+
+            });
+
+        });
+
+        const url = URL.createObjectURL(blob);
+
+        try {
+
+            const image = new window.Image();
+
+            await new Promise<void>((resolve, reject) => {
+
+                image.onload = () => {
+                    resolve();
+                };
+
+                image.onerror = () => {
+                    reject(new Error("Failed to load image."));
+                };
+
+                image.src = url;
+
+            });
+
+            this.htmlImage = image;
+
+        } finally {
+
+            URL.revokeObjectURL(url);
+
+        }
+
+    }
+
     private setImageSize(
         width: number,
         height: number,
@@ -158,6 +205,15 @@ export class Document {
             x: width / 2,
             y: height / 2,
         });
+    }
+
+    setImageCrop(crop: CropState) {
+        this.imageState.crop = {
+            x: crop.x,
+            y: crop.y,
+            width: crop.width,
+            height: crop.height
+        }
     }
 
     private setDocumentSize(
@@ -235,9 +291,6 @@ export class Document {
     }
 
     private renderImage(): void {
-        if (!this.htmlImage) return;
-        if (!this.image) return;
-
         this.prepareRenderCanvas();
         this.drawImage();
         this.updateImageNode();
@@ -427,24 +480,25 @@ export class Document {
         this._events.emit("cameraCenter");
     }
 
-    cropImage(
+    async cropImage(
         x: number = 0,
         y: number = 0,
         width: number,
         height: number
-    ) {
+    ): Promise<void> {
         if (!this.image) return;
 
-        this.imageState.crop = {
-            x,
-            y,
-            width,
-            height,
-        };
-
-        this.renderImage();
-
+        this.setImageCrop({
+            x: x,
+            y: y,
+            width: width,
+            height: height
+        })
         this.setImageSize(width, height);
+        this.renderImage();
+        
+        await this.commitDocumentCanvas();
+
         this.apply();
         this.applyWorkspace();
         this.centerInWorkspace();

@@ -32,8 +32,8 @@ $effect(() => {
     });
 });
 
-function crop() {
-    canvas.document.cropImage(x, y, width, height);
+async function crop() {
+    await canvas.document.cropImage(x, y, width, height);
 }
 </script>
 
