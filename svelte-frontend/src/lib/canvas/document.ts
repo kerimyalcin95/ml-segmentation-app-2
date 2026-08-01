@@ -38,6 +38,14 @@ interface KonvaCanvasCache {
     scene: {
         _canvas: HTMLCanvasElement;
     };
+
+    filter: {
+        _canvas: HTMLCanvasElement;
+    };
+
+    hit: {
+        _canvas: HTMLCanvasElement;
+    };
 }
 
 type ImageFilters = Parameters<Konva.Image["filters"]>[0];
@@ -64,7 +72,6 @@ export class Document {
 
     // Private member variables
     private image?: Konva.Image;
-    private readonly filterImage = new Konva.Image();
 
     private htmlImage?: HTMLImageElement;
     private readonly documentCanvas = document.createElement("canvas");
@@ -652,12 +659,12 @@ export class Document {
             return;
         }
 
-        this.filterImage.filters([]);
-        this.filterImage.clearCache();
+        this.image.filters([]);
+        this.image.clearCache();
 
         for (const filter of this.imageState.filters) {
             const konvaFilter = this.configureFilter(
-                this.filterImage,
+                this.image,
                 filter,
             );
 
@@ -665,13 +672,14 @@ export class Document {
                 continue;
             }
 
-            this.filterImage.image(this.documentCanvas);
+            this.image.image(this.documentCanvas);
 
-            this.filterImage.filters([konvaFilter]);
-            this.filterImage.cache();
+            this.image.filters([konvaFilter]);
+
+            this.image.cache();
 
             const cache = (
-                this.filterImage as unknown as {
+                this.image as unknown as {
                     _cache: Map<string, unknown>;
                 }
             )._cache;
@@ -679,14 +687,10 @@ export class Document {
             const canvasCache =
                 cache.get("canvas") as KonvaCanvasCache;
 
-            const filteredCanvas =
-                canvasCache.scene._canvas;
+            console.log(canvasCache);
 
-            // -----------------------------------------------------------------
-            // Temporary implementation:
-            // Replace the document with the filtered result.
-            // (No opacity / blend mode yet.)
-            // -----------------------------------------------------------------
+            const filteredCanvas =
+                canvasCache.filter._canvas;
 
             this.documentContext.setTransform(
                 1,
@@ -713,8 +717,7 @@ export class Document {
                 0,
             );
 
-            this.filterImage.clearCache();
-            this.filterImage.filters([]);
+            this.image.filters([]);
         }
 
         this.image.image(this.documentCanvas);
