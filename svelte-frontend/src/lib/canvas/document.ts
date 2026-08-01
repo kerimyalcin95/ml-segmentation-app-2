@@ -647,88 +647,64 @@ export class Document {
             return;
         }
 
-        const filters: NonNullable<ImageFilters> = [];
+        this.image.filters([]);
+        this.image.clearCache();
 
         for (const filter of this.imageState.filters) {
-            switch (filter.type) {
-                case FilterType.Blur:
-                    this.image.blurRadius(filter.blurRadius);
-                    filters.push(Konva.Filters.Blur);
-                    break;
+            const konvaFilter = this.configureFilter(filter);
 
-                case FilterType.Brighten:
-                    this.image.brightness(filter.brightness);
-                    filters.push(Konva.Filters.Brighten);
-                    break;
-
-                case FilterType.Contrast:
-                    this.image.contrast(filter.contrast);
-                    filters.push(Konva.Filters.Contrast);
-                    break;
-
-                case FilterType.Enhance:
-                    this.image.enhance(filter.enhance);
-                    filters.push(Konva.Filters.Enhance);
-                    break;
-
-                case FilterType.Grayscale:
-                    filters.push(Konva.Filters.Grayscale);
-                    break;
-
-                case FilterType.HSL:
-                    this.image.hue(filter.hue);
-                    this.image.saturation(filter.saturation);
-                    this.image.luminance(filter.luminance);
-                    filters.push(Konva.Filters.HSL);
-                    break;
-
-                case FilterType.Invert:
-                    filters.push(Konva.Filters.Invert);
-                    break;
-
-                case FilterType.Mask:
-                    this.image.threshold(filter.threshold);
-                    filters.push(Konva.Filters.Mask);
-                    break;
-
-                case FilterType.Noise:
-                    this.image.noise(filter.noise);
-                    filters.push(Konva.Filters.Noise);
-                    break;
-
-                case FilterType.Pixelate:
-                    this.image.pixelSize(filter.pixelSize);
-                    filters.push(Konva.Filters.Pixelate);
-                    break;
-
-                case FilterType.Posterize:
-                    this.image.levels(filter.levels);
-                    filters.push(Konva.Filters.Posterize);
-                    break;
-
-                case FilterType.RGB:
-                    this.image.red(filter.red);
-                    this.image.green(filter.green);
-                    this.image.blue(filter.blue);
-                    filters.push(Konva.Filters.RGB);
-                    break;
-
-                case FilterType.Sepia:
-                    filters.push(Konva.Filters.Sepia);
-                    break;
-
-                case FilterType.Solarize:
-                    filters.push(Konva.Filters.Solarize);
-                    break;
-
-                case FilterType.Threshold:
-                    this.image.threshold(filter.threshold);
-                    filters.push(Konva.Filters.Threshold);
-                    break;
+            if (!konvaFilter) {
+                continue;
             }
+
+            this.image.image(this.documentCanvas);
+
+            this.image.filters([konvaFilter]);
+            this.image.cache();
+
+            // TODO: Replace with the correct cache canvas for your Konva version.
+            // Example:
+            //
+            // const filteredCanvas =
+            //     (this.image as any)._cache.scene._canvas;
+            //
+            // or
+            //
+            // const filteredCanvas =
+            //     (this.image as any)._getCanvasCache().scene._canvas;
+            //
+            // console.dir(this.image) after cache() to find the correct property.
+            const filteredCanvas = null as HTMLCanvasElement | null;
+
+            if (!filteredCanvas) {
+                console.dir(this.image);
+                continue;
+            }
+
+            this.documentContext.save();
+
+            this.documentContext.globalAlpha = filter.opacity;
+            this.documentContext.globalCompositeOperation = filter.blendMode;
+
+            this.documentContext.clearRect(
+                0,
+                0,
+                this.documentCanvas.width,
+                this.documentCanvas.height,
+            );
+
+            this.documentContext.drawImage(
+                filteredCanvas,
+                0,
+                0,
+            );
+
+            this.documentContext.restore();
+
+            this.image.clearCache();
+            this.image.filters([]);
         }
 
-        this.image.filters(filters);
-        this.image.cache();
+        this.image.image(this.documentCanvas);
     }
 }
