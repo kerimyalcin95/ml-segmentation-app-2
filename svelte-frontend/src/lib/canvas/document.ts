@@ -145,26 +145,34 @@ export class Document {
             x: width / 2,
             y: height / 2,
         });
+
+        this.updateDocumentState(width, height);
+    }
+
+    private updateImageState(
+        width: number,
+        height: number,
+    ): void {
+        this.imageState.width = width;
+        this.imageState.height = height;
     }
 
     private updateDocumentState(
         width: number,
         height: number,
     ): void {
-        this.imageState.width = width;
-        this.imageState.height = height;
-
         this.state.size.width = width;
         this.state.size.height = height;
     }
 
     private updateWorkspace(): void {
 
+        // insert the size of the document (bounds)
         this.workspace.setBounds({
             x: 0,
             y: 0,
-            width: this.state.size.width + 2 * this.workspace.margin,
-            height: this.state.size.height + 2 * this.workspace.margin
+            width: this.state.size.width,
+            height: this.state.size.height
         })
 
         this._events.emit("workspaceResize", { width: this.workspace.width, height: this.workspace.height });
@@ -276,7 +284,8 @@ export class Document {
                     width: image.width,
                     height: image.height,
                 };
-
+                
+                this.updateImageState(image.width, image.height);
                 this.updateDocumentState(image.width, image.height);
 
                 this._group.destroyChildren();
@@ -412,6 +421,7 @@ export class Document {
 
         this.apply();
         this.updateWorkspace();
+        this.updateDocumentState(width, height);
         this.centerInWorkspace();
 
         this._events.emit("documentResize", {
@@ -437,11 +447,10 @@ export class Document {
             height,
         };
 
-        this.updateDocumentState(width, height);
-
         this.renderImage();
 
         this.apply();
+        this.updateDocumentState(width, height);
         this.updateWorkspace();
         this.centerInWorkspace();
 

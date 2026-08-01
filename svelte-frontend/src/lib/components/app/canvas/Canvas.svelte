@@ -45,11 +45,6 @@ let cameraStart = {
     y: 0,
 };
 
-let transformedDocumentSize = $state({
-    width: 0,
-    height: 0,
-});
-
 const wheelConfig = {
     scrollSpeed: 1,
 
@@ -64,8 +59,8 @@ const panConfig = {
     speed: 1,
 } as const;
 
-const contentWidth = $derived(transformedDocumentSize.width * zoom);
-const contentHeight = $derived(transformedDocumentSize.height * zoom);
+const contentWidth = $derived(workspaceSize.width * zoom);
+const contentHeight = $derived(workspaceSize.height * zoom);
 
 const maxScrollX = $derived(Math.max(0, contentWidth - viewportSize.width));
 const maxScrollY = $derived(Math.max(0, contentHeight - viewportSize.height));
@@ -203,12 +198,16 @@ onMount(() => {
         workspaceSize.width = width;
         workspaceSize.height = height;
 
-        transformedDocumentSize = canvas.document.getWorkspaceSize();
+        console.log("workspaceSize.width",workspaceSize.width);
+        console.log("workspaceSize.height",workspaceSize.height);
     });
 
     canvas.document.events.on('documentResize', ({ width, height }) => {
         documentSize.width = width;
         documentSize.height = height;
+
+        console.log("documentSize.width",documentSize.width);
+        console.log("documentSize.height",documentSize.height);
     });
 
     const observer = new ResizeObserver(() => {

@@ -131,6 +131,5 @@ export class Camera {
         this.clamp();
         this.apply();
         this.notify();
-
     }
 }
