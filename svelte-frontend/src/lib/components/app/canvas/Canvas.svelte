@@ -197,17 +197,11 @@ onMount(() => {
     canvas.document.workspace.events.on('workspaceResize', ({ width, height }) => {
         workspaceSize.width = width;
         workspaceSize.height = height;
-
-        console.log("workspaceSize.width",workspaceSize.width);
-        console.log("workspaceSize.height",workspaceSize.height);
     });
 
     canvas.document.events.on('documentResize', ({ width, height }) => {
         documentSize.width = width;
         documentSize.height = height;
-
-        console.log("documentSize.width",documentSize.width);
-        console.log("documentSize.height",documentSize.height);
     });
 
     const observer = new ResizeObserver(() => {

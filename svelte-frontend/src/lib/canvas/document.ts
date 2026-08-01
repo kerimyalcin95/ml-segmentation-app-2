@@ -149,6 +149,11 @@ export class Document {
             return;
         }
 
+        this.imageNode.setSize({
+            width: width,
+            height: height
+        });
+
         this.imageNode.offset({
             x: width / 2,
             y: height / 2,
@@ -164,6 +169,11 @@ export class Document {
 
         this._group.offsetX(0);
         this._group.offsetY(0);
+
+        this._group.setSize({
+            width: width,
+            height: height
+        });
 
         this._events.emit("documentResize", {
             width: width,
