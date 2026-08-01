@@ -202,13 +202,13 @@ onMount(() => {
     canvas.document.events.on('workspaceResize', ({ width, height }) => {
         workspaceSize.width = width;
         workspaceSize.height = height;
+
+        transformedDocumentSize = canvas.document.getWorkspaceSize();
     });
 
     canvas.document.events.on('documentResize', ({ width, height }) => {
         documentSize.width = width;
         documentSize.height = height;
-
-        transformedDocumentSize = canvas.document.getWorkspaceBoundsSize();
     });
 
     const observer = new ResizeObserver(() => {

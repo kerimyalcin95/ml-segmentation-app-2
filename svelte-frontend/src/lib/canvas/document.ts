@@ -107,29 +107,6 @@ export class Document {
     }
 
     // Functions
-    private getDocumentBounds() {
-        const camera = contextContainer.resolve<Camera>(CONTEXT.Camera);
-        const rect =
-            this._group.getClientRect({
-                relativeTo: camera.group,
-            });
-
-        return {
-            x: rect.x,
-            y: rect.y,
-            width: rect.width,
-            height: rect.height,
-        };
-    }
-
-    getDocumentBoundsSize() {
-        const bounds = this.getDocumentBounds();
-
-        return {
-            width: bounds.width,
-            height: bounds.height,
-        };
-    }
 
     private apply() {
 
@@ -182,13 +159,12 @@ export class Document {
     }
 
     private updateWorkspace(): void {
-        const bounds = this.getDocumentBoundsSize();
 
         this.workspace.setBounds({
             x: 0,
             y: 0,
-            width: bounds.width + 2 * this.workspace.margin,
-            height: bounds.height + 2 * this.workspace.margin
+            width: this.state.size.width + 2 * this.workspace.margin,
+            height: this.state.size.height + 2 * this.workspace.margin
         })
 
         this._events.emit("workspaceResize", { width: this.workspace.width, height: this.workspace.height });
@@ -201,7 +177,7 @@ export class Document {
         });
     }
 
-    getWorkspaceBoundsSize() {
+    getWorkspaceSize() {
         return {
             width: this._workspace.width,
             height: this._workspace.height
@@ -438,11 +414,9 @@ export class Document {
         this.updateWorkspace();
         this.centerInWorkspace();
 
-        const size = this.getDocumentBoundsSize();
-
         this._events.emit("documentResize", {
-            width: size.width,
-            height: size.height,
+            width: this.state.size.width,
+            height: this.state.size.height,
         });
 
         this._events.emit("cameraRefresh");
@@ -491,10 +465,11 @@ export class Document {
         this.centerInWorkspace();
 
         this._events.emit("documentResize", {
-            width: this.getDocumentBoundsSize().width,
-            height: this.getDocumentBoundsSize().height
+            width: this.state.size.width,
+            height: this.state.size.height
         });
 
+        this._events.emit("cameraRefresh");
         this._events.emit("cameraCenter");
     }
 
