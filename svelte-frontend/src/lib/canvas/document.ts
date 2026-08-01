@@ -34,20 +34,6 @@ interface DocumentState {
     };
 }
 
-interface KonvaCanvasCache {
-    scene: {
-        _canvas: HTMLCanvasElement;
-    };
-
-    filter: {
-        _canvas: HTMLCanvasElement;
-    };
-
-    hit: {
-        _canvas: HTMLCanvasElement;
-    };
-}
-
 type ImageFilters = Parameters<Konva.Image["filters"]>[0];
 type ImageFilter = NonNullable<ImageFilters>[number];
 
@@ -76,6 +62,12 @@ export class Document {
     private htmlImage?: HTMLImageElement;
     private readonly documentCanvas = document.createElement("canvas");
     private readonly documentContext;
+
+    private readonly filterSourceContext;
+    private readonly filterDestinationContext;
+
+    private readonly filterSourceCanvas = document.createElement("canvas");
+    private readonly filterDestinationCanvas = document.createElement("canvas");
 
     private imageState: ImageState = {
         width: 0,
@@ -109,6 +101,19 @@ export class Document {
         this._group = new Konva.Group();
 
         const context = this.documentCanvas.getContext("2d");
+
+        const filterSourceContext =
+            this.filterSourceCanvas.getContext("2d");
+
+        const filterDestinationContext =
+            this.filterDestinationCanvas.getContext("2d");
+
+        if (!filterSourceContext || !filterDestinationContext) {
+            throw new Error("Failed to create filter rendering contexts.");
+        }
+
+        this.filterSourceContext = filterSourceContext;
+        this.filterDestinationContext = filterDestinationContext;
 
         if (!context) {
             throw new Error("Failed to create 2D rendering context.");
@@ -305,11 +310,11 @@ export class Document {
         this.image.offsetY(this.imageState.height / 2);
     }
 
-    private renderImage(): void {
+    private async renderImage(): Promise<void> {
         this.prepareRenderCanvas();
         this.drawImage();
         this.updateImageNode();
-        this.applyImageFilters();
+        await this.applyImageFilters();
 
         this._events.emit("layerRedraw");
     }
@@ -336,7 +341,7 @@ export class Document {
 
     // Image operations
 
-    public loadImage(
+    public async loadImage(
         imageBytes: Uint8Array,
     ): Promise<void> {
 
@@ -354,7 +359,7 @@ export class Document {
 
             const image = new window.Image();
 
-            image.onload = () => {
+            image.onload = async () => {
                 this.htmlImage = image;
 
                 this.imageState.crop = {
@@ -383,7 +388,7 @@ export class Document {
                     this.image
                 );
 
-                this.renderImage();
+                await this.renderImage();
                 this.apply();
                 this.applyWorkspace();
                 this.centerInWorkspace();
@@ -485,7 +490,7 @@ export class Document {
 
     async resizeImage(width: number, height: number) {
         this.setImageSize(width, height);
-        this.renderImage();
+        await this.renderImage();
 
         await this.commitDocumentCanvas();
 
@@ -519,7 +524,7 @@ export class Document {
             height: height
         })
         this.setImageSize(width, height);
-        this.renderImage();
+        await this.renderImage();
 
         await this.commitDocumentCanvas();
 
@@ -571,16 +576,16 @@ export class Document {
 
     // Filter
 
-    addFilter(filter: FilterState): void {
+    async addFilter(filter: FilterState): Promise<void> {
         this.imageState.filters.push(filter);
 
-        this.renderImage();
+        await this.renderImage();
     }
 
-    setFilters(filters: FilterState[]): void {
+    async setFilters(filters: FilterState[]): Promise<void> {
         this.imageState.filters = [...filters];
 
-        this.renderImage();
+        await this.renderImage();
     }
 
     private configureFilter(
@@ -654,15 +659,52 @@ export class Document {
         }
     }
 
-    private applyImageFilters(): void {
+    private async applyImageFilters() {
         if (!this.image) {
             return;
         }
 
-        this.image.filters([]);
-        this.image.clearCache();
+        if (
+            this.filterSourceCanvas.width !== this.imageState.width ||
+            this.filterSourceCanvas.height !== this.imageState.height
+        ) {
+            this.filterSourceCanvas.width = this.imageState.width;
+            this.filterSourceCanvas.height = this.imageState.height;
+        }
+
+        if (
+            this.filterDestinationCanvas.width !== this.imageState.width ||
+            this.filterDestinationCanvas.height !== this.imageState.height
+        ) {
+            this.filterDestinationCanvas.width = this.imageState.width;
+            this.filterDestinationCanvas.height = this.imageState.height;
+        }
+
+        const sourceContext = this.filterSourceContext;
+        const destinationContext = this.filterDestinationContext;
+
+        sourceContext.clearRect(
+            0,
+            0,
+            this.filterSourceCanvas.width,
+            this.filterSourceCanvas.height,
+        );
+
+        destinationContext.clearRect(
+            0,
+            0,
+            this.filterDestinationCanvas.width,
+            this.filterDestinationCanvas.height,
+        );
+
+        sourceContext.drawImage(
+            this.documentCanvas,
+            0,
+            0,
+        );
 
         for (const filter of this.imageState.filters) {
+
             const konvaFilter = this.configureFilter(
                 this.image,
                 filter,
@@ -672,54 +714,66 @@ export class Document {
                 continue;
             }
 
-            this.image.image(this.documentCanvas);
-
+            this.image.clearCache();
+            this.image.image(this.filterSourceCanvas);
             this.image.filters([konvaFilter]);
 
-            this.image.cache();
+            this.image.cache({
+                x: 0,
+                y: 0,
+                width: this.imageState.width,
+                height: this.imageState.height,
+            });
 
-            const cache = (
-                this.image as unknown as {
-                    _cache: Map<string, unknown>;
-                }
-            )._cache;
-
-            const canvasCache =
-                cache.get("canvas") as KonvaCanvasCache;
-
-            console.log(canvasCache);
-
-            const filteredCanvas =
-                canvasCache.filter._canvas;
-
-            this.documentContext.setTransform(
-                1,
+            destinationContext.clearRect(
                 0,
                 0,
-                1,
-                0,
-                0,
+                this.filterDestinationCanvas.width,
+                this.filterDestinationCanvas.height,
             );
 
-            this.documentContext.globalAlpha = 1;
-            this.documentContext.globalCompositeOperation = "source-over";
-
-            this.documentContext.clearRect(
-                0,
-                0,
-                this.documentCanvas.width,
-                this.documentCanvas.height,
-            );
-
-            this.documentContext.drawImage(
-                filteredCanvas,
+            destinationContext.drawImage(
+                this.image.toCanvas({
+                    pixelRatio: 1,
+                }),
                 0,
                 0,
             );
 
             this.image.filters([]);
+            this.image.clearCache();
+
+            sourceContext.clearRect(
+                0,
+                0,
+                this.filterSourceCanvas.width,
+                this.filterSourceCanvas.height,
+            );
+
+            sourceContext.drawImage(
+                this.filterDestinationCanvas,
+                0,
+                0,
+            );
         }
 
+        this.documentContext.clearRect(
+            0,
+            0,
+            this.documentCanvas.width,
+            this.documentCanvas.height,
+        );
+
+        this.documentContext.drawImage(
+            this.filterSourceCanvas,
+            0,
+            0,
+        );
+
         this.image.image(this.documentCanvas);
+
+        await new Promise<void>((resolve) => {
+            requestAnimationFrame(() => {resolve()});
+        });
     }
 }
