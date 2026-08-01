@@ -59,7 +59,9 @@ function removeFilter(id: number) {
             {selectedFilterId === filter.id ? 'bg-accent' : ''}
             "
             onclick={() => {
-                onSelectFilter(filter.id);
+                onSelectFilter(
+                    selectedFilterId === filter.id ? null : filter.id,
+                );
             }}
         >
             <div class="flex items-center justify-between">
