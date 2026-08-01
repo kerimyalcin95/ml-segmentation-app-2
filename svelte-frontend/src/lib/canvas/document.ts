@@ -135,15 +135,6 @@ export class Document {
                 ? this.imageState.width
                 : this.imageState.height;
 
-        if (!this.imageNode) {
-            return;
-        }
-
-        this.imageNode.offset({
-            x: width / 2,
-            y: height / 2,
-        });
-
         this.setDocumentSize(width, height);
     }
 
@@ -153,6 +144,15 @@ export class Document {
     ): void {
         this.imageState.width = width;
         this.imageState.height = height;
+
+        if (!this.imageNode) {
+            return;
+        }
+
+        this.imageNode.offset({
+            x: width / 2,
+            y: height / 2,
+        });
     }
 
     private setDocumentSize(
@@ -161,6 +161,9 @@ export class Document {
     ): void {
         this.state.size.width = width;
         this.state.size.height = height;
+
+        this._group.offsetX(0);
+        this._group.offsetY(0);
 
         this._events.emit("documentResize", {
             width: width,
@@ -181,8 +184,8 @@ export class Document {
 
     private centerInWorkspace(): void {
         this._group.position({
-            x: this.workspace.width / 2,
-            y: this.workspace.height / 2,
+            x: this._workspace.width / 2,
+            y: this._workspace.height / 2,
         });
     }
 
@@ -283,8 +286,6 @@ export class Document {
                     height: image.height,
                 };
 
-                this.setImageSize(image.width, image.height);
-
                 this._group.destroyChildren();
 
                 this.imageNode = new Konva.Image({
@@ -298,10 +299,7 @@ export class Document {
                     listening: false,
                 });
 
-                this._group.position({
-                    x: image.width / 2,
-                    y: image.height / 2,
-                });
+                this.setImageSize(image.width, image.height);
 
                 this._group.add(
                     this.imageNode
