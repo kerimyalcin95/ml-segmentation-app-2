@@ -500,7 +500,7 @@ export class Document {
             height: this.getDocumentBoundsSize().height
         });
 
-        this._events.emit("documentChange");
+        // this._events.emit("documentChange");
     }
 
     flipImage(

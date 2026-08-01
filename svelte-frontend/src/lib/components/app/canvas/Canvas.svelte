@@ -65,11 +65,9 @@ const panConfig = {
 } as const;
 
 const contentWidth = $derived(transformedDocumentSize.width * zoom);
-
 const contentHeight = $derived(transformedDocumentSize.height * zoom);
 
 const maxScrollX = $derived(Math.max(0, contentWidth - viewportSize.width));
-
 const maxScrollY = $derived(Math.max(0, contentHeight - viewportSize.height));
 
 function updateViewport() {
