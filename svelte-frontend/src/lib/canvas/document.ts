@@ -158,6 +158,22 @@ export class Document {
         this.setDocumentSize(width, height);
     }
 
+    private resetDocumentState() {
+        this.state = {
+            size: {
+                width: 0,
+                height: 0,
+            },
+
+            rotation: 0,
+
+            flip: {
+                horizontal: false,
+                vertical: false,
+            },
+        }
+    }
+
     private async commitDocumentCanvas(): Promise<void> {
 
         const blob = await new Promise<Blob>((resolve, reject) => {
@@ -203,6 +219,22 @@ export class Document {
 
         }
 
+    }
+
+    private resetImageState() {
+        this.imageState = {
+            width: 0,
+            height: 0,
+
+            crop: {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
+            },
+
+            filters: [],
+        }
     }
 
     private setImageSize(
@@ -356,6 +388,9 @@ export class Document {
     public async loadImage(
         imageBytes: Uint8Array,
     ): Promise<void> {
+
+        this.resetImageState();
+        this.resetDocumentState();
 
         return new Promise<void>((resolve, reject) => {
 
