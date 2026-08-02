@@ -57,9 +57,8 @@ export class Document {
     }
 
     // Private member variables
-    private image?: Konva.Image;
+    private outputImage?: Konva.Image;
 
-    private htmlImage?: HTMLImageElement;
     private readonly documentCanvas = document.createElement("canvas");
     private readonly documentContext;
 
@@ -211,7 +210,7 @@ export class Document {
 
             });
 
-            this.htmlImage = image;
+            this.htmlImageElement = image;
 
         } finally {
 
@@ -244,16 +243,16 @@ export class Document {
         this.imageState.width = width;
         this.imageState.height = height;
 
-        if (!this.image) {
+        if (!this.outputImage) {
             return;
         }
 
-        this.image.setSize({
+        this.outputImage.setSize({
             width: width,
             height: height
         });
 
-        this.image.offset({
+        this.outputImage.offset({
             x: width / 2,
             y: height / 2,
         });
@@ -282,6 +281,9 @@ export class Document {
             width: width,
             height: height
         });
+
+        this.documentCanvas.width = width;
+        this.documentCanvas.height = height;
 
         this._events.emit("documentResize", {
             width: width,
@@ -316,7 +318,13 @@ export class Document {
 
     // Rendering
 
-    private prepareRenderCanvas(): void {
+    private prepareDocumentCanvas(): void {
+
+        const source = this.outputImage?.image();
+        if (!source) {
+            return
+        }
+
         this.documentCanvas.width = this.imageState.width;
         this.documentCanvas.height = this.imageState.height;
 
@@ -326,20 +334,29 @@ export class Document {
             this.documentCanvas.width,
             this.documentCanvas.height,
         );
+
+        const context = this.documentCanvas.getContext("2d");
+        context?.drawImage(
+            source,
+            0,
+            0,
+            this.imageState.width,
+            this.imageState.height
+        );
     }
 
     private updateImageNode(): void {
-        if (!this.image) {
+        if (!this.outputImage) {
             return;
         }
 
-        this.image.image(this.documentCanvas);
+        this.outputImage.image(this.documentCanvas);
 
-        this.image.width(this.imageState.width);
-        this.image.height(this.imageState.height);
+        this.outputImage.width(this.imageState.width);
+        this.outputImage.height(this.imageState.height);
 
-        this.image.offsetX(this.imageState.width / 2);
-        this.image.offsetY(this.imageState.height / 2);
+        this.outputImage.offsetX(this.imageState.width / 2);
+        this.outputImage.offsetY(this.imageState.height / 2);
     }
 
     private renderImage(
@@ -352,7 +369,7 @@ export class Document {
             applyFilters = true,
         } = options;
 
-        this.prepareRenderCanvas();
+        this.prepareDocumentCanvas();
         this.drawImage();
         this.updateImageNode();
 
@@ -364,14 +381,14 @@ export class Document {
     }
 
     private drawImage(): void {
-        if (!this.htmlImage) {
+        if (!this.htmlImageElement) {
             return;
         }
 
         const crop = this.imageState.crop;
 
         this.documentContext.drawImage(
-            this.htmlImage,
+            this.htmlImageElement,
             crop.x,
             crop.y,
             crop.width,
@@ -392,72 +409,43 @@ export class Document {
         this.resetImageState();
         this.resetDocumentState();
 
-        return new Promise<void>((resolve, reject) => {
+        const blob = new Blob([
+            imageBytes.buffer as ArrayBuffer,
+        ]);
 
-            const blob = new Blob([
-                imageBytes.buffer as ArrayBuffer,
-            ]);
+        const bitmap = await createImageBitmap(blob);
 
-            const cleanup = () => {
-                URL.revokeObjectURL(url);
-            };
+        this.imageState.crop = {
+            x: 0,
+            y: 0,
+            width: bitmap.width,
+            height: bitmap.height,
+        };
 
-            const url = URL.createObjectURL(blob);
+        this._group.destroyChildren();
 
-            const image = new window.Image();
-
-            image.onload = () => {
-                this.htmlImage = image;
-
-                this.imageState.crop = {
-                    x: 0,
-                    y: 0,
-                    width: image.width,
-                    height: image.height,
-                };
-
-                this._group.destroyChildren();
-
-                this.image = new Konva.Image({
-                    image: this.documentCanvas,
-                    x: 0,
-                    y: 0,
-                    width: image.width,
-                    height: image.height,
-                    offsetX: image.width / 2,
-                    offsetY: image.height / 2,
-                    listening: false,
-                });
-
-                this.setImageSize(image.width, image.height);
-
-                this._group.add(
-                    this.image
-                );
-
-                this.renderImage();
-                this.apply();
-                this.applyWorkspace();
-                this.centerInWorkspace();
-
-                this._events.emit("cameraRefresh");
-                this._events.emit("cameraCenter");
-
-                cleanup();
-                resolve();
-            };
-
-            image.onerror = (_event) => {
-                cleanup();
-                reject(
-                    new Error(
-                        "Failed to load image from blob."
-                    )
-                );
-            };
-
-            image.src = url;
+        this.outputImage = new Konva.Image({
+            image: bitmap,
+            x: 0,
+            y: 0,
+            width: bitmap.width,
+            height: bitmap.height,
+            offsetX: bitmap.width / 2,
+            offsetY: bitmap.height / 2,
+            listening: false,
         });
+
+        this.setImageSize(bitmap.width, bitmap.height);
+
+        this._group.add(this.outputImage);
+
+        this.renderImage();
+        this.apply();
+        this.applyWorkspace();
+        this.centerInWorkspace();
+
+        this._events.emit("cameraRefresh");
+        this._events.emit("cameraCenter");
     }
 
     async saveImage(
@@ -564,7 +552,7 @@ export class Document {
         width: number,
         height: number
     ): Promise<void> {
-        if (!this.image) return;
+        if (!this.outputImage) return;
 
         this.setImageCrop({
             x: x,
@@ -605,7 +593,7 @@ export class Document {
         horizontal: boolean,
         vertical: boolean,
     ) {
-        if (!this.image) return;
+        if (!this.outputImage) return;
 
         if (horizontal) {
             this.state.flip.horizontal =
@@ -621,7 +609,7 @@ export class Document {
         this.applyWorkspace();
         this.centerInWorkspace();
 
-        this.image.cache();
+        this.outputImage.cache();
         this._events.emit("cameraRefresh");
     }
 
@@ -711,7 +699,7 @@ export class Document {
     }
 
     private applyImageFilters(): void {
-        if (!this.image) {
+        if (!this.outputImage) {
             return;
         }
 
@@ -752,7 +740,7 @@ export class Document {
         for (const filter of this.imageState.filters) {
 
             const konvaFilter = this.configureFilter(
-                this.image,
+                this.outputImage,
                 filter,
             );
 
@@ -760,11 +748,11 @@ export class Document {
                 continue;
             }
 
-            this.image.clearCache();
-            this.image.image(this.filterSourceCanvas);
-            this.image.filters([konvaFilter]);
+            this.outputImage.clearCache();
+            this.outputImage.image(this.filterSourceCanvas);
+            this.outputImage.filters([konvaFilter]);
 
-            this.image.cache({
+            this.outputImage.cache({
                 x: 0,
                 y: 0,
                 width: this.imageState.width,
@@ -796,7 +784,7 @@ export class Document {
                 filter.blendMode;
 
             destinationContext.drawImage(
-                this.image.toCanvas({
+                this.outputImage.toCanvas({
                     pixelRatio: 1,
                 }),
                 0,
@@ -808,8 +796,8 @@ export class Document {
             destinationContext.globalAlpha = 1;
             destinationContext.globalCompositeOperation = "source-over";
 
-            this.image.filters([]);
-            this.image.clearCache();
+            this.outputImage.filters([]);
+            this.outputImage.clearCache();
 
             sourceContext.clearRect(
                 0,
@@ -840,6 +828,6 @@ export class Document {
             0,
         );
 
-        this.image.image(this.documentCanvas);
+        this.outputImage.image(this.documentCanvas);
     }
 }
