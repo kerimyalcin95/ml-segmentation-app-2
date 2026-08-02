@@ -17,21 +17,21 @@ interface CropState {
 interface ImageState {
     width: number;
     height: number;
-    crop: CropState;
     filters: FilterState[];
 }
 
 interface DocumentState {
-    size: {
-        width: number;
-        height: number;
-    };
+
+    width: number;
+    height: number;
     rotation: number;
 
     flip: {
         horizontal: boolean;
         vertical: boolean;
     };
+
+    crop: CropState;
 }
 
 type ImageFilters = Parameters<Konva.Image["filters"]>[0];
@@ -75,27 +75,25 @@ export class Document {
         width: 0,
         height: 0,
 
-        crop: {
-            x: 0,
-            y: 0,
-            width: 0,
-            height: 0,
-        },
-
         filters: [],
     };
 
     private state: DocumentState = {
-        size: {
-            width: 0,
-            height: 0,
-        },
+        width: 0,
+        height: 0,
 
         rotation: 0,
 
         flip: {
             horizontal: false,
             vertical: false,
+        },
+
+        crop: {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0,
         },
     };
 
@@ -139,16 +137,21 @@ export class Document {
 
     private resetDocumentState() {
         this.state = {
-            size: {
-                width: 0,
-                height: 0,
-            },
+            width: 0,
+            height: 0,
 
             rotation: 0,
 
             flip: {
                 horizontal: false,
                 vertical: false,
+            },
+
+            crop: {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0,
             },
         }
     }
@@ -205,13 +208,6 @@ export class Document {
             width: 0,
             height: 0,
 
-            crop: {
-                x: 0,
-                y: 0,
-                width: 0,
-                height: 0,
-            },
-
             filters: [],
         }
     }
@@ -238,8 +234,8 @@ export class Document {
         });
     }
 
-    setImageCrop(crop: CropState) {
-        this.imageState.crop = {
+    setDocumentCrop(crop: CropState) {
+        this.state.crop = {
             x: crop.x,
             y: crop.y,
             width: crop.width,
@@ -251,8 +247,8 @@ export class Document {
         width: number,
         height: number,
     ): void {
-        this.state.size.width = width;
-        this.state.size.height = height;
+        this.state.width = width;
+        this.state.height = height;
 
         this._group.offsetX(0);
         this._group.offsetY(0);
@@ -274,8 +270,8 @@ export class Document {
         this.workspace.setBounds({
             x: 0,
             y: 0,
-            width: this.state.size.width,
-            height: this.state.size.height
+            width: this.state.width,
+            height: this.state.height
         })
     }
 
@@ -376,7 +372,7 @@ export class Document {
             return;
         }
 
-        const crop = this.imageState.crop;
+        const crop = this.state.crop;
 
         this.documentContext.drawImage(
             this.htmlImageElement,
@@ -406,7 +402,7 @@ export class Document {
 
         const bitmap = await createImageBitmap(blob);
 
-        this.imageState.crop = {
+        this.state.crop = {
             x: 0,
             y: 0,
             width: bitmap.width,
@@ -509,7 +505,7 @@ export class Document {
 
     resizeImage(width: number, height: number): void {
         this.setImageSize(width, height);
-        this.setImageCrop({
+        this.setDocumentCrop({
             x: 0,
             y: 0,
             width: width,
@@ -533,7 +529,7 @@ export class Document {
     ): Promise<void> {
         if (!this.outputImage) return;
 
-        this.setImageCrop({
+        this.setDocumentCrop({
             x: x,
             y: y,
             width: width,
@@ -563,8 +559,8 @@ export class Document {
         * clear documentCanvas, copy workCanvas into documentCanvas,
         * replace outputImage with documentCanvas
         */
-        this.workCanvas.width = this.state.size.height;
-        this.workCanvas.height = this.state.size.width;
+        this.workCanvas.width = this.state.height;
+        this.workCanvas.height = this.state.width;
 
         this.workContext.translate(
             this.workCanvas.width / 2,
@@ -590,12 +586,12 @@ export class Document {
 
         this.outputImage.image(this.documentCanvas);
 
-        this.setDocumentSize(this.state.size.height, this.state.size.width);
+        this.setDocumentSize(this.state.height, this.state.width);
         this.setImageSize(this.imageState.height, this.imageState.width);
 
         // set the new rotation state
         if (clockwise) {
-            this.state.rotation +=  90
+            this.state.rotation += 90
         }
         else {
             this.state.rotation -= 90;
