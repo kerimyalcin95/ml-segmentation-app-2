@@ -99,8 +99,16 @@ export class Document {
     constructor() {
         this._group = new Konva.Group();
 
+        // Create document canvas context
         const context = this.documentCanvas.getContext("2d");
 
+        if (!context) {
+            throw new Error("Failed to create 2D rendering context.");
+        }
+
+        this.documentContext = context;
+
+        // Create filter canvas contexts
         const filterSourceContext =
             this.filterSourceCanvas.getContext("2d");
 
@@ -114,18 +122,13 @@ export class Document {
         this.filterSourceContext = filterSourceContext;
         this.filterDestinationContext = filterDestinationContext;
 
-        if (!context) {
-            throw new Error("Failed to create 2D rendering context.");
-        }
-
-        this.documentContext = context;
-
+        
         this._workspace = new Workspace();
     }
 
     // Functions
 
-    private apply() {
+    private applyState() {
 
         this._group.rotation(
             this.state.rotation
@@ -291,7 +294,7 @@ export class Document {
         })
     }
 
-    private applyWorkspace(): void {
+    private applyNewWorkspaceSize(): void {
 
         // insert the size of the document (bounds)
         this.workspace.setBounds({
@@ -436,12 +439,12 @@ export class Document {
         });
 
         this.setImageSize(bitmap.width, bitmap.height);
+        this.setDocumentSize(bitmap.width, bitmap.height);
 
         this._group.add(this.outputImage);
 
-        this.renderImage();
-        this.apply();
-        this.applyWorkspace();
+        this.applyState();
+        this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
         this._events.emit("cameraRefresh");
@@ -502,33 +505,22 @@ export class Document {
                                     "Failed to create image blob."
                                 )
                             );
-
                             return;
                         }
-
                         resolve(blob);
-
                     },
-
                     mimeType,
                     quality,
-
                 );
-
             });
 
         return new Uint8Array(
             await blob.arrayBuffer()
         );
-
     }
 
-    async resizeImage(width: number, height: number): Promise<void> {
+    resizeImage(width: number, height: number): void {
         this.setImageSize(width, height);
-
-        this.renderImage({ applyFilters: false });
-        await this.commitDocumentCanvas();
-
         this.setImageCrop({
             x: 0,
             y: 0,
@@ -536,8 +528,8 @@ export class Document {
             height: height
         });
 
-        this.apply();
-        this.applyWorkspace();
+        this.applyState();
+        this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
         this.applyImageFilters();
@@ -565,8 +557,8 @@ export class Document {
         this.renderImage({ applyFilters: false });
         await this.commitDocumentCanvas();
 
-        this.apply();
-        this.applyWorkspace();
+        this.applyState();
+        this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
         this.applyImageFilters();
@@ -582,8 +574,8 @@ export class Document {
                 this.state.rotation + angle
             ) % 360;
 
-        this.apply();
-        this.applyWorkspace();
+        this.applyState();
+        this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
         this._events.emit("cameraRefresh");
@@ -605,8 +597,8 @@ export class Document {
                 !this.state.flip.vertical;
         }
 
-        this.apply();
-        this.applyWorkspace();
+        this.applyState();
+        this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
         this.outputImage.cache();
