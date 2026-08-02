@@ -62,6 +62,9 @@ export class Document {
     private readonly documentCanvas = document.createElement("canvas");
     private readonly documentContext;
 
+    private readonly workCanvas = document.createElement("canvas");
+    private readonly workContext;
+
     private readonly filterSourceContext;
     private readonly filterDestinationContext;
 
@@ -100,18 +103,24 @@ export class Document {
         this._group = new Konva.Group();
 
         // Create document canvas context
-        const context = this.documentCanvas.getContext("2d");
+        const documentContext = this.documentCanvas.getContext("2d");
 
-        if (!context) {
+        if (!documentContext) {
             throw new Error("Failed to create 2D rendering context.");
         }
+        this.documentContext = documentContext;
 
-        this.documentContext = context;
+        // Create work canvas context
+        const workContext = this.workCanvas.getContext("2d");
+
+        if (!workContext) {
+            throw new Error("Failed to create 2D rendering context.");
+        }
+        this.workContext = workContext;
 
         // Create filter canvas contexts
         const filterSourceContext =
             this.filterSourceCanvas.getContext("2d");
-
         const filterDestinationContext =
             this.filterDestinationCanvas.getContext("2d");
 
@@ -122,43 +131,11 @@ export class Document {
         this.filterSourceContext = filterSourceContext;
         this.filterDestinationContext = filterDestinationContext;
 
-        
+
         this._workspace = new Workspace();
     }
 
     // Functions
-
-    private applyState() {
-
-        this._group.rotation(
-            this.state.rotation
-        );
-
-        this._group.scale({
-            x: this.state.flip.horizontal ? -1 : 1,
-            y: this.state.flip.vertical ? -1 : 1,
-        });
-
-        this.updateDocumentTransformOrigin();
-    }
-
-    private updateDocumentTransformOrigin(): void {
-
-        const rotated =
-            Math.abs(this.state.rotation) % 180 === 90;
-
-        const width =
-            rotated
-                ? this.imageState.height
-                : this.imageState.width;
-
-        const height =
-            rotated
-                ? this.imageState.width
-                : this.imageState.height;
-
-        this.setDocumentSize(width, height);
-    }
 
     private resetDocumentState() {
         this.state = {
@@ -285,9 +262,6 @@ export class Document {
             height: height
         });
 
-        this.documentCanvas.width = width;
-        this.documentCanvas.height = height;
-
         this._events.emit("documentResize", {
             width: width,
             height: height
@@ -310,6 +284,20 @@ export class Document {
             x: this._workspace.width / 2,
             y: this._workspace.height / 2,
         });
+    }
+
+    setDocumentCanvasBitmap(bitmap: ImageBitmap) {
+
+        this.documentCanvas.width = bitmap.width;
+        this.documentCanvas.height = bitmap.height;
+
+        this.documentContext.drawImage(
+            bitmap,
+            0,
+            0,
+            bitmap.width,
+            bitmap.height
+        );
     }
 
     getWorkspaceSize() {
@@ -438,12 +426,12 @@ export class Document {
             listening: false,
         });
 
+        this.setDocumentCanvasBitmap(bitmap);
         this.setImageSize(bitmap.width, bitmap.height);
         this.setDocumentSize(bitmap.width, bitmap.height);
 
         this._group.add(this.outputImage);
 
-        this.applyState();
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
@@ -528,7 +516,6 @@ export class Document {
             height: height
         });
 
-        this.applyState();
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
@@ -557,7 +544,6 @@ export class Document {
         this.renderImage({ applyFilters: false });
         await this.commitDocumentCanvas();
 
-        this.applyState();
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
@@ -567,14 +553,54 @@ export class Document {
         this._events.emit("cameraCenter");
     }
 
-    rotateImage(angle: number) {
+    rotate90(clockwise: boolean = true) {
+        if (!this.outputImage) {
+            return
+        }
 
-        this.state.rotation =
-            (
-                this.state.rotation + angle
-            ) % 360;
+        /* 
+        * clear workCanvas, translate origin to midpoint, rotate CW or CCW,
+        * clear documentCanvas, copy workCanvas into documentCanvas,
+        * replace outputImage with documentCanvas
+        */
+        this.workCanvas.width = this.state.size.height;
+        this.workCanvas.height = this.state.size.width;
 
-        this.applyState();
+        this.workContext.translate(
+            this.workCanvas.width / 2,
+            this.workCanvas.height / 2,
+        );
+
+        this.workContext.rotate(clockwise ? Math.PI / 2 : -Math.PI / 2);
+
+        this.workContext.drawImage(
+            this.documentCanvas,
+            -this.documentCanvas.width / 2,
+            -this.documentCanvas.height / 2,
+        );
+
+        this.documentCanvas.width = this.workCanvas.width;
+        this.documentCanvas.height = this.workCanvas.height;
+
+        this.documentContext.drawImage(
+            this.workCanvas,
+            0,
+            0,
+        );
+
+        this.outputImage.image(this.documentCanvas);
+
+        this.setDocumentSize(this.state.size.height, this.state.size.width);
+        this.setImageSize(this.imageState.height, this.imageState.width);
+
+        // set the new rotation state
+        if (clockwise) {
+            this.state.rotation +=  90
+        }
+        else {
+            this.state.rotation -= 90;
+        }
+
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
@@ -597,7 +623,6 @@ export class Document {
                 !this.state.flip.vertical;
         }
 
-        this.applyState();
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
