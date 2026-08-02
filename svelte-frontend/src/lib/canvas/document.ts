@@ -503,7 +503,7 @@ export class Document {
     async resizeImage(width: number, height: number): Promise<void> {
         this.setImageSize(width, height);
 
-        this.renderImage({applyFilters: false});
+        this.renderImage({ applyFilters: false });
         await this.commitDocumentCanvas();
 
         this.setImageCrop({
@@ -517,7 +517,7 @@ export class Document {
         this.applyWorkspace();
         this.centerInWorkspace();
 
-        this.applyImageFilters()
+        this.applyImageFilters();
 
         this._events.emit("cameraRefresh");
         this._events.emit("cameraCenter");
@@ -539,7 +539,7 @@ export class Document {
         })
         this.setImageSize(width, height);
 
-        this.renderImage({applyFilters: false});
+        this.renderImage({ applyFilters: false });
         await this.commitDocumentCanvas();
 
         this.apply();
