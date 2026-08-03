@@ -82,6 +82,17 @@ export class CropOverlay {
             "left",
         ];
 
+        const cursors = [
+            "nwse-resize",
+            "ns-resize",
+            "nesw-resize",
+            "ew-resize",
+            "nwse-resize",
+            "ns-resize",
+            "nesw-resize",
+            "ew-resize",
+        ];
+
         this.rect = new Konva.Rect({
             stroke: primary,
             strokeWidth: 1,
@@ -106,6 +117,16 @@ export class CropOverlay {
             this.state.cropStart = {
                 ...this.document.state.crop,
             };
+        });
+
+        this.rect.on("mouseenter", () => {
+            this.stage.container().style.cursor = "move";
+        });
+
+        this.rect.on("mouseleave", () => {
+            if (!this.state.dragging) {
+                this.stage.container().style.cursor = "default";
+            }
         });
 
         this.group.add(this.rect);
@@ -133,6 +154,7 @@ export class CropOverlay {
             });
 
             handle.listening(true);
+            handle.hitStrokeWidth(16);
 
             handle.on("pointerdown", () => {
                 const pointer = this.getDocumentPointer();
@@ -149,6 +171,16 @@ export class CropOverlay {
                 this._state.cropStart = {
                     ...this.document.state.crop,
                 };
+            });
+
+            handle.on("mouseenter", () => {
+                this.stage.container().style.cursor = cursors[i];
+            });
+
+            handle.on("mouseleave", () => {
+                if (!this.state.dragging) {
+                    this.stage.container().style.cursor = "default";
+                }
             });
 
             this.handles.push(handle);
