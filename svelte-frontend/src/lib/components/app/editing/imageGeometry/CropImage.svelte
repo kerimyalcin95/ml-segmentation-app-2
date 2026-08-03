@@ -5,7 +5,10 @@ import { CanvasManager } from '$lib/canvas/canvas';
 import * as ToggleGroup from '$lib/components/ui/toggle-group';
 import CropIcon from 'phosphor-svelte/lib/CropIcon';
 
-import { documentSize } from '$lib/components/stores/canvasStore.svelte';
+import {
+    documentCrop,
+    documentSize,
+} from '$lib/components/stores/canvasStore.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -15,8 +18,6 @@ let { canvas }: Props = $props();
 
 let cropMode = $state(false);
 
-let x = $state(0);
-let y = $state(0);
 let width = $state(0);
 let height = $state(0);
 
@@ -24,6 +25,10 @@ $effect(() => {
     if (!cropMode) {
         width = documentSize.width;
         height = documentSize.height;
+    }
+    else {
+        width = documentCrop.width;
+        height = documentCrop.height;
     }
 
     canvas.document.events.on(
@@ -44,7 +49,11 @@ $effect(() => {
 });
 
 function crop() {
-    canvas.document.crop(x, y, width, height);
+    canvas.document.crop(
+        documentCrop.x,
+        documentCrop.y,
+        documentCrop.width,
+        documentCrop.height);
 }
 </script>
 

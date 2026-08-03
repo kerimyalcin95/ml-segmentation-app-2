@@ -3,6 +3,8 @@ import Konva from "konva";
 import { Camera } from "../camera";
 import { Document } from "../document";
 
+import { documentCrop } from "$lib/components/stores/canvasStore.svelte";
+
 type CropDragMode =
     | "move"
     | "top"
@@ -293,18 +295,83 @@ export class CropOverlay {
         this.handles.forEach((handle) => handle.moveToTop());
     }
 
-    private clamp() {
+    private clamp(): void {
         const crop = this.document.state.crop;
+        const documentWidth = this.document.state.width;
+        const documentHeight = this.document.state.height;
 
-        crop.x = Math.max(
-            0,
-            Math.min(crop.x, this.document.state.width - crop.width),
-        );
+        const minSize = 1;
 
-        crop.y = Math.max(
-            0,
-            Math.min(crop.y, this.document.state.height - crop.height),
-        );
+        switch (this.state.dragMode) {
+            case "move":
+                crop.x = Math.max(0, Math.min(crop.x, documentWidth - crop.width));
+                crop.y = Math.max(0, Math.min(crop.y, documentHeight - crop.height));
+                break;
+
+            case "left":
+                crop.x = Math.max(0, Math.min(crop.x, this.state.cropStart.x + this.state.cropStart.width - minSize));
+                crop.width = this.state.cropStart.x + this.state.cropStart.width - crop.x;
+                break;
+
+            case "right":
+                crop.width = Math.max(
+                    minSize,
+                    Math.min(crop.width, documentWidth - crop.x),
+                );
+                break;
+
+            case "top":
+                crop.y = Math.max(0, Math.min(crop.y, this.state.cropStart.y + this.state.cropStart.height - minSize));
+                crop.height = this.state.cropStart.y + this.state.cropStart.height - crop.y;
+                break;
+
+            case "bottom":
+                crop.height = Math.max(
+                    minSize,
+                    Math.min(crop.height, documentHeight - crop.y),
+                );
+                break;
+
+            case "topLeft":
+                crop.x = Math.max(0, Math.min(crop.x, this.state.cropStart.x + this.state.cropStart.width - minSize));
+                crop.y = Math.max(0, Math.min(crop.y, this.state.cropStart.y + this.state.cropStart.height - minSize));
+
+                crop.width = this.state.cropStart.x + this.state.cropStart.width - crop.x;
+                crop.height = this.state.cropStart.y + this.state.cropStart.height - crop.y;
+                break;
+
+            case "topRight":
+                crop.width = Math.max(
+                    minSize,
+                    Math.min(crop.width, documentWidth - crop.x),
+                );
+
+                crop.y = Math.max(0, Math.min(crop.y, this.state.cropStart.y + this.state.cropStart.height - minSize));
+                crop.height = this.state.cropStart.y + this.state.cropStart.height - crop.y;
+                break;
+
+            case "bottomLeft":
+                crop.x = Math.max(0, Math.min(crop.x, this.state.cropStart.x + this.state.cropStart.width - minSize));
+                crop.width = this.state.cropStart.x + this.state.cropStart.width - crop.x;
+
+                crop.height = Math.max(
+                    minSize,
+                    Math.min(crop.height, documentHeight - crop.y),
+                );
+                break;
+
+            case "bottomRight":
+                crop.width = Math.max(
+                    minSize,
+                    Math.min(crop.width, documentWidth - crop.x),
+                );
+
+                crop.height = Math.max(
+                    minSize,
+                    Math.min(crop.height, documentHeight - crop.y),
+                );
+                break;
+        }
     }
 
     show(): void {
@@ -391,9 +458,10 @@ export class CropOverlay {
             });
         });
 
-        console.log("group", this.document.group.position());
-        console.log("offset", image.offset());
-        console.log("crop", this.document.state.crop);
+        documentCrop.x = Math.round(crop.x);
+        documentCrop.y = Math.round(crop.y);
+        documentCrop.width = Math.round(crop.width);
+        documentCrop.height = Math.round(crop.height);
     }
 
     resetState() {
