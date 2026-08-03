@@ -753,6 +753,7 @@ export class Document {
             destinationContext.globalAlpha = 1;
             destinationContext.globalCompositeOperation = "source-over";
 
+            // Clear cache, otherwise opacity and blendmode will not work
             this.outputImage.filters([]);
             this.outputImage.clearCache();
 
