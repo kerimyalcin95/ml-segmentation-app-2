@@ -161,7 +161,7 @@ export class Document {
             height: height
         })
 
-        this._events.emit("documentState", {state: this._state});
+        this._events.emit("documentState", { state: this._state });
     }
 
     applyNewWorkspaceSize(): void {
@@ -320,7 +320,6 @@ export class Document {
         mimeType: string = "image/png",
         quality?: number,
     ): Promise<Uint8Array> {
-
         const camera =
             contextContainer.resolve<Camera>(CONTEXT.Camera);
 
@@ -330,58 +329,47 @@ export class Document {
         const oldScale = camera.group.scale();
         const oldPosition = camera.group.position();
 
-        camera.group.scale({
-            x: 1,
-            y: 1,
+        const uiLayer = stage.getLayers().at(-1);
+        const uiLayerVisible = uiLayer?.visible() ?? false;
+
+        uiLayer?.visible(false);
+
+        camera.group.scale({ x: 1, y: 1 });
+        camera.group.position({ x: 0, y: 0 });
+
+        stage.draw();
+
+        const bounds = this._group.getClientRect();
+
+        const canvas = stage.toCanvas({
+            x: bounds.x,
+            y: bounds.y,
+            width: bounds.width,
+            height: bounds.height,
+            pixelRatio: 1,
         });
-
-        camera.group.position({
-            x: 0,
-            y: 0,
-        });
-
-        const bounds =
-            this._group.getClientRect();
-
-        const canvas =
-            stage.toCanvas({
-                x: bounds.x,
-                y: bounds.y,
-                width: bounds.width,
-                height: bounds.height,
-                pixelRatio: 1,
-            });
 
         camera.group.scale(oldScale);
         camera.group.position(oldPosition);
 
+        uiLayer?.visible(uiLayerVisible);
+
+        stage.draw();
+
         this._events.emit("layerRedraw");
 
-        const blob =
-            await new Promise<Blob>((resolve, reject) => {
+        const blob = await new Promise<Blob>((resolve, reject) => {
+            canvas.toBlob((blob) => {
+                if (!blob) {
+                    reject(new Error("Failed to create image blob."));
+                    return;
+                }
 
-                canvas.toBlob(
+                resolve(blob);
+            }, mimeType, quality);
+        });
 
-                    (blob) => {
-
-                        if (!blob) {
-                            reject(
-                                new Error(
-                                    "Failed to create image blob."
-                                )
-                            );
-                            return;
-                        }
-                        resolve(blob);
-                    },
-                    mimeType,
-                    quality,
-                );
-            });
-
-        return new Uint8Array(
-            await blob.arrayBuffer()
-        );
+        return new Uint8Array(await blob.arrayBuffer());
     }
 
     resize(
@@ -547,7 +535,7 @@ export class Document {
                 !this._state.flip.vertical;
         }
 
-        this._events.emit("documentState", {state: this._state});
+        this._events.emit("documentState", { state: this._state });
 
         this.refresh({
             cameraCenter: false
