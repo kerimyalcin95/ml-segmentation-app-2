@@ -266,49 +266,6 @@ export class Document {
         this.workCanvas.height = height;
     }
 
-    // Rendering
-
-    private prepareDocumentCanvas(): void {
-
-        const source = this.outputImage?.image();
-        if (!source) {
-            return
-        }
-
-        this.documentCanvas.width = this.imageState.width;
-        this.documentCanvas.height = this.imageState.height;
-
-        this.documentContext.clearRect(
-            0,
-            0,
-            this.documentCanvas.width,
-            this.documentCanvas.height,
-        );
-
-        const context = this.documentCanvas.getContext("2d");
-        context?.drawImage(
-            source,
-            0,
-            0,
-            this.imageState.width,
-            this.imageState.height
-        );
-    }
-
-    private updateImageNode(): void {
-        if (!this.outputImage) {
-            return;
-        }
-
-        this.outputImage.image(this.documentCanvas);
-
-        this.outputImage.width(this.imageState.width);
-        this.outputImage.height(this.imageState.height);
-
-        this.outputImage.offsetX(this.imageState.width / 2);
-        this.outputImage.offsetY(this.imageState.height / 2);
-    }
-
     // Image operations
 
     public async loadImage(
@@ -425,14 +382,42 @@ export class Document {
         );
     }
 
-    resizeImage(width: number, height: number): void {
+    resizeImage(
+        width: number,
+        height: number,
+    ): void {
+        if (!this.outputImage) {
+            return;
+        }
+
+        // Scale into work canvas.
+        this.setWorkCanvasSize(width, height);
+
+        this.workContext.drawImage(
+            this.documentCanvas,
+            0,
+            0,
+            this.documentCanvas.width,
+            this.documentCanvas.height,
+            0,
+            0,
+            width,
+            height,
+        );
+
+        // Replace the document image.
+        this.setDocumentCanvasSize(width, height);
+
+        this.documentContext.drawImage(
+            this.workCanvas,
+            0,
+            0,
+        );
+
+        this.outputImage.image(this.documentCanvas);
+
         this.setImageSize(width, height);
-        this.setDocumentCrop({
-            x: 0,
-            y: 0,
-            width: width,
-            height: height
-        });
+        this.setDocumentSize(width, height);
 
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
@@ -440,7 +425,6 @@ export class Document {
         this.applyImageFilters();
 
         this._events.emit("cameraRefresh");
-        this._events.emit("cameraCenter");
     }
 
     async cropImage(
@@ -699,7 +683,7 @@ export class Document {
         );
 
         this.outputImage.clearCache();
-        
+
         // Image filtering pipeline
         for (const filter of this.imageState.filters) {
 
