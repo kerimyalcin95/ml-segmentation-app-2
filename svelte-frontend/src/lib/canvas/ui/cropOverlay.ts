@@ -41,7 +41,7 @@ export class CropOverlay {
 
     private readonly rect: Konva.Rect;
     private readonly gridLines: Konva.Line[] = [];
-    private readonly handles: Konva.Circle[] = [];
+    private readonly handles: Konva.Rect[] = [];
 
     private _state: CropOverlayState = {
         dragging: false,
@@ -71,6 +71,9 @@ export class CropOverlay {
             .getPropertyValue("--primary")
             .trim();
 
+        const primaryTransparent = primary.replace(")", " / 0.1)");
+        const handleSize = 10;
+
         const dragModes: CropDragMode[] = [
             "topLeft",
             "top",
@@ -96,7 +99,7 @@ export class CropOverlay {
         this.rect = new Konva.Rect({
             stroke: primary,
             strokeWidth: 1,
-            fillEnabled: false,
+            fill: primaryTransparent
         });
 
         this.rect.listening(true);
@@ -145,11 +148,12 @@ export class CropOverlay {
 
         // 8 resize handles
         for (let i = 0; i < 8; i++) {
-            const handle = new Konva.Circle({
-                radius: 5,
+            const handle = new Konva.Rect({
+                width: handleSize,
+                height: handleSize,
+                offsetX: handleSize / 2,
+                offsetY: handleSize / 2,
                 fill: "white",
-                stroke: primary,
-                strokeWidth: 1,
                 opacity: 1
             });
 
@@ -284,6 +288,9 @@ export class CropOverlay {
 
             this.refresh();
         });
+
+        this.rect.moveToTop();
+        this.handles.forEach((handle) => handle.moveToTop());
     }
 
     private clamp() {
@@ -383,6 +390,27 @@ export class CropOverlay {
                 y: py,
             });
         });
+
+        console.log("group", this.document.group.position());
+        console.log("offset", image.offset());
+        console.log("crop", this.document.state.crop);
+    }
+
+    resetState() {
+        this._state = {
+            dragging: false,
+            dragStart: {
+                x: 0,
+                y: 0
+            },
+            cropStart: {
+                x: 0,
+                y: 0,
+                width: 0,
+                height: 0
+            },
+            dragMode: "move"
+        }
     }
 
     private getDocumentPointer() {

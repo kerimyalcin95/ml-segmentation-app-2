@@ -2,7 +2,7 @@ import Konva from 'konva';
 import { Camera } from "./camera";
 import { Document } from './document';
 import { CONTEXT, contextContainer } from './container';
-import { CropOverlay } from "./ui/crop";
+import { CropOverlay } from "./ui/cropOverlay";
 
 export class CanvasManager {
     private stage: Konva.Stage;
@@ -73,11 +73,19 @@ export class CanvasManager {
 
         this.document.events.on("documentState", () => {
             this.cropOverlay.refresh();
+            this.cropOverlay.resetState();
+            this.document.setCrop({
+                x: 0,
+                y: 0,
+                width: this.document.state.width,
+                height: this.document.state.height
+            });
             this.uiLayer.batchDraw();
         });
 
         this.document.events.on("documentResize", () => {
             this.cropOverlay.refresh();
+            this.cropOverlay.resetState();
             this.uiLayer.batchDraw();
         });
 
