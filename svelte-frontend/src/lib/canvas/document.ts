@@ -4,20 +4,14 @@ import mitt from "mitt";
 import type { CanvasEvents } from "./events";
 import { CONTEXT, contextContainer } from "./container"
 import { Camera } from "./camera";
-import { type FilterState, FilterType } from '$lib/types/filter';
 import { Workspace } from './workspace';
+import { Image } from './image';
 
 interface CropState {
     x: number;
     y: number;
     width: number;
     height: number;
-}
-
-interface ImageState {
-    width: number;
-    height: number;
-    filters: FilterState[];
 }
 
 interface DocumentState {
@@ -34,15 +28,13 @@ interface DocumentState {
     crop: CropState;
 }
 
-type ImageFilters = Parameters<Konva.Image["filters"]>[0];
-type ImageFilter = NonNullable<ImageFilters>[number];
-
 export class Document {
 
     // Getter/Setter variables
     private readonly _group: Konva.Group;
     private _workspace: Workspace;
     private readonly _events = mitt<CanvasEvents>();
+    private readonly _image: Image;
 
     get group(): Konva.Group {
         return this._group;
@@ -56,29 +48,17 @@ export class Document {
         return this._events;
     }
 
-    // Private member variables
-    private outputImage?: Konva.Image;
+    get image() {
+        return this._image;
+    }
 
-    private readonly documentCanvas = document.createElement("canvas");
-    private readonly documentContext;
+    private readonly sourceCanvas = document.createElement("canvas");
+    private readonly sourceContext;
 
     private readonly workCanvas = document.createElement("canvas");
     private readonly workContext;
 
-    private readonly filterSourceCanvas = document.createElement("canvas");
-    private readonly filterSourceContext;
-
-    private readonly filterDestinationCanvas = document.createElement("canvas");
-    private readonly filterDestinationContext;
-
-    private imageState: ImageState = {
-        width: 0,
-        height: 0,
-
-        filters: [],
-    };
-
-    private state: DocumentState = {
+    private _state: DocumentState = {
         width: 0,
         height: 0,
 
@@ -97,17 +77,21 @@ export class Document {
         },
     };
 
+    get state(): DocumentState {
+        return this._state;
+    }
+
     constructor() {
         this._group = new Konva.Group();
         this._workspace = new Workspace();
 
         // Create document canvas context
-        const documentContext = this.documentCanvas.getContext("2d");
+        const documentContext = this.sourceCanvas.getContext("2d");
 
         if (!documentContext) {
             throw new Error("Failed to create 2D rendering context.");
         }
-        this.documentContext = documentContext;
+        this.sourceContext = documentContext;
 
         // Create work canvas context
         const workContext = this.workCanvas.getContext("2d");
@@ -117,24 +101,15 @@ export class Document {
         }
         this.workContext = workContext;
 
-        // Create filter canvas contexts
-        const filterSourceContext =
-            this.filterSourceCanvas.getContext("2d");
-        const filterDestinationContext =
-            this.filterDestinationCanvas.getContext("2d");
-
-        if (!filterSourceContext || !filterDestinationContext) {
-            throw new Error("Failed to create filter rendering contexts.");
-        }
-
-        this.filterSourceContext = filterSourceContext;
-        this.filterDestinationContext = filterDestinationContext;
+        this._image = new Image(
+            this.sourceCanvas
+        );
     }
 
     // Functions
 
-    private resetDocumentState() {
-        this.state = {
+    resetState() {
+        this._state = {
             width: 0,
             height: 0,
 
@@ -154,39 +129,8 @@ export class Document {
         }
     }
 
-    private resetImageState() {
-        this.imageState = {
-            width: 0,
-            height: 0,
-
-            filters: [],
-        }
-    }
-
-    private setImageSize(
-        width: number,
-        height: number,
-    ): void {
-        this.imageState.width = width;
-        this.imageState.height = height;
-
-        if (!this.outputImage) {
-            return;
-        }
-
-        this.outputImage.setSize({
-            width: width,
-            height: height
-        });
-
-        this.outputImage.offset({
-            x: width / 2,
-            y: height / 2,
-        });
-    }
-
-    setDocumentCrop(crop: CropState) {
-        this.state.crop = {
+    setCrop(crop: CropState) {
+        this._state.crop = {
             x: crop.x,
             y: crop.y,
             width: crop.width,
@@ -194,12 +138,12 @@ export class Document {
         }
     }
 
-    private setDocumentSize(
+    setSize(
         width: number,
         height: number,
     ): void {
-        this.state.width = width;
-        this.state.height = height;
+        this._state.width = width;
+        this._state.height = height;
 
         this._group.offsetX(0);
         this._group.offsetY(0);
@@ -215,30 +159,30 @@ export class Document {
         })
     }
 
-    private applyNewWorkspaceSize(): void {
+    applyNewWorkspaceSize(): void {
 
         // insert the size of the document (bounds)
         this.workspace.setBounds({
             x: 0,
             y: 0,
-            width: this.state.width,
-            height: this.state.height
+            width: this._state.width,
+            height: this._state.height
         })
     }
 
-    private centerInWorkspace(): void {
+    centerInWorkspace(): void {
         this._group.position({
             x: this._workspace.width / 2,
             y: this._workspace.height / 2,
         });
     }
 
-    setDocumentCanvasBitmap(bitmap: ImageBitmap) {
+    setCanvasBitmap(bitmap: ImageBitmap) {
 
-        this.documentCanvas.width = bitmap.width;
-        this.documentCanvas.height = bitmap.height;
+        this.sourceCanvas.width = bitmap.width;
+        this.sourceCanvas.height = bitmap.height;
 
-        this.documentContext.drawImage(
+        this.sourceContext.drawImage(
             bitmap,
             0,
             0,
@@ -247,10 +191,27 @@ export class Document {
         );
     }
 
-    setDocumentCanvasSize(width: number, height: number) {
+    setSourceCanvasSize(width: number, height: number) {
         // warning: this resets the canvas
-        this.documentCanvas.width = width;
-        this.documentCanvas.height = height;
+        this.sourceCanvas.width = width;
+        this.sourceCanvas.height = height;
+    }
+
+    private replaceSourceCanvasFromWorkCanvas(
+        width: number,
+        height: number,
+    ): void {
+        this.setSourceCanvasSize(width, height);
+
+        this.sourceContext.drawImage(
+            this.workCanvas,
+            0,
+            0,
+        );
+
+        this.image.outputImage?.image(
+            this.sourceCanvas,
+        );
     }
 
     getWorkspaceSize() {
@@ -266,14 +227,51 @@ export class Document {
         this.workCanvas.height = height;
     }
 
+    private refresh(options?: {
+        workspace?: boolean;
+        filters?: boolean;
+        redraw?: boolean;
+        cameraRefresh?: boolean;
+        cameraCenter?: boolean;
+    }) {
+        const {
+            workspace = true,
+            filters = true,
+            redraw = true,
+            cameraRefresh = true,
+            cameraCenter = true,
+        } = options ?? {};
+
+        if (workspace) {
+            this.applyNewWorkspaceSize();
+            this.centerInWorkspace();
+        }
+
+        if (filters) {
+            this._image.applyFilters();
+        }
+
+        if (redraw) {
+            this._events.emit("layerRedraw");
+        }
+
+        if (cameraRefresh) {
+            this._events.emit("cameraRefresh");
+        }
+
+        if (cameraCenter) {
+            this._events.emit("cameraCenter");
+        }
+    }
+
     // Image operations
 
-    public async loadImage(
+    public async loadAsset(
         imageBytes: Uint8Array,
     ): Promise<void> {
 
-        this.resetImageState();
-        this.resetDocumentState();
+        this.image.resetState();
+        this.resetState();
 
         const blob = new Blob([
             imageBytes.buffer as ArrayBuffer,
@@ -281,7 +279,7 @@ export class Document {
 
         const bitmap = await createImageBitmap(blob);
 
-        this.state.crop = {
+        this._state.crop = {
             x: 0,
             y: 0,
             width: bitmap.width,
@@ -290,7 +288,7 @@ export class Document {
 
         this._group.destroyChildren();
 
-        this.outputImage = new Konva.Image({
+        this.image.outputImage = new Konva.Image({
             image: bitmap,
             x: 0,
             y: 0,
@@ -301,20 +299,19 @@ export class Document {
             listening: false,
         });
 
-        this.setDocumentCanvasBitmap(bitmap);
-        this.setImageSize(bitmap.width, bitmap.height);
-        this.setDocumentSize(bitmap.width, bitmap.height);
+        this.setCanvasBitmap(bitmap);
+        this.image.setSize(bitmap.width, bitmap.height);
+        this.setSize(bitmap.width, bitmap.height);
 
-        this._group.add(this.outputImage);
+        this._group.add(this.image.outputImage);
 
-        this.applyNewWorkspaceSize();
-        this.centerInWorkspace();
-
-        this._events.emit("cameraRefresh");
-        this._events.emit("cameraCenter");
+        this.refresh({
+            redraw: false,
+            filters: false
+        })
     }
 
-    async saveImage(
+    async saveAsset(
         mimeType: string = "image/png",
         quality?: number,
     ): Promise<Uint8Array> {
@@ -382,22 +379,22 @@ export class Document {
         );
     }
 
-    resizeImage(
+    resize(
         width: number,
         height: number,
     ): void {
-        if (!this.outputImage) {
+        if (!this.image.outputImage) {
             return;
         }
 
         // Scale into work canvas.
         this.setWorkCanvasSize(width, height);
         this.workContext.drawImage(
-            this.documentCanvas,
+            this.sourceCanvas,
             0,
             0,
-            this.documentCanvas.width,
-            this.documentCanvas.height,
+            this.sourceCanvas.width,
+            this.sourceCanvas.height,
             0,
             0,
             width,
@@ -405,40 +402,27 @@ export class Document {
         );
 
         // Replace the document image.
-        this.setDocumentCanvasSize(width, height);
-        this.documentContext.drawImage(
-            this.workCanvas,
-            0,
-            0,
-        );
+        this.replaceSourceCanvasFromWorkCanvas(width, height);
 
-        this.outputImage.image(this.documentCanvas);
-
-        this.setImageSize(width, height);
-        this.setDocumentSize(width, height);
-        this.setDocumentCrop({
+        this.image.setSize(width, height);
+        this.setSize(width, height);
+        this.setCrop({
             x: 0,
             y: 0,
             width: width,
             height: height
         });
 
-        this.applyNewWorkspaceSize();
-        this.centerInWorkspace();
-
-        this.applyImageFilters();
-
-        this._events.emit("cameraRefresh");
-        this._events.emit("cameraCenter");
+        this.refresh();
     }
 
-    cropImage(
+    crop(
         x: number = 0,
         y: number = 0,
         width: number,
         height: number,
     ): void {
-        if (!this.outputImage) {
+        if (!this.image.outputImage) {
             return;
         }
 
@@ -446,7 +430,7 @@ export class Document {
         this.setWorkCanvasSize(width, height);
 
         this.workContext.drawImage(
-            this.documentCanvas,
+            this.sourceCanvas,
             x,
             y,
             width,
@@ -457,44 +441,29 @@ export class Document {
             height,
         );
 
-        // Replace the document image.
-        this.setDocumentCanvasSize(width, height);
+        this.replaceSourceCanvasFromWorkCanvas(width, height);
 
-        this.documentContext.drawImage(
-            this.workCanvas,
-            0,
-            0,
-        );
-
-        this.outputImage.image(this.documentCanvas);
-
-        this.setImageSize(width, height);
-        this.setDocumentSize(width, height);
-        this.setDocumentCrop({
+        this.image.setSize(width, height);
+        this.setSize(width, height);
+        this.setCrop({
             x: 0,
             y: 0,
             width,
             height,
         });
 
-        this.applyNewWorkspaceSize();
-        this.centerInWorkspace();
-
-        this.applyImageFilters();
-
-        this._events.emit("cameraRefresh");
-        this._events.emit("cameraCenter");
+        this.refresh();
     }
 
-    rotateImage90(clockwise: boolean = true) {
-        if (!this.outputImage) return;
+    rotate90(clockwise: boolean = true) {
+        if (!this.image.outputImage) return;
 
         /* 
         * clear workCanvas, translate origin to midpoint, rotate CW or CCW,
         * clear documentCanvas, copy workCanvas into documentCanvas,
         * replace outputImage with documentCanvas
         */
-        this.setWorkCanvasSize(this.state.height, this.state.width);
+        this.setWorkCanvasSize(this._state.height, this._state.width);
         this.workContext.translate(
             this.workCanvas.width / 2,
             this.workCanvas.height / 2,
@@ -503,44 +472,37 @@ export class Document {
         this.workContext.rotate(clockwise ? Math.PI / 2 : -Math.PI / 2);
 
         this.workContext.drawImage(
-            this.documentCanvas,
-            -this.documentCanvas.width / 2,
-            -this.documentCanvas.height / 2,
+            this.sourceCanvas,
+            -this.sourceCanvas.width / 2,
+            -this.sourceCanvas.height / 2,
         );
 
-        this.setDocumentCanvasSize(this.workCanvas.width, this.workCanvas.height);
-        this.documentContext.drawImage(
-            this.workCanvas,
-            0,
-            0,
+        this.replaceSourceCanvasFromWorkCanvas(
+            this.workCanvas.width,
+            this.workCanvas.height
         );
 
-        this.outputImage.image(this.documentCanvas);
-
-        this.setDocumentSize(this.state.height, this.state.width);
-        this.setImageSize(this.imageState.height, this.imageState.width);
+        this.setSize(this._state.height, this._state.width);
+        this.image.setSize(this.image.state.height, this.image.state.width);
 
         // set the new rotation state
         if (clockwise) {
-            this.state.rotation += 90
+            this._state.rotation += 90
         }
         else {
-            this.state.rotation -= 90;
+            this._state.rotation -= 90;
         }
 
-        this.applyNewWorkspaceSize();
-        this.centerInWorkspace();
-
-        this.applyImageFilters();
-
-        this._events.emit("cameraRefresh");
+        this.refresh({
+            cameraCenter: false
+        });
     }
 
-    flipImage(
+    flip(
         horizontal: boolean,
         vertical: boolean,
     ) {
-        if (!this.outputImage) return;
+        if (!this.image.outputImage) return;
 
         /* 
         * clear workCanvas, translate origin one width or height, 
@@ -548,7 +510,7 @@ export class Document {
         * clear documentCanvas, copy workCanvas into documentCanvas,
         * replace outputImage with documentCanvas
         */
-        this.setWorkCanvasSize(this.documentCanvas.width, this.documentCanvas.height);
+        this.setWorkCanvasSize(this.sourceCanvas.width, this.sourceCanvas.height);
         this.workContext.translate(
             horizontal ? this.workCanvas.width : 0,
             vertical ? this.workCanvas.height : 0,
@@ -560,254 +522,28 @@ export class Document {
         );
 
         this.workContext.drawImage(
-            this.documentCanvas,
+            this.sourceCanvas,
             0,
             0,
         );
 
-        this.setDocumentCanvasSize(this.workCanvas.width, this.workCanvas.height);
-        this.documentContext.drawImage(
-            this.workCanvas,
-            0,
-            0,
+        this.replaceSourceCanvasFromWorkCanvas(
+            this.workCanvas.width,
+            this.workCanvas.height
         );
-
-        this.outputImage.image(this.documentCanvas);
 
         if (horizontal) {
-            this.state.flip.horizontal =
-                !this.state.flip.horizontal;
+            this._state.flip.horizontal =
+                !this._state.flip.horizontal;
         }
 
         if (vertical) {
-            this.state.flip.vertical =
-                !this.state.flip.vertical;
+            this._state.flip.vertical =
+                !this._state.flip.vertical;
         }
 
-        this.applyNewWorkspaceSize();
-        this.centerInWorkspace();
-
-        this.applyImageFilters();
-
-        this._events.emit("cameraRefresh");
-    }
-
-    // Filter
-
-    addFilter(filter: FilterState): void {
-        this.imageState.filters.push(filter);
-
-        this.applyImageFilters();
-    }
-
-    setFilters(filters: FilterState[]): void {
-        this.imageState.filters = [...filters];
-
-        this.applyImageFilters();
-    }
-
-    private configureFilter(
-        image: Konva.Image,
-        filter: FilterState,
-    ): ImageFilter | null {
-
-        switch (filter.type) {
-            case FilterType.Blur:
-                image.blurRadius(filter.blurRadius);
-                return Konva.Filters.Blur;
-
-            case FilterType.Brighten:
-                image.brightness(filter.brightness);
-                return Konva.Filters.Brighten;
-
-            case FilterType.Contrast:
-                image.contrast(filter.contrast);
-                return Konva.Filters.Contrast;
-
-            case FilterType.Enhance:
-                image.enhance(filter.enhance);
-                return Konva.Filters.Enhance;
-
-            case FilterType.Grayscale:
-                return Konva.Filters.Grayscale;
-
-            case FilterType.HSL:
-                image.hue(filter.hue);
-                image.saturation(filter.saturation);
-                image.luminance(filter.luminance);
-                return Konva.Filters.HSL;
-
-            case FilterType.Invert:
-                return Konva.Filters.Invert;
-
-            case FilterType.Mask:
-                image.threshold(filter.threshold);
-                return Konva.Filters.Mask;
-
-            case FilterType.Noise:
-                image.noise(filter.noise);
-                return Konva.Filters.Noise;
-
-            case FilterType.Pixelate:
-                image.pixelSize(filter.pixelSize);
-                return Konva.Filters.Pixelate;
-
-            case FilterType.Posterize:
-                image.levels(filter.levels);
-                return Konva.Filters.Posterize;
-
-            case FilterType.RGB:
-                image.red(filter.red);
-                image.green(filter.green);
-                image.blue(filter.blue);
-                return Konva.Filters.RGB;
-
-            case FilterType.Sepia:
-                return Konva.Filters.Sepia;
-
-            case FilterType.Solarize:
-                return Konva.Filters.Solarize;
-
-            case FilterType.Threshold:
-                image.threshold(filter.threshold);
-                return Konva.Filters.Threshold;
-
-            default:
-                return null;
-        }
-    }
-
-    private applyImageFilters(): void {
-        if (!this.outputImage) {
-            return;
-        }
-
-        if (
-            this.filterSourceCanvas.width !== this.documentCanvas.width ||
-            this.filterSourceCanvas.height !== this.documentCanvas.height
-        ) {
-            this.filterSourceCanvas.width = this.documentCanvas.width;
-            this.filterSourceCanvas.height = this.documentCanvas.height;
-        }
-
-        if (
-            this.filterDestinationCanvas.width !== this.documentCanvas.width ||
-            this.filterDestinationCanvas.height !== this.documentCanvas.height
-        ) {
-            this.filterDestinationCanvas.width = this.documentCanvas.width;
-            this.filterDestinationCanvas.height = this.documentCanvas.height;
-        }
-
-        const sourceContext = this.filterSourceContext;
-        const destinationContext = this.filterDestinationContext;
-
-        const padding = 64; // or compute from the filter
-
-        sourceContext.clearRect(
-            0,
-            0,
-            this.filterSourceCanvas.width,
-            this.filterSourceCanvas.height,
-        );
-
-        sourceContext.drawImage(
-            this.documentCanvas,
-            0,
-            0,
-        );
-
-        this.outputImage.clearCache();
-
-        // Image filtering pipeline
-        for (const filter of this.imageState.filters) {
-
-            const konvaFilter = this.configureFilter(
-                this.outputImage,
-                filter,
-            );
-
-            if (!konvaFilter) {
-                continue;
-            }
-
-            this.outputImage.image(this.filterSourceCanvas);
-            this.outputImage.filters([konvaFilter]);
-            this.outputImage.cache({
-                x: -padding,
-                y: -padding,
-                width: this.documentCanvas.width + padding * 2,
-                height: this.documentCanvas.height + padding * 2,
-            });
-
-            destinationContext.clearRect(
-                0,
-                0,
-                this.filterDestinationCanvas.width,
-                this.filterDestinationCanvas.height,
-            );
-
-            // Draw the previous image.
-            destinationContext.globalAlpha = 1;
-            destinationContext.globalCompositeOperation = "source-over";
-
-            destinationContext.drawImage(
-                this.filterSourceCanvas,
-                0,
-                0,
-            );
-
-            // Blend the filtered image over it.
-            destinationContext.globalAlpha = filter.opacity;
-            destinationContext.globalCompositeOperation =
-                filter.blendMode;
-
-            destinationContext.drawImage(
-                this.outputImage.toCanvas({
-                    pixelRatio: 1,
-                }),
-                0,
-                0,
-                this.filterSourceCanvas.width,
-                this.filterSourceCanvas.height,
-            );
-
-            destinationContext.globalAlpha = 1;
-            destinationContext.globalCompositeOperation = "source-over";
-
-            // Clear cache, otherwise opacity and blendmode will not work
-            this.outputImage.filters([]);
-            this.outputImage.clearCache();
-
-            sourceContext.clearRect(
-                0,
-                0,
-                this.filterSourceCanvas.width,
-                this.filterSourceCanvas.height,
-            );
-
-            sourceContext.drawImage(
-                this.filterDestinationCanvas,
-                0,
-                0,
-            );
-        }
-
-        // Do not overwrite the document canvas
-        // this.documentContext.clearRect(
-        //     0,
-        //     0,
-        //     this.documentCanvas.width,
-        //     this.documentCanvas.height,
-        // );
-
-        // this.documentContext.drawImage(
-        //     this.filterSourceCanvas,
-        //     0,
-        //     0,
-        // );
-
-        this.outputImage.image(this.filterSourceCanvas);
-
-        this._events.emit("layerRedraw");
+        this.refresh({
+            cameraCenter: false
+        });
     }
 }

@@ -14,7 +14,6 @@ interface Props {
 let { canvas }: Props = $props();
 
 async function saveImage() {
-
     const result = await window.electronAPI.showSaveImageDialog(
         sessionStore.lastDirectory,
     );
@@ -41,7 +40,7 @@ async function saveImage() {
             break;
     }
 
-    const imageBytes = await canvas.document.saveImage(mimeType, quality);
+    const imageBytes = await canvas.document.saveAsset(mimeType, quality);
 
     await window.electronAPI.writeImage(result.filePath, imageBytes);
 

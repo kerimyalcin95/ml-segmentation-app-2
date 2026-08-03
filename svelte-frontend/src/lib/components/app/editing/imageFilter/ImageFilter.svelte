@@ -27,7 +27,7 @@ let currentFilter = $derived(
 
 
 function applyFilters(): void {
-    canvas.document.setFilters(
+    canvas.document.image.setFilters(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         activeFilters.map(({ id, ...filter }) => filter),
     );

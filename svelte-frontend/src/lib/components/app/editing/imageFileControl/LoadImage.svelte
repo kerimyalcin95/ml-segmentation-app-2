@@ -25,7 +25,7 @@ async function loadImage() {
 
     const imageBytes = await window.electronAPI.readImage(filePath);
 
-    await canvas.document.loadImage(imageBytes);
+    await canvas.document.loadAsset(imageBytes);
 }
 </script>
 

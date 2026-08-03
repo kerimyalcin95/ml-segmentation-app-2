@@ -23,7 +23,7 @@ let { canvas }: Props = $props();
             <Button
                 class="w-full"
                 onclick={() => {
-                    canvas.document.rotateImage90();
+                    canvas.document.rotate90();
                 }}
             >
                 <ArrowClockwiseIcon weight="bold" />
@@ -32,7 +32,7 @@ let { canvas }: Props = $props();
             <Button
                 class="w-full mb-2"
                 onclick={() => {
-                    canvas.document.rotateImage90(false);
+                    canvas.document.rotate90(false);
                 }}
             >
                 <ArrowCounterClockwiseIcon weight="bold" />
@@ -42,7 +42,7 @@ let { canvas }: Props = $props();
             <Button
                 class="w-full"
                 onclick={() => {
-                    canvas.document.flipImage(true, false);
+                    canvas.document.flip(true, false);
                 }}
             >
                 <FlipHorizontalIcon weight="bold" />
@@ -52,7 +52,7 @@ let { canvas }: Props = $props();
             <Button
                 class="w-full"
                 onclick={() => {
-                    canvas.document.flipImage(false, true);
+                    canvas.document.flip(false, true);
                 }}
             >
                 <FlipVerticalIcon weight="bold" />

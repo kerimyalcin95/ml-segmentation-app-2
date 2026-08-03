@@ -26,14 +26,17 @@ $effect(() => {
         height = documentSize.height;
     }
 
-    canvas.document.events.on("documentResize", ({width: newWidth, height: newHeight}) => {
-        width = newWidth;
-        height = newHeight;
-    });
+    canvas.document.events.on(
+        'documentResize',
+        ({ width: newWidth, height: newHeight }) => {
+            width = newWidth;
+            height = newHeight;
+        },
+    );
 });
 
-async function crop() {
-    await canvas.document.cropImage(x, y, width, height);
+function crop() {
+    canvas.document.crop(x, y, width, height);
 }
 </script>
 
