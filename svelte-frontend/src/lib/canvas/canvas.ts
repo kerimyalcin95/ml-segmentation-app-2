@@ -46,6 +46,7 @@ export class CanvasManager {
         )
 
         this._cropOverlay = new CropOverlay(
+            this.stage,
             this._camera,
             this._document,
         );

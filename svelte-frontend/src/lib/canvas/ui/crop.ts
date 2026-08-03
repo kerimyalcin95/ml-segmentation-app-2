@@ -3,19 +3,67 @@ import Konva from "konva";
 import { Camera } from "../camera";
 import { Document } from "../document";
 
+type CropDragMode =
+    | "move"
+    | "top"
+    | "right"
+    | "bottom"
+    | "left"
+    | "topLeft"
+    | "topRight"
+    | "bottomRight"
+    | "bottomLeft";
+
+export interface CropOverlayState {
+    dragging: boolean;
+    dragMode: CropDragMode;
+
+    dragStart: {
+        x: number;
+        y: number;
+    };
+
+    cropStart: {
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+    };
+}
+
+
+
 export class CropOverlay {
     readonly group = new Konva.Group({
         visible: false,
-        listening: false,
+        listening: true,
     });
 
     private readonly rect: Konva.Rect;
-
     private readonly gridLines: Konva.Line[] = [];
-
     private readonly handles: Konva.Circle[] = [];
 
+    private _state: CropOverlayState = {
+        dragging: false,
+        dragStart: {
+            x: 0,
+            y: 0
+        },
+        cropStart: {
+            x: 0,
+            y: 0,
+            width: 0,
+            height: 0
+        },
+        dragMode: "move"
+    }
+
+    get state(): CropOverlayState {
+        return this._state;
+    }
+
     constructor(
+        private readonly stage: Konva.Stage,
         private readonly camera: Camera,
         private readonly document: Document,
     ) {
@@ -23,10 +71,41 @@ export class CropOverlay {
             .getPropertyValue("--primary")
             .trim();
 
+        const dragModes: CropDragMode[] = [
+            "topLeft",
+            "top",
+            "topRight",
+            "right",
+            "bottomRight",
+            "bottom",
+            "bottomLeft",
+            "left",
+        ];
+
         this.rect = new Konva.Rect({
             stroke: primary,
             strokeWidth: 1,
             fillEnabled: false,
+        });
+
+        this.rect.listening(true);
+        this.rect.draggable(false);
+
+        this.rect.on("pointerdown", () => {
+            const pointer = this.getDocumentPointer();
+
+            if (!pointer) {
+                return;
+            }
+
+            this.state.dragging = true;
+            this.state.dragMode = "move";
+
+            this.state.dragStart = pointer;
+
+            this.state.cropStart = {
+                ...this.document.state.crop,
+            };
         });
 
         this.group.add(this.rect);
@@ -53,9 +132,140 @@ export class CropOverlay {
                 opacity: 1
             });
 
+            handle.listening(true);
+
+            handle.on("pointerdown", () => {
+                const pointer = this.getDocumentPointer();
+
+                if (!pointer) {
+                    return;
+                }
+
+                this._state.dragging = true;
+                this._state.dragMode = dragModes[i];
+
+                this._state.dragStart = pointer;
+
+                this._state.cropStart = {
+                    ...this.document.state.crop,
+                };
+            });
+
             this.handles.push(handle);
             this.group.add(handle);
         }
+
+        this.rect.on("pointerdown", () => {
+            const pointer = this.getDocumentPointer();
+
+            if (!pointer) {
+                return;
+            }
+
+            this._state.dragging = true;
+
+            this._state.dragStart = pointer;
+
+            this._state.cropStart = {
+                ...this.document.state.crop,
+            };
+        });
+
+        this.stage.on("pointerup", () => {
+            this._state.dragging = false;
+        });
+
+        this.stage.on("pointermove", () => {
+            if (!this._state.dragging) {
+                return;
+            }
+
+            const pointer = this.getDocumentPointer();
+
+            if (!pointer) {
+                return;
+            }
+
+            const dx = pointer.x - this._state.dragStart.x;
+            const dy = pointer.y - this._state.dragStart.y;
+
+            const crop = {
+                ...this._state.cropStart,
+            };
+
+            switch (this._state.dragMode) {
+
+                case "move":
+                    crop.x += dx;
+                    crop.y += dy;
+                    break;
+
+                case "left":
+                    crop.x += dx;
+                    crop.width -= dx;
+                    break;
+
+                case "right":
+                    crop.width += dx;
+                    break;
+
+                case "top":
+                    crop.y += dy;
+                    crop.height -= dy;
+                    break;
+
+                case "bottom":
+                    crop.height += dy;
+                    break;
+
+                case "topLeft":
+                    crop.x += dx;
+                    crop.width -= dx;
+
+                    crop.y += dy;
+                    crop.height -= dy;
+                    break;
+
+                case "topRight":
+                    crop.width += dx;
+
+                    crop.y += dy;
+                    crop.height -= dy;
+                    break;
+
+                case "bottomRight":
+                    crop.width += dx;
+                    crop.height += dy;
+                    break;
+
+                case "bottomLeft":
+                    crop.x += dx;
+                    crop.width -= dx;
+
+                    crop.height += dy;
+                    break;
+            }
+
+            this.document.setCrop(crop);
+
+            this.clamp();
+
+            this.refresh();
+        });
+    }
+
+    private clamp() {
+        const crop = this.document.state.crop;
+
+        crop.x = Math.max(
+            0,
+            Math.min(crop.x, this.document.state.width - crop.width),
+        );
+
+        crop.y = Math.max(
+            0,
+            Math.min(crop.y, this.document.state.height - crop.height),
+        );
     }
 
     show(): void {
@@ -141,5 +351,31 @@ export class CropOverlay {
                 y: py,
             });
         });
+    }
+
+    private getDocumentPointer() {
+        const pointer = this.stage.getPointerPosition();
+
+        if (!pointer) {
+            return null;
+        }
+
+        const camera = this.camera.state;
+        const image = this.document.image.outputImage;
+
+        if (!image) {
+            return null;
+        }
+
+        const group = this.document.group.position();
+        const offset = image.offset();
+
+        const worldX = (pointer.x + camera.x) / camera.zoom;
+        const worldY = (pointer.y + camera.y) / camera.zoom;
+
+        return {
+            x: worldX - group.x + offset.x,
+            y: worldY - group.y + offset.y,
+        };
     }
 }
