@@ -1,4 +1,5 @@
 import { type CameraState } from "./camera";
+import { type DocumentState } from "./document";
 
 export type CanvasEvents = {
     cameraState: {state: CameraState};
@@ -9,6 +10,8 @@ export type CanvasEvents = {
         width: number;
         height: number;
     };
+
+    documentState: {state: DocumentState}
 
     cameraCenter: undefined;
 

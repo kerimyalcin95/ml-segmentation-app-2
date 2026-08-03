@@ -70,12 +70,21 @@ export class CropOverlay {
     refresh(): void {
         const crop = this.document.state.crop;
         const camera = this.camera.state;
+        const image = this.document.image.outputImage;
 
-        const x = (crop.x - camera.x) * camera.zoom;
-        const y = (crop.y - camera.y) * camera.zoom;
+        if (!image) return;
 
         const width = crop.width * camera.zoom;
         const height = crop.height * camera.zoom;
+
+        const group = this.document.group.position();
+        const offset = image.offset();
+
+        const worldX = group.x - offset.x + crop.x;
+        const worldY = group.y - offset.y + crop.y;
+
+        const x = worldX * camera.zoom - camera.x;
+        const y = worldY * camera.zoom - camera.y;
 
         this.rect.position({ x, y });
         this.rect.size({ width, height });

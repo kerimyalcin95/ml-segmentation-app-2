@@ -7,14 +7,14 @@ import { Camera } from "./camera";
 import { Workspace } from './workspace';
 import { Image } from './image';
 
-interface CropState {
+export interface CropState {
     x: number;
     y: number;
     width: number;
     height: number;
 }
 
-interface DocumentState {
+export interface DocumentState {
 
     width: number;
     height: number;
@@ -145,6 +145,9 @@ export class Document {
         this._state.width = width;
         this._state.height = height;
 
+        this._state.crop.width = width;
+        this._state.crop.height = height;
+
         this._group.offsetX(0);
         this._group.offsetY(0);
 
@@ -157,6 +160,8 @@ export class Document {
             width: width,
             height: height
         })
+
+        this._events.emit("documentState", {state: this._state});
     }
 
     applyNewWorkspaceSize(): void {
@@ -541,6 +546,8 @@ export class Document {
             this._state.flip.vertical =
                 !this._state.flip.vertical;
         }
+
+        this._events.emit("documentState", {state: this._state});
 
         this.refresh({
             cameraCenter: false

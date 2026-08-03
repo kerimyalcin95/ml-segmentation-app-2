@@ -70,6 +70,11 @@ export class CanvasManager {
             this.camera.center();
         })
 
+        this.document.events.on("documentState", () => {
+            this.cropOverlay.refresh();
+            this.uiLayer.batchDraw();
+        });
+
         this.document.events.on("documentResize", () => {
             this.cropOverlay.refresh();
             this.uiLayer.batchDraw();
