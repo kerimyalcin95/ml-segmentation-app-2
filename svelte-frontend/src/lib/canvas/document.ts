@@ -65,11 +65,11 @@ export class Document {
     private readonly workCanvas = document.createElement("canvas");
     private readonly workContext;
 
-    private readonly filterSourceContext;
-    private readonly filterDestinationContext;
-
     private readonly filterSourceCanvas = document.createElement("canvas");
+    private readonly filterSourceContext;
+
     private readonly filterDestinationCanvas = document.createElement("canvas");
+    private readonly filterDestinationContext;
 
     private imageState: ImageState = {
         width: 0,
@@ -99,6 +99,7 @@ export class Document {
 
     constructor() {
         this._group = new Konva.Group();
+        this._workspace = new Workspace();
 
         // Create document canvas context
         const documentContext = this.documentCanvas.getContext("2d");
@@ -128,9 +129,6 @@ export class Document {
 
         this.filterSourceContext = filterSourceContext;
         this.filterDestinationContext = filterDestinationContext;
-
-
-        this._workspace = new Workspace();
     }
 
     // Functions
@@ -154,53 +152,6 @@ export class Document {
                 height: 0,
             },
         }
-    }
-
-    private async commitDocumentCanvas(): Promise<void> {
-
-        const blob = await new Promise<Blob>((resolve, reject) => {
-
-            this.documentCanvas.toBlob((blob) => {
-
-                if (!blob) {
-                    reject(new Error("Failed to create image blob."));
-                    return;
-                }
-
-                resolve(blob);
-
-            });
-
-        });
-
-        const url = URL.createObjectURL(blob);
-
-        try {
-
-            const image = new window.Image();
-
-            await new Promise<void>((resolve, reject) => {
-
-                image.onload = () => {
-                    resolve();
-                };
-
-                image.onerror = () => {
-                    reject(new Error("Failed to load image."));
-                };
-
-                image.src = url;
-
-            });
-
-            this.htmlImageElement = image;
-
-        } finally {
-
-            URL.revokeObjectURL(url);
-
-        }
-
     }
 
     private resetImageState() {
@@ -296,11 +247,23 @@ export class Document {
         );
     }
 
+    setDocumentCanvasSize(width: number, height: number) {
+        // warning: this resets the canvas
+        this.documentCanvas.width = width;
+        this.documentCanvas.height = height;
+    }
+
     getWorkspaceSize() {
         return {
             width: this._workspace.width,
             height: this._workspace.height
         }
+    }
+
+    setWorkCanvasSize(width: number, height: number) {
+        // warning: this resets the canvas
+        this.workCanvas.width = width;
+        this.workCanvas.height = height;
     }
 
     // Rendering
@@ -344,47 +307,6 @@ export class Document {
 
         this.outputImage.offsetX(this.imageState.width / 2);
         this.outputImage.offsetY(this.imageState.height / 2);
-    }
-
-    private renderImage(
-        options: {
-            applyFilters?: boolean;
-        } = {},
-    ): void {
-
-        const {
-            applyFilters = true,
-        } = options;
-
-        this.prepareDocumentCanvas();
-        this.drawImage();
-        this.updateImageNode();
-
-        if (applyFilters) {
-            this.applyImageFilters();
-        }
-
-        this._events.emit("layerRedraw");
-    }
-
-    private drawImage(): void {
-        if (!this.htmlImageElement) {
-            return;
-        }
-
-        const crop = this.state.crop;
-
-        this.documentContext.drawImage(
-            this.htmlImageElement,
-            crop.x,
-            crop.y,
-            crop.width,
-            crop.height,
-            0,
-            0,
-            this.imageState.width,
-            this.imageState.height,
-        );
     }
 
     // Image operations
@@ -537,9 +459,6 @@ export class Document {
         })
         this.setImageSize(width, height);
 
-        this.renderImage({ applyFilters: false });
-        await this.commitDocumentCanvas();
-
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
@@ -549,19 +468,15 @@ export class Document {
         this._events.emit("cameraCenter");
     }
 
-    rotate90(clockwise: boolean = true) {
-        if (!this.outputImage) {
-            return
-        }
+    rotateImage90(clockwise: boolean = true) {
+        if (!this.outputImage) return;
 
         /* 
         * clear workCanvas, translate origin to midpoint, rotate CW or CCW,
         * clear documentCanvas, copy workCanvas into documentCanvas,
         * replace outputImage with documentCanvas
         */
-        this.workCanvas.width = this.state.height;
-        this.workCanvas.height = this.state.width;
-
+        this.setWorkCanvasSize(this.state.height, this.state.width);
         this.workContext.translate(
             this.workCanvas.width / 2,
             this.workCanvas.height / 2,
@@ -575,9 +490,7 @@ export class Document {
             -this.documentCanvas.height / 2,
         );
 
-        this.documentCanvas.width = this.workCanvas.width;
-        this.documentCanvas.height = this.workCanvas.height;
-
+        this.setDocumentCanvasSize(this.workCanvas.width, this.workCanvas.height);
         this.documentContext.drawImage(
             this.workCanvas,
             0,
@@ -600,6 +513,8 @@ export class Document {
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
+        this.applyImageFilters();
+
         this._events.emit("cameraRefresh");
     }
 
@@ -608,6 +523,38 @@ export class Document {
         vertical: boolean,
     ) {
         if (!this.outputImage) return;
+
+        /* 
+        * clear workCanvas, translate origin one width or height, 
+        * scale to negative direction,
+        * clear documentCanvas, copy workCanvas into documentCanvas,
+        * replace outputImage with documentCanvas
+        */
+        this.setWorkCanvasSize(this.documentCanvas.width, this.documentCanvas.height);
+        this.workContext.translate(
+            horizontal ? this.workCanvas.width : 0,
+            vertical ? this.workCanvas.height : 0,
+        );
+
+        this.workContext.scale(
+            horizontal ? -1 : 1,
+            vertical ? -1 : 1,
+        );
+
+        this.workContext.drawImage(
+            this.documentCanvas,
+            0,
+            0,
+        );
+
+        this.setDocumentCanvasSize(this.workCanvas.width, this.workCanvas.height);
+        this.documentContext.drawImage(
+            this.workCanvas,
+            0,
+            0,
+        );
+
+        this.outputImage.image(this.documentCanvas);
 
         if (horizontal) {
             this.state.flip.horizontal =
@@ -622,7 +569,8 @@ export class Document {
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
 
-        this.outputImage.cache();
+        this.applyImageFilters();
+
         this._events.emit("cameraRefresh");
     }
 
@@ -631,13 +579,13 @@ export class Document {
     addFilter(filter: FilterState): void {
         this.imageState.filters.push(filter);
 
-        this.renderImage();
+        this.applyImageFilters();
     }
 
     setFilters(filters: FilterState[]): void {
         this.imageState.filters = [...filters];
 
-        this.renderImage();
+        this.applyImageFilters();
     }
 
     private configureFilter(
@@ -750,6 +698,9 @@ export class Document {
             this.filterSourceCanvas.height,
         );
 
+        this.outputImage.clearCache();
+        
+        // Image filtering pipeline
         for (const filter of this.imageState.filters) {
 
             const konvaFilter = this.configureFilter(
@@ -761,16 +712,9 @@ export class Document {
                 continue;
             }
 
-            this.outputImage.clearCache();
             this.outputImage.image(this.filterSourceCanvas);
             this.outputImage.filters([konvaFilter]);
-
-            this.outputImage.cache({
-                x: 0,
-                y: 0,
-                width: this.imageState.width,
-                height: this.imageState.height,
-            });
+            this.outputImage.cache();
 
             destinationContext.clearRect(
                 0,
@@ -828,19 +772,22 @@ export class Document {
             );
         }
 
-        this.documentContext.clearRect(
-            0,
-            0,
-            this.documentCanvas.width,
-            this.documentCanvas.height,
-        );
+        // Do not overwrite the document canvas
+        // this.documentContext.clearRect(
+        //     0,
+        //     0,
+        //     this.documentCanvas.width,
+        //     this.documentCanvas.height,
+        // );
 
-        this.documentContext.drawImage(
-            this.filterSourceCanvas,
-            0,
-            0,
-        );
+        // this.documentContext.drawImage(
+        //     this.filterSourceCanvas,
+        //     0,
+        //     0,
+        // );
 
-        this.outputImage.image(this.documentCanvas);
+        this.outputImage.image(this.filterSourceCanvas);
+
+        this._events.emit("layerRedraw");
     }
 }

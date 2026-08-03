@@ -14,31 +14,47 @@ interface Props {
 }
 
 let { canvas }: Props = $props();
-
-function flip(horizontal: boolean, vertical: boolean) {
-    canvas.document.flipImage(horizontal, vertical);
-}
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">
     <div class="flex flex-col gap-2 mx-4">
         <span class="text-sm font-medium mb-2"> Transform </span>
         <div class="flex flex-col gap-2 items-center">
-            <Button class="w-full" onclick={() => {canvas.document.rotate90()}}>
+            <Button
+                class="w-full"
+                onclick={() => {
+                    canvas.document.rotateImage90();
+                }}
+            >
                 <ArrowClockwiseIcon weight="bold" />
                 Rotate CW
             </Button>
-            <Button class="w-full mb-2" onclick={() => {canvas.document.rotate90(false)}}>
+            <Button
+                class="w-full mb-2"
+                onclick={() => {
+                    canvas.document.rotateImage90(false);
+                }}
+            >
                 <ArrowCounterClockwiseIcon weight="bold" />
                 Rotate CCW
             </Button>
 
-            <Button class="w-full" onclick={() => {flip(true, false)}}>
+            <Button
+                class="w-full"
+                onclick={() => {
+                    canvas.document.flipImage(true, false);
+                }}
+            >
                 <FlipHorizontalIcon weight="bold" />
                 Flip Horizontal
             </Button>
 
-            <Button class="w-full" onclick={() => {flip(false, true)}}>
+            <Button
+                class="w-full"
+                onclick={() => {
+                    canvas.document.flipImage(false, true);
+                }}
+            >
                 <FlipVerticalIcon weight="bold" />
                 Flip Vertical
             </Button>
