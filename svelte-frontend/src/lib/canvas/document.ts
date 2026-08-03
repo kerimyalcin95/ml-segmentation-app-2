@@ -392,13 +392,65 @@ export class Document {
 
         // Scale into work canvas.
         this.setWorkCanvasSize(width, height);
-
         this.workContext.drawImage(
             this.documentCanvas,
             0,
             0,
             this.documentCanvas.width,
             this.documentCanvas.height,
+            0,
+            0,
+            width,
+            height,
+        );
+
+        // Replace the document image.
+        this.setDocumentCanvasSize(width, height);
+        this.documentContext.drawImage(
+            this.workCanvas,
+            0,
+            0,
+        );
+
+        this.outputImage.image(this.documentCanvas);
+
+        this.setImageSize(width, height);
+        this.setDocumentSize(width, height);
+        this.setDocumentCrop({
+            x: 0,
+            y: 0,
+            width: width,
+            height: height
+        });
+
+        this.applyNewWorkspaceSize();
+        this.centerInWorkspace();
+
+        this.applyImageFilters();
+
+        this._events.emit("cameraRefresh");
+        this._events.emit("cameraCenter");
+    }
+
+    cropImage(
+        x: number = 0,
+        y: number = 0,
+        width: number,
+        height: number,
+    ): void {
+        if (!this.outputImage) {
+            return;
+        }
+
+        // Copy the selected region into the work canvas.
+        this.setWorkCanvasSize(width, height);
+
+        this.workContext.drawImage(
+            this.documentCanvas,
+            x,
+            y,
+            width,
+            height,
             0,
             0,
             width,
@@ -418,30 +470,12 @@ export class Document {
 
         this.setImageSize(width, height);
         this.setDocumentSize(width, height);
-
-        this.applyNewWorkspaceSize();
-        this.centerInWorkspace();
-
-        this.applyImageFilters();
-
-        this._events.emit("cameraRefresh");
-    }
-
-    async cropImage(
-        x: number = 0,
-        y: number = 0,
-        width: number,
-        height: number
-    ): Promise<void> {
-        if (!this.outputImage) return;
-
         this.setDocumentCrop({
-            x: x,
-            y: y,
-            width: width,
-            height: height
-        })
-        this.setImageSize(width, height);
+            x: 0,
+            y: 0,
+            width,
+            height,
+        });
 
         this.applyNewWorkspaceSize();
         this.centerInWorkspace();
@@ -649,23 +683,25 @@ export class Document {
         }
 
         if (
-            this.filterSourceCanvas.width !== this.imageState.width ||
-            this.filterSourceCanvas.height !== this.imageState.height
+            this.filterSourceCanvas.width !== this.documentCanvas.width ||
+            this.filterSourceCanvas.height !== this.documentCanvas.height
         ) {
-            this.filterSourceCanvas.width = this.imageState.width;
-            this.filterSourceCanvas.height = this.imageState.height;
+            this.filterSourceCanvas.width = this.documentCanvas.width;
+            this.filterSourceCanvas.height = this.documentCanvas.height;
         }
 
         if (
-            this.filterDestinationCanvas.width !== this.imageState.width ||
-            this.filterDestinationCanvas.height !== this.imageState.height
+            this.filterDestinationCanvas.width !== this.documentCanvas.width ||
+            this.filterDestinationCanvas.height !== this.documentCanvas.height
         ) {
-            this.filterDestinationCanvas.width = this.imageState.width;
-            this.filterDestinationCanvas.height = this.imageState.height;
+            this.filterDestinationCanvas.width = this.documentCanvas.width;
+            this.filterDestinationCanvas.height = this.documentCanvas.height;
         }
 
         const sourceContext = this.filterSourceContext;
         const destinationContext = this.filterDestinationContext;
+
+        const padding = 64; // or compute from the filter
 
         sourceContext.clearRect(
             0,
@@ -678,8 +714,6 @@ export class Document {
             this.documentCanvas,
             0,
             0,
-            this.filterSourceCanvas.width,
-            this.filterSourceCanvas.height,
         );
 
         this.outputImage.clearCache();
@@ -698,7 +732,12 @@ export class Document {
 
             this.outputImage.image(this.filterSourceCanvas);
             this.outputImage.filters([konvaFilter]);
-            this.outputImage.cache();
+            this.outputImage.cache({
+                x: -padding,
+                y: -padding,
+                width: this.documentCanvas.width + padding * 2,
+                height: this.documentCanvas.height + padding * 2,
+            });
 
             destinationContext.clearRect(
                 0,
@@ -715,8 +754,6 @@ export class Document {
                 this.filterSourceCanvas,
                 0,
                 0,
-                this.filterSourceCanvas.width,
-                this.filterSourceCanvas.height,
             );
 
             // Blend the filtered image over it.
@@ -752,8 +789,6 @@ export class Document {
                 this.filterDestinationCanvas,
                 0,
                 0,
-                this.filterSourceCanvas.width,
-                this.filterSourceCanvas.height
             );
         }
 
