@@ -35,6 +35,14 @@ $effect(() => {
     );
 });
 
+$effect(() => {
+    if (cropMode && width !== 0 && height !== 0) {
+        canvas.cropOverlay.show();
+    } else {
+        canvas.cropOverlay.hide();
+    }
+});
+
 function crop() {
     canvas.document.crop(x, y, width, height);
 }

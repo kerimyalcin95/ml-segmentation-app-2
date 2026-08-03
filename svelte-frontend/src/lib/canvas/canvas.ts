@@ -2,20 +2,29 @@ import Konva from 'konva';
 import { Camera } from "./camera";
 import { Document } from './document';
 import { CONTEXT, contextContainer } from './container';
+import { CropOverlay } from "./ui/crop";
 
 export class CanvasManager {
     private stage: Konva.Stage;
     private layer: Konva.Layer;
+    private uiLayer: Konva.Layer;
 
     private readonly _camera: Camera;
-    private readonly _document: Document;
 
     get camera(): Camera {
         return this._camera;
     }
 
+    private readonly _document: Document;
+
     get document(): Document {
         return this._document
+    }
+
+    private readonly _cropOverlay: CropOverlay;
+
+    get cropOverlay(): CropOverlay {
+        return this._cropOverlay;
     }
 
     constructor(container: HTMLDivElement) {
@@ -26,6 +35,7 @@ export class CanvasManager {
         });
 
         this.layer = new Konva.Layer();
+        this.uiLayer = new Konva.Layer();
 
         this._document = new Document();
 
@@ -35,15 +45,18 @@ export class CanvasManager {
             this.document.workspace
         )
 
+        this._cropOverlay = new CropOverlay(
+            this._camera,
+            this._document,
+        );
+
         this._camera.group.add(this._document.group);
 
-        this.layer.add(
-            this.camera.group
-        );
+        this.layer.add(this.camera.group);
+        this.uiLayer.add(this.cropOverlay.group);
 
-        this.stage.add(
-            this.layer
-        );
+        this.stage.add(this.layer);
+        this.stage.add(this.uiLayer);
 
         this.document.events.on("cameraRefresh", () => {
             this.camera.refresh();
@@ -56,6 +69,16 @@ export class CanvasManager {
         this.document.events.on("cameraCenter", () => {
             this.camera.center();
         })
+
+        this.document.events.on("documentResize", () => {
+            this.cropOverlay.refresh();
+            this.uiLayer.batchDraw();
+        });
+
+        this.camera.events.on("cameraState", () => {
+            this.cropOverlay.refresh();
+            this.uiLayer.batchDraw();
+        });
 
         contextContainer.register(CONTEXT.MainStage, this.stage);
         contextContainer.register(CONTEXT.Camera, this._camera);
