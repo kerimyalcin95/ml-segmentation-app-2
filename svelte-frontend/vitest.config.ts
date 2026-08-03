@@ -4,8 +4,13 @@ import { defineConfig } from "vitest/config";
 import viteConfig from "./vite.config";
 import { svelteTesting } from "@testing-library/svelte/vite";
 
+const resolvedViteConfig =
+    typeof viteConfig === "function"
+        ? viteConfig({ mode: "test", command: "serve", isSsrBuild: false, isPreview: false })
+        : viteConfig;
+
 export default mergeConfig(
-    viteConfig,
+    resolvedViteConfig,
     defineConfig({
         plugins: [svelteTesting()],
         test: {
