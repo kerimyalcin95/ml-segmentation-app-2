@@ -21,6 +21,8 @@ class WebSocketServer:
         try:
             async for message in websocket:
                 print(f"'{message}'", end="")
+                import sys
+
                 await websocket.send(message)
 
         except websockets.exceptions.ConnectionClosedOK as e:

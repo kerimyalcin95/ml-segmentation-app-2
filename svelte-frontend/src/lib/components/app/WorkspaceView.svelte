@@ -21,6 +21,7 @@ let {
     mode = $bindable(),
     workspaceViewMode = $bindable(),
 }: Props = $props();
+
 </script>
 
 <div
@@ -33,17 +34,25 @@ let {
 
     <div class="flex-1 relative min-h-0 min-w-0">
         <div
-            class="absolute inset-0"
-            class:hidden={workspaceViewMode === 'terminal'}
+            class={[
+                'absolute inset-0',
+                workspaceViewMode === 'terminal'
+                    ? 'opacity-0 pointer-events-none'
+                    : 'opacity-100',
+            ]}
         >
             <Canvas {onCanvasReady} />
         </div>
 
         <div
-            class="absolute inset-0"
-            class:hidden={workspaceViewMode === 'canvas'}
+            class={[
+                'absolute inset-0 mx-6',
+                workspaceViewMode === 'canvas'
+                    ? 'opacity-0 pointer-events-none'
+                    : 'opacity-100',
+            ]}
         >
-            <Terminal />
+            <Terminal/>
         </div>
     </div>
 </div>

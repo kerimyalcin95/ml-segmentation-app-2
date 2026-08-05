@@ -6,10 +6,13 @@ import { PythonServer } from "../python/pythonServer.js";
 import { WindowManager } from "./windowManager.js";
 import { IpcHandlers } from "./ipcHandlers.js";
 
+import { ConsoleMirror } from '../utils/consoleMirror.js';
+
 export class ElectronApp {
 
     private readonly pythonServer: PythonServer;
     private readonly windowManager: WindowManager;
+    private readonly consoleMirror = new ConsoleMirror();
 
     private window?: BrowserWindow | undefined;
 
@@ -48,9 +51,20 @@ export class ElectronApp {
 
                     this.configurePython();
 
+                    this.window = this.windowManager.create();
+
+                    this.consoleMirror.attach(this.window);
+                    this.consoleMirror.install();
+
                     await this.pythonServer.start();
 
-                    this.window = this.windowManager.create();
+                    console.log("Electron: log");
+                    console.info("Electron: info");
+                    console.warn("Electron: warning");
+                    console.error("Electron: error");
+
+                    process.stdout.write("Electron stdout\n");
+                    process.stderr.write("Electron stderr\n");
 
                     this.window.on("closed", () => {
                         this.window = undefined;
@@ -61,7 +75,6 @@ export class ElectronApp {
                         if (BrowserWindow.getAllWindows().length === 0) {
                             this.window = this.windowManager.create();
                         }
-
                     });
                 } catch (error) {
                     console.error("Failed to start Python server:", error);
@@ -111,36 +124,12 @@ export class ElectronApp {
 
         };
 
-        this.pythonServer.onStdout = (chunk: Buffer) => {
-
-            if (
-                this.window &&
-                !this.window.isDestroyed() &&
-                !this.window.webContents.isDestroyed()
-            ) {
-                this.window.webContents.send(
-                    "terminal-data",
-                    chunk,
-                );
-            }
-
+        this.pythonServer.onStdout = (chunk) => {
+            this.consoleMirror.write(chunk.toString("utf8"));
         };
 
-        this.pythonServer.onStderr = (chunk: Buffer) => {
-
-            if (
-                this.window &&
-                !this.window.isDestroyed() &&
-                !this.window.webContents.isDestroyed()
-            ) {
-                this.window.webContents.send(
-                    "terminal-data",
-                    chunk,
-                );
-            }
-
+        this.pythonServer.onStderr = (chunk) => {
+            this.consoleMirror.write(chunk.toString("utf8"));
         };
-
     }
-
 }

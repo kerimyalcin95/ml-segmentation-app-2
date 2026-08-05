@@ -7,26 +7,43 @@ let container: HTMLDivElement;
 
 let terminal: TerminalManager;
 
+interface Props {
+    onTerminalReady?: (terminal: TerminalManager) => void;
+}
+
+let { onTerminalReady }: Props = $props();
+
+import { tick } from 'svelte';
+
 onMount(() => {
-    terminal = new TerminalManager(container);
+    let unsubscribe: (() => void) | undefined;
 
-    terminal.writeln('');
-    terminal.writeln('');
-    terminal.writeln('');
-    terminal.writeln('');
-    terminal.writeln('');
-    terminal.writeln('ML Segmentation');
-    terminal.writeln('Terminal initialized.');
-    terminal.writeln('');
+    void (async () => {
+        await tick();
 
-    const decoder = new TextDecoder();
+        console.log('Mounted:', container.clientWidth, container.clientHeight);
 
-    const unsubscribe = window.electronAPI.onTerminalData((chunk) => {
-        terminal.write(decoder.decode(chunk));
-    });
+        terminal = new TerminalManager(container);
+
+        onTerminalReady?.(terminal);
+
+        terminal.writeln('');
+        terminal.writeln('');
+        terminal.writeln('');
+        terminal.writeln('');
+        terminal.writeln('ML Segmentation');
+        terminal.writeln('Terminal initialized.');
+        terminal.writeln('');
+
+        const decoder = new TextDecoder();
+
+        unsubscribe = window.electronAPI.onTerminalData((chunk) => {
+            terminal.write(decoder.decode(chunk));
+        });
+    })();
 
     return () => {
-        unsubscribe();
+        unsubscribe?.();
         terminal.destroy();
     };
 });
@@ -47,5 +64,17 @@ onMount(() => {
 :global(.xterm-viewport::-webkit-scrollbar) {
     width: 0;
     height: 0;
+}
+
+:global(.xterm) {
+    user-select: text;
+}
+
+:global(.xterm-screen) {
+    user-select: none;
+}
+
+:global(.xterm-selection) {
+    user-select: text;
 }
 </style>
