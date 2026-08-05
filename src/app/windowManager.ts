@@ -27,8 +27,8 @@ export class WindowManager {
 
             title: "ML-Segmentation",
 
-            minWidth: 500,
-            minHeight: 500,
+            minWidth: 840,
+            minHeight: 600,
 
             webPreferences: {
 
