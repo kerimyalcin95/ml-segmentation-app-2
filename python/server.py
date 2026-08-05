@@ -16,12 +16,11 @@ class WebSocketServer:
         self.port = port
 
     async def handleConnection(self, websocket: ServerConnection) -> None:
-        print("Connected", end="")
+        print("Python server connected")
 
         try:
             async for message in websocket:
-                print(f"'{message}'", end="")
-                import sys
+                # print(f"'{message}'", end="") for debugging
 
                 await websocket.send(message)
 

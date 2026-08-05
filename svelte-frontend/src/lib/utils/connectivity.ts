@@ -6,6 +6,7 @@ export function setupConnectivity() {
     const electronAPI = window.electronAPI;
 
     // Browser-only dev mode has no Electron preload bridge.
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
     if (!electronAPI) {
         isOnline.set(0);
         return () => {
@@ -17,8 +18,10 @@ export function setupConnectivity() {
 
     const retry = setInterval(() => {
         if (!received) {
-            electronAPI.sendMessage("0");
+            electronAPI.sendMessage("Test message received");
             electronAPI.log("Retrying to connect");
+        } else {
+            electronAPI.log("Connection between Electron and Python server successfull")
         }
     }, 1000);
 

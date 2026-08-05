@@ -58,14 +58,6 @@ export class ElectronApp {
 
                     await this.pythonServer.start();
 
-                    console.log("Electron: log");
-                    console.info("Electron: info");
-                    console.warn("Electron: warning");
-                    console.error("Electron: error");
-
-                    process.stdout.write("Electron stdout\n");
-                    process.stderr.write("Electron stderr\n");
-
                     this.window.on("closed", () => {
                         this.window = undefined;
                     });
