@@ -54,4 +54,24 @@ contextBridge.exposeInMainWorld('electronAPI', {
             "read-image",
             filePath,
         ),
+
+    onTerminalData: (
+        callback: (chunk: Uint8Array) => void,
+    ) => {
+        const listener = (
+            _event: IpcRendererEvent,
+            chunk: Uint8Array,
+        ) => {
+            callback(chunk);
+        };
+
+        ipcRenderer.on("terminal-data", listener);
+
+        return () => {
+            ipcRenderer.removeListener(
+                "terminal-data",
+                listener,
+            );
+        };
+    },
 });

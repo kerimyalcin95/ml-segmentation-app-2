@@ -12,6 +12,9 @@ export class PythonServer {
     public onDisconnected?: (code: number, reason: string) => void;
     public onError?: (error: Error) => void;
 
+    public onStdout?: (chunk: Buffer) => void;
+    public onStderr?: (chunk: Buffer) => void;
+
     public constructor(
         private readonly pythonPath: string
     ) { }
@@ -35,9 +38,11 @@ export class PythonServer {
 
             process.stdout.on("data", (data: Buffer) => {
 
-                const output = data.toString();
+                globalThis.process.stdout.write(data);
 
-                console.log(`Python: ${output}`);
+                this.onStdout?.(data);
+
+                const output = data.toString();
 
                 if (output.includes("Listening on")) {
                     resolve();
@@ -46,7 +51,11 @@ export class PythonServer {
             });
 
             process.stderr.on("data", (data: Buffer) => {
-                console.error(`Python Error: ${data.toString()}`);
+
+                globalThis.process.stderr.write(data);
+
+                this.onStderr?.(data);
+
             });
 
             process.once("error", reject);

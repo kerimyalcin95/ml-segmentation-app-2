@@ -111,6 +111,36 @@ export class ElectronApp {
 
         };
 
+        this.pythonServer.onStdout = (chunk: Buffer) => {
+
+            if (
+                this.window &&
+                !this.window.isDestroyed() &&
+                !this.window.webContents.isDestroyed()
+            ) {
+                this.window.webContents.send(
+                    "terminal-data",
+                    chunk,
+                );
+            }
+
+        };
+
+        this.pythonServer.onStderr = (chunk: Buffer) => {
+
+            if (
+                this.window &&
+                !this.window.isDestroyed() &&
+                !this.window.webContents.isDestroyed()
+            ) {
+                this.window.webContents.send(
+                    "terminal-data",
+                    chunk,
+                );
+            }
+
+        };
+
     }
 
 }

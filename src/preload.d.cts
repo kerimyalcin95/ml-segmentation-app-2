@@ -15,6 +15,9 @@ export interface ElectronAPI {
     readImage: (
         filePath: string,
     ) => Promise<Uint8Array>;
+    onTerminalData: (
+        callback: (chunk: Uint8Array) => void,
+    ) => () => void;
 }
 
 export interface SaveImageDialogResult {
