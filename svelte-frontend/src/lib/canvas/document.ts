@@ -358,6 +358,8 @@ export class Document {
 
         this._events.emit("layerRedraw");
 
+        console.log("Image loaded.")
+
         const blob = await new Promise<Blob>((resolve, reject) => {
             canvas.toBlob((blob) => {
                 if (!blob) {

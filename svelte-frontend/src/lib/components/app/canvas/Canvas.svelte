@@ -194,10 +194,13 @@ onMount(() => {
         scroll.y = state.y;
     });
 
-    canvas.document.workspace.events.on('workspaceResize', ({ width, height }) => {
-        workspaceSize.width = width;
-        workspaceSize.height = height;
-    });
+    canvas.document.workspace.events.on(
+        'workspaceResize',
+        ({ width, height }) => {
+            workspaceSize.width = width;
+            workspaceSize.height = height;
+        },
+    );
 
     canvas.document.events.on('documentResize', ({ width, height }) => {
         documentSize.width = width;
@@ -242,7 +245,7 @@ onMount(() => {
 });
 </script>
 
-<div data-e2e="canvas" class="flex-1 relative min-h-0 min-w-0">
+<div data-e2e="canvas" class="relative w-full h-full">
     <div
         bind:this={viewport}
         id="canvas-viewport"
