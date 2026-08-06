@@ -42,7 +42,7 @@
 
 ## About
 
-ML-Segmentation 2 is an open-source desktop application for machine learning-based image segmentation. It combines dataset management, image annotation, image editing, model training, and inference into a single cross-platform workflow powered by Python, fastai, Electron, and Svelte.
+ML-Segmentation 2 is an open-source desktop application for machine learning-based image segmentation. It combines dataset management, image labeling, image editing, model training, and inference into a single cross-platform workflow powered by Python, fastai, Electron, and Svelte.
 
 The project is currently in the **alpha** stage of development. While the core architecture is in place, many features are still under active development and may change significantly before the first stable release. Expect incomplete functionality, bugs, breaking changes, and limited documentation as the application continues to evolve.
 
@@ -60,7 +60,7 @@ The project also serves as a practical software engineering playground, focusing
 The application uses a local client–server architecture to enable communication between the frontend client and the Python backend server. [WebSocket](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) technology provides real-time, bidirectional communication for exchanging commands, image data, segmentation results, and application events.
 
 **Frontend:**  
-[Svelte](https://svelte.dev/) is used for dynamic UI rendering and interactive user experiences. The interface is built with [shadcn-svelte](https://www.shadcn-svelte.com/) components, styled using [Tailwind CSS](https://tailwindcss.com/), and uses [Konva](https://konvajs.org/) for interactive canvas-based image editing, drawing, annotation, and segmentation mask manipulation.
+[Svelte](https://svelte.dev/) is used for dynamic UI rendering and interactive user experiences. The interface is built with [shadcn-svelte](https://www.shadcn-svelte.com/) components, styled using [Tailwind CSS](https://tailwindcss.com/), and uses [Konva](https://konvajs.org/) for interactive canvas-based image editing, drawing, labeling, and segmentation mask manipulation.
 
 **Cross-Platform Distribution:**  
 The complete pipeline is open source and distributed as native desktop applications for multiple platforms, including **Windows**, **Linux** (Debian and Ubuntu), and **macOS**. This provides a consistent installation and user experience across supported operating systems.
@@ -107,7 +107,7 @@ The root project folder `ml-segmentation-2` is divided into three main directori
 
   The interface uses [shadcn-svelte](https://www.shadcn-svelte.com/) components, which provide reusable and customizable UI elements designed specifically for Svelte applications. These components are styled and adapted using [Tailwind CSS](https://tailwindcss.com/), a utility-first CSS framework that provides predefined styling classes for controlling layout, spacing, colors, typography, and responsive behavior directly within the application markup. This approach enables consistent design patterns while allowing fine-grained customization of the user interface.
 
-  For interactive image processing functionality, the frontend integrates [Konva](https://konvajs.org/), a 2D canvas framework that enables high-performance rendering and manipulation of graphical objects in the browser. Konva is used to implement image editing features such as annotation, drawing, object manipulation, image cropping, and interactive visualization of image data. It provides the foundation for creating a dynamic workspace where users can modify and analyze images directly within the application.
+  For interactive image processing functionality, the frontend integrates [Konva](https://konvajs.org/), a 2D canvas framework that enables high-performance rendering and manipulation of graphical objects in the browser. Konva is used to implement image editing features such as labeling, drawing, object manipulation, image cropping, and interactive visualization of image data. It provides the foundation for creating a dynamic workspace where users can modify and analyze images directly within the application.
 
 Other directories and files included in the root folder:
 

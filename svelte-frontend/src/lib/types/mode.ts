@@ -1,1 +1,1 @@
-export type Mode = 'editing' | 'annotation' | 'training' | 'prediction';
+export type Mode = 'editing' | 'labeling' | 'training' | 'prediction';

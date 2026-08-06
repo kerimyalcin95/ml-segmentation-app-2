@@ -10,6 +10,9 @@ import ImageGeometry from '../editing/imageGeometry/ImageGeometry.svelte';
 import VerticalScrollBar from '$lib/components/app/sidebar/VerticalScrollBar.svelte';
 import ImageFilter from '../editing/imageFilter/ImageFilter.svelte';
 
+import LabelFileControl from '$lib/components/app/labeling/labelFileControl/LabelFileControl.svelte';
+import LabelBrush from '../labeling/labelBrush/labelBrush.svelte';
+
 interface Props {
     canvas: CanvasManager;
     mode: Mode;
@@ -17,11 +20,11 @@ interface Props {
 
 let { canvas, mode }: Props = $props();
 
-let viewport: HTMLDivElement;
+let viewport: HTMLDivElement | undefined;
 
 let scrollbar: {
     showScrollbar: () => void;
-};
+} | undefined;
 
 let scrollY = $state(0);
 let viewportHeight = $state(0);
@@ -29,7 +32,7 @@ let contentHeight = $state(0);
 
 const maxScroll = $derived(Math.max(0, contentHeight - viewportHeight));
 
-let resizeObserver: ResizeObserver;
+let resizeObserver: ResizeObserver | undefined;
 
 $effect(() => {
     if (!viewport) return;
@@ -52,7 +55,7 @@ $effect(() => {
     window.addEventListener('resize', updateSizes);
 
     return () => {
-        resizeObserver.disconnect();
+        resizeObserver?.disconnect();
         window.removeEventListener('resize', updateSizes);
     };
 });
@@ -127,8 +130,11 @@ function handleMouseMove() {
                 <ImageFilter {canvas} />
                 <ImageTransform {canvas} />
                 <ImageGeometry {canvas} />
-            {:else if mode === 'annotation'}
-                <h2 class="text-md font-bold mb-3">Annotation</h2>
+            {:else if mode === 'labeling'}
+                <h2 class="text-md font-bold mb-3">Labeling</h2>
+
+                <LabelFileControl {canvas} />
+                <LabelBrush {canvas} />
 
                 <Card class="h-min flex flex-col gap-4"></Card>
             {:else if mode === 'training'}

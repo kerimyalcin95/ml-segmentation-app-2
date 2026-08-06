@@ -30,9 +30,9 @@ function onValueChange(value: string) {
             >
 
             <ToggleGroup.Item
-                value="annotation"
+                value="labeling"
                 class="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
-                >Annotation</ToggleGroup.Item
+                >Labeling</ToggleGroup.Item
             >
 
             <ToggleGroup.Item

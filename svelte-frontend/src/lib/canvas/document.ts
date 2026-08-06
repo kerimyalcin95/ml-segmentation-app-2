@@ -53,10 +53,10 @@ export class Document {
     }
 
     private readonly sourceCanvas = document.createElement("canvas");
-    private readonly sourceContext;
+    private readonly sourceContext: CanvasRenderingContext2D;
 
     private readonly workCanvas = document.createElement("canvas");
-    private readonly workContext;
+    private readonly workContext: CanvasRenderingContext2D;
 
     private _state: DocumentState = {
         width: 0,
@@ -86,12 +86,12 @@ export class Document {
         this._workspace = new Workspace();
 
         // Create document canvas context
-        const documentContext = this.sourceCanvas.getContext("2d");
+        const sourceContext = this.sourceCanvas.getContext("2d");
 
-        if (!documentContext) {
+        if (!sourceContext) {
             throw new Error("Failed to create 2D rendering context.");
         }
-        this.sourceContext = documentContext;
+        this.sourceContext = sourceContext;
 
         // Create work canvas context
         const workContext = this.workCanvas.getContext("2d");
@@ -99,6 +99,7 @@ export class Document {
         if (!workContext) {
             throw new Error("Failed to create 2D rendering context.");
         }
+
         this.workContext = workContext;
 
         this._image = new Image(
@@ -199,7 +200,7 @@ export class Document {
     setSourceCanvasSize(width: number, height: number) {
         // warning: this resets the canvas
         this.sourceCanvas.width = width;
-        this.sourceCanvas.height = height;
+        this.sourceCanvas.height = height; 
     }
 
     private replaceSourceCanvasFromWorkCanvas(
@@ -293,18 +294,19 @@ export class Document {
 
         this._group.destroyChildren();
 
+        this.setCanvasBitmap(bitmap);
+
         this.image.outputImage = new Konva.Image({
-            image: bitmap,
+            image: this.sourceCanvas,
             x: 0,
             y: 0,
-            width: bitmap.width,
-            height: bitmap.height,
-            offsetX: bitmap.width / 2,
-            offsetY: bitmap.height / 2,
+            width: this.sourceCanvas.width,
+            height: this.sourceCanvas.height,
+            offsetX: this.sourceCanvas.width / 2,
+            offsetY: this.sourceCanvas.height / 2,
             listening: false,
         });
 
-        this.setCanvasBitmap(bitmap);
         this.image.setSize(bitmap.width, bitmap.height);
         this.setSize(bitmap.width, bitmap.height);
 
