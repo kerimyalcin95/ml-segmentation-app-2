@@ -18,7 +18,7 @@ interface Props {
 let { canvas }: Props = $props();
 
 let visible = $state(true);
-let opacity = $state(100);
+let opacity = $state(63);
 
 function toggleVisibility(): void {
     visible = !visible;
