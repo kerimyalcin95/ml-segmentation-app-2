@@ -22,11 +22,24 @@ Semantic annotation with configurable labels, brush tools and layer management.
 
 ![Labeling Mode](snapshots/snapshot-2.png)
 
+<br>
+
+<div align="center">
+
+## Terminal Output
+
+Live console output from the Electron app and Python server.
+
+</div>
+
+![Terminal Output](snapshots/snapshot-terminal.png)
+
 ## Table of Contents
 
 - [Segmentation App 2](#segmentation-app-2)
   - [Editing Mode](#editing-mode)
   - [Labeling Mode](#labeling-mode)
+  - [Terminal Output](#terminal-output)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
   - [Architecture](#architecture)
