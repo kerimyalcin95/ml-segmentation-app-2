@@ -11,8 +11,9 @@ import VerticalScrollBar from '$lib/components/app/sidebar/VerticalScrollBar.sve
 import ImageFilter from '../editing/imageFilter/ImageFilter.svelte';
 
 import LabelFileControl from '$lib/components/app/labeling/labelFileControl/LabelFileControl.svelte';
-import LabelBrush from '../labeling/labelBrush/labelBrush.svelte';
+import LabelBrush from '../labeling/labelBrush/LabelBrush.svelte';
 import LabelLayer from '../labeling/labelLayer/LabelLayer.svelte';
+import LabelDisplay from '../labeling/labelDisplay/LabelDisplay.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -137,6 +138,7 @@ function handleMouseMove() {
                 <LabelFileControl {canvas} />
                 <LabelBrush {canvas} />
                 <LabelLayer {canvas} />
+                <LabelDisplay {canvas} />
             {:else if mode === 'training'}
                 <h2 class="text-md font-bold mb-3">Training</h2>
 

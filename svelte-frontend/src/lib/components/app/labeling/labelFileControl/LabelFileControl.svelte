@@ -1,24 +1,22 @@
 <script lang="ts">
-    import { Card } from '$lib/components/ui/card';
-    import { CanvasManager } from '$lib/canvas/canvas';
+import { Card } from '$lib/components/ui/card';
+import { CanvasManager } from '$lib/canvas/canvas';
 
-    import LoadLabelImage from './LoadLabelImage.svelte';
-    import SaveLabelImage from './SaveLabelImage.svelte';
-    import CreateLabel from './CreateLabel.svelte';
+import LoadLabelImage from './LoadLabelImage.svelte';
+import SaveLabelImage from './SaveLabelImage.svelte';
+import CreateLabel from './CreateLabel.svelte';
 import Separator from '$lib/components/ui/separator/separator.svelte';
 
-    interface Props {
-        canvas: CanvasManager;
-    }
+interface Props {
+    canvas: CanvasManager;
+}
 
-    let { canvas }: Props = $props();
+let { canvas }: Props = $props();
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">
     <div class="flex flex-col gap-2 mx-4">
-        <span class="text-sm font-medium mb-2">
-            File Control
-        </span>
+        <span class="text-sm font-medium mb-2"> File Control </span>
 
         <LoadLabelImage {canvas} />
         <SaveLabelImage {canvas} />

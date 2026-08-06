@@ -45,21 +45,25 @@
 :root[data-mode="editing"] {
     --primary: oklch(0.496 0.265 301.924);
     --card: oklch(95.343% 0.02431 331.694);
+    --ring: oklch(0.711 0.019 323.02);
 }
 
 :root[data-mode="labeling"] {
     --primary: oklch(0.65 0.18 40);
     --card: oklch(96.518% 0.01361 67.486);
+    --ring: oklch(71.903% 0.00994 62.31);
 }
 
 :root[data-mode="training"] {
     --primary: oklch(0.65 0.18 145);
     --card: oklch(97.109% 0.02507 140.027);
+    --ring: oklch(72.439% 0.01858 140.208);
 }
 
 :root[data-mode="prediction"] {
     --primary: oklch(63.882% 0.24754 31.187);
     --card: oklch(94.973% 0.01739 17.123);
+    --ring: oklch(70.864% 0.01286 17.118);
 }
 
 .dark {
@@ -98,22 +102,26 @@
 
 .dark[data-mode="editing"] {
     --primary: oklch(0.496 0.265 301.924);
-    	--card: oklch(0.212 0.019 322.12);
+    --card: oklch(0.212 0.019 322.12);
+    --ring: oklch(0.542 0.034 322.5);
 }
 
 .dark[data-mode="labeling"] {
     --primary: oklch(0.65 0.18 40);
-    	--card: oklch(22.096% 0.00985 67.226);
+    --card: oklch(22.096% 0.00985 67.226);
+    --ring: oklch(55.754% 0.0176 67.377);
 }
 
 .dark[data-mode="training"] {
     --primary: oklch(0.65 0.18 145);
     --card: oklch(22.597% 0.01755 137.972);
+    --ring: oklch(56.594% 0.03182 138.83);
 }
 
 .dark[data-mode="prediction"] {
     --primary: oklch(63.882% 0.24754 31.187);
     --card: oklch(21.014% 0.01302 18.141);
+    --ring: oklch(53.795% 0.02292 17.742);
 }
 
 @theme inline {
