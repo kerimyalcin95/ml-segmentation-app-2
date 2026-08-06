@@ -13,7 +13,21 @@ interface Props {
 
 let { canvas }: Props = $props();
 
-const labelsEnabled = $derived(canvas.document.hasLabelImage());
+let labelsEnabled = $state(false);
+
+$effect(() => {
+    labelsEnabled = canvas.document.hasLabelImage();
+
+    const handler = () => {
+        labelsEnabled = canvas.document.hasLabelImage();
+    };
+
+    canvas.document.events.on("labelImageCreate", handler);
+
+    return () => {
+        canvas.document.events.off("labelImageCreate", handler);
+    };
+});
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">

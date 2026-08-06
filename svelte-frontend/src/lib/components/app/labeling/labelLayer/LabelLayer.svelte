@@ -19,7 +19,21 @@ let { canvas }: Props = $props();
 
 let activeLabels = $state<ActiveLabel[]>([]);
 
-const labelsEnabled = $derived(canvas.document.hasLabelImage());
+let labelsEnabled = $state(false);
+
+$effect(() => {
+    labelsEnabled = canvas.document.hasLabelImage();
+
+    const handler = () => {
+        labelsEnabled = canvas.document.hasLabelImage();
+    };
+
+    canvas.document.events.on('labelImageCreate', handler);
+
+    return () => {
+        canvas.document.events.off('labelImageCreate', handler);
+    };
+});
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">
@@ -39,7 +53,7 @@ const labelsEnabled = $derived(canvas.document.hasLabelImage());
             }}
         />
 
-        <Separator class="mb-2"/>
+        <Separator class="mb-2" />
 
         <LoadLabelFile {canvas} {activeLabels} enabled={labelsEnabled} />
         <SaveLabelFile {canvas} {activeLabels} enabled={labelsEnabled} />

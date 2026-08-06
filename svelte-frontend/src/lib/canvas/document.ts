@@ -579,6 +579,10 @@ export class Document {
         }
 
         this.events.emit("layerRedraw");
+
+        this.events.emit("labelImageCreate", {
+            created: true,
+        });
     }
 
     hasImage(): boolean {
