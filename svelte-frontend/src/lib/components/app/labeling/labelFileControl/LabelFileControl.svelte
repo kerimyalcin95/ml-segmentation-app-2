@@ -22,7 +22,7 @@ import Separator from '$lib/components/ui/separator/separator.svelte';
 
         <LoadLabel {canvas} />
         <SaveLabel {canvas} />
-        <Separator />
+        <Separator class="my-2"/>
         <CreateLabel {canvas} />
     </div>
 </Card>
