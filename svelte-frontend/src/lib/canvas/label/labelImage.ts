@@ -7,6 +7,12 @@ export class LabelImage {
 
     readonly outputImage: Konva.Image;
 
+    private _created = false;
+
+    get created(): boolean {
+        return this._created;
+    }
+
     constructor() {
 
         const context = this.canvas.getContext("2d");
@@ -23,6 +29,16 @@ export class LabelImage {
             y: 0,
             listening: false,
         });
+    }
+
+    create(
+        width: number,
+        height: number,
+    ): void {
+        this.setSize(width, height);
+        this.clear();
+
+        this._created = true;
     }
 
     setSize(
@@ -47,13 +63,14 @@ export class LabelImage {
     }
 
     clear(): void {
-
         this.context.clearRect(
             0,
             0,
             this.canvas.width,
             this.canvas.height,
         );
+
+        this._created = false;
 
         this.refresh();
     }

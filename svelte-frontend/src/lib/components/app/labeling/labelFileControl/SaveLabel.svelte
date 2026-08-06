@@ -20,5 +20,5 @@
 
 <Button onclick={saveLabel}>
     <FloppyDiskIcon weight="bold" />
-    Save Image Label
+    Save Label Image
 </Button>

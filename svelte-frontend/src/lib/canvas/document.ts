@@ -560,4 +560,24 @@ export class Document {
             cameraCenter: false
         });
     }
+
+    // Labeling
+
+    hasLabelImage(): boolean {
+        return this.labelImage.created;
+    }
+
+    createLabel(): void {
+
+        this.labelImage.create(
+            this.state.width,
+            this.state.height,
+        );
+
+        if (!this.group.children.includes(this.labelImage.outputImage)) {
+            this.group.add(this.labelImage.outputImage);
+        }
+
+        this.events.emit("layerRedraw");
+    }
 }

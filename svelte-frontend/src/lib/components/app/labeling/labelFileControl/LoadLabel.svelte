@@ -20,5 +20,5 @@
 
 <Button onclick={loadLabel}>
     <ImageSquareIcon weight="bold" />
-    Load Image Label
+    Load Label Image
 </Button>
