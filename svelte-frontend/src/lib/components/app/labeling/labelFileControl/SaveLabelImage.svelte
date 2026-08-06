@@ -6,9 +6,10 @@
 
     interface Props {
         canvas: CanvasManager;
+        enabled: boolean;
     }
 
-    let { canvas }: Props = $props();
+    let { canvas, enabled = false }: Props = $props();
 
     async function saveLabel() {
         // TODO:
@@ -18,7 +19,7 @@
     }
 </script>
 
-<Button onclick={saveLabel}>
+<Button onclick={saveLabel} disabled={!enabled}>
     <FloppyDiskIcon weight="bold" />
     Save Label Image
 </Button>

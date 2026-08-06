@@ -580,4 +580,8 @@ export class Document {
 
         this.events.emit("layerRedraw");
     }
+
+    hasImage(): boolean {
+        return this.state.width > 0 && this.state.height > 0;
+    }
 }

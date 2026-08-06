@@ -2,8 +2,8 @@
     import { Card } from '$lib/components/ui/card';
     import { CanvasManager } from '$lib/canvas/canvas';
 
-    import LoadLabel from './LoadLabel.svelte';
-    import SaveLabel from './SaveLabel.svelte';
+    import LoadLabelImage from './LoadLabelImage.svelte';
+    import SaveLabelImage from './SaveLabelImage.svelte';
     import CreateLabel from './CreateLabel.svelte';
 import Separator from '$lib/components/ui/separator/separator.svelte';
 
@@ -20,8 +20,8 @@ import Separator from '$lib/components/ui/separator/separator.svelte';
             File Control
         </span>
 
-        <LoadLabel {canvas} />
-        <SaveLabel {canvas} />
+        <LoadLabelImage {canvas} />
+        <SaveLabelImage {canvas} />
         <Separator />
         <CreateLabel {canvas} />
     </div>

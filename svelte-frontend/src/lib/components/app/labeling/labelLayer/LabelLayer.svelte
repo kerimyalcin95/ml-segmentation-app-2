@@ -7,7 +7,9 @@ import type { ActiveLabel } from '$lib/types/label';
 
 import LabelSelect from './LabelSelect.svelte';
 import LabelDragList from './LabelDragList.svelte';
-import SaveLabels from './SaveLabels.svelte';
+import SaveLabelFile from './SaveLabelFile.svelte';
+import LoadLabelFile from './LoadLabelFile.svelte';
+import Separator from '$lib/components/ui/separator/separator.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -16,13 +18,15 @@ interface Props {
 let { canvas }: Props = $props();
 
 let activeLabels = $state<ActiveLabel[]>([]);
+
+const labelsEnabled = $derived(canvas.document.hasLabelImage());
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">
     <div class="flex flex-col gap-2 mx-4">
         <span class="text-sm font-medium mb-2"> Labels </span>
 
-        <LabelSelect {activeLabels} />
+        <LabelSelect {activeLabels} enabled={labelsEnabled} />
 
         <LabelDragList
             {canvas}
@@ -35,6 +39,9 @@ let activeLabels = $state<ActiveLabel[]>([]);
             }}
         />
 
-        <SaveLabels {canvas} {activeLabels} />
+        <Separator class="mb-2"/>
+
+        <LoadLabelFile {canvas} {activeLabels} enabled={labelsEnabled} />
+        <SaveLabelFile {canvas} {activeLabels} enabled={labelsEnabled} />
     </div>
 </Card>

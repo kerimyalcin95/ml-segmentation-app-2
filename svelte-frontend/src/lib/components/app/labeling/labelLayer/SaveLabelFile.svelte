@@ -10,11 +10,13 @@ import type { ActiveLabel } from '$lib/types/label';
 interface Props {
     canvas: CanvasManager;
     activeLabels: ActiveLabel[];
+    enabled: boolean;
 }
 
 let {
     canvas,
     activeLabels,
+    enabled = false,
 }: Props = $props();
 
 function saveLabels(): void {
@@ -22,7 +24,7 @@ function saveLabels(): void {
 }
 </script>
 
-<Button onclick={saveLabels}>
+<Button onclick={saveLabels} disabled={!enabled}>
     <FloppyDiskIcon weight="bold" />
     Save Labels
 </Button>
