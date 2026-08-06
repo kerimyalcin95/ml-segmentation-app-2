@@ -12,6 +12,8 @@ interface Props {
 }
 
 let { canvas }: Props = $props();
+
+const labelsEnabled = $derived(canvas.document.hasLabelImage());
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">
@@ -19,7 +21,7 @@ let { canvas }: Props = $props();
         <span class="text-sm font-medium mb-2"> File Control </span>
 
         <LoadLabelImage {canvas} />
-        <SaveLabelImage {canvas} />
+        <SaveLabelImage {canvas} enabled={labelsEnabled} />
         <Separator />
         <CreateLabel {canvas} />
     </div>
