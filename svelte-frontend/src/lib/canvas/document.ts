@@ -6,6 +6,7 @@ import { CONTEXT, contextContainer } from "./container"
 import { Camera } from "./camera";
 import { Workspace } from './workspace';
 import { Image } from './image';
+import { LabelImage } from "./label/labelImage";
 
 export interface CropState {
     x: number;
@@ -32,24 +33,33 @@ export class Document {
 
     // Getter/Setter variables
     private readonly _group: Konva.Group;
-    private _workspace: Workspace;
-    private readonly _events = mitt<CanvasEvents>();
-    private readonly _image: Image;
 
     get group(): Konva.Group {
         return this._group;
     }
 
+    private _workspace: Workspace;
+
     get workspace(): Workspace {
         return this._workspace;
     }
+
+    private readonly _events = mitt<CanvasEvents>();
 
     get events() {
         return this._events;
     }
 
+    private readonly _image: Image;
+
     get image() {
         return this._image;
+    }
+
+    private readonly _labelImage: LabelImage;
+
+    get labelImage(): LabelImage {
+        return this._labelImage;
     }
 
     private readonly sourceCanvas = document.createElement("canvas");
@@ -84,6 +94,7 @@ export class Document {
     constructor() {
         this._group = new Konva.Group();
         this._workspace = new Workspace();
+        this._labelImage = new LabelImage();
 
         // Create document canvas context
         const sourceContext = this.sourceCanvas.getContext("2d");
@@ -101,6 +112,10 @@ export class Document {
         }
 
         this.workContext = workContext;
+
+        this._image = new Image(
+            this.sourceCanvas
+        );
 
         this._image = new Image(
             this.sourceCanvas
@@ -200,7 +215,7 @@ export class Document {
     setSourceCanvasSize(width: number, height: number) {
         // warning: this resets the canvas
         this.sourceCanvas.width = width;
-        this.sourceCanvas.height = height; 
+        this.sourceCanvas.height = height;
     }
 
     private replaceSourceCanvasFromWorkCanvas(

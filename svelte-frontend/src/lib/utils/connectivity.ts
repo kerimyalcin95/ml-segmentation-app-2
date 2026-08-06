@@ -20,8 +20,6 @@ export function setupConnectivity() {
         if (!received) {
             electronAPI.sendMessage("Test message received");
             electronAPI.log("Retrying to connect");
-        } else {
-            electronAPI.log("Connection between Electron and Python server successfull")
         }
     }, 1000);
 
@@ -29,9 +27,13 @@ export function setupConnectivity() {
         received = true;
         clearInterval(retry);
 
+        electronAPI.log("Connection between Electron and Python server successful");
+
         let state = parseInt(msg) || 0;
 
-        if (state === 0) state = 1;
+        if (state === 0) {
+            state = 1;
+        }
 
         isOnline.set(state);
     });

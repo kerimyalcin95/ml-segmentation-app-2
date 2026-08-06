@@ -38,7 +38,7 @@ class WebSocketServer:
             self.host,
             self.port,
         ):
-            print(f"Listening on ws://{self.host}:{self.port}", end="")
+            print(f"Listening on ws://{self.host}:{self.port}")
             await asyncio.Future()
 
 
