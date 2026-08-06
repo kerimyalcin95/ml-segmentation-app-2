@@ -1,10 +1,32 @@
 # Segmentation App 2
 
-![Application screenshot](snapshots/snapshot-1.png)
+<div align="center">
+
+## Editing Mode
+
+Image preprocessing, enhancement and dataset preparation.
+
+</div>
+
+![Editing Mode](snapshots/snapshot-1.png)
+
+<br>
+
+<div align="center">
+
+## Labeling Mode
+
+Semantic annotation with configurable labels, brush tools and layer management.
+
+</div>
+
+![Labeling Mode](snapshots/snapshot-2.png)
 
 ## Table of Contents
 
 - [Segmentation App 2](#segmentation-app-2)
+  - [Editing Mode](#editing-mode)
+  - [Labeling Mode](#labeling-mode)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
   - [Architecture](#architecture)
