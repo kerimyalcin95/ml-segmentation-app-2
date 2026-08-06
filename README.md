@@ -14,8 +14,6 @@ Image preprocessing, enhancement and dataset preparation.
 
 ![Editing Mode](snapshots/snapshot-1.png)
 
-<br>
-
 <div align="center">
 
 ## Labeling Mode
@@ -25,8 +23,6 @@ Semantic annotation with configurable labels, brush tools and layer management.
 </div>
 
 ![Labeling Mode](snapshots/snapshot-2.png)
-
-<br>
 
 <div align="center">
 
