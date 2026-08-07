@@ -12,6 +12,8 @@ export class Brush {
     private enabled = false;
     private drawing = false;
 
+    private resizing = false;
+
     private _size = 32;
 
     get size(): number {
@@ -41,6 +43,31 @@ export class Brush {
 
         this.registerEvents();
     }
+
+    private getCanvas(): HTMLCanvasElement | null {
+        return this.stage
+            .container()
+            .querySelector("canvas");
+    }
+
+    private onPointerLockChange = (): void => {
+
+        const canvas = this.getCanvas();
+
+        if (!canvas) {
+            return;
+        }
+
+        const locked = document.pointerLockElement === canvas;
+
+        this.resizing = locked;
+
+        if (!locked) {
+            this.drawing = false;
+            this.show();
+            this.layer.batchDraw();
+        }
+    };
 
     private onCameraState = (): void => {
         this.updateCursor();
@@ -86,6 +113,11 @@ export class Brush {
     }
 
     private registerEvents(): void {
+        document.addEventListener(
+            "pointerlockchange",
+            this.onPointerLockChange,
+        );
+
         this.stage.on("pointermove", this.onPointerMove);
         this.stage.on("mouseenter", this.onMouseEnter);
         this.stage.on("mouseleave", this.onMouseLeave);
@@ -96,6 +128,20 @@ export class Brush {
 
     private onPointerMove = (event: Konva.KonvaEventObject<PointerEvent>): void => {
         if (!this.enabled) {
+            return;
+        }
+
+        if (this.resizing) {
+
+            this.show();
+
+            const delta = -event.evt.movementY;
+
+            if (delta !== 0) {
+                sessionStore.brushSize += delta;
+                this.setSize(sessionStore.brushSize);
+            }
+
             return;
         }
 
@@ -145,14 +191,35 @@ export class Brush {
             return;
         }
 
-        this.drawing = true;
+        if (event.evt.ctrlKey && event.evt.altKey) {
 
+            this.drawing = false;
+            this.resizing = true;
+
+            const canvas = this.getCanvas();
+
+            if (!canvas) {
+                return;
+            }
+
+            void canvas.requestPointerLock();
+
+            return;
+        }
+
+        this.drawing = true;
         this.paint(event.evt.altKey);
     };
 
     private onPointerUp = (): void => {
+
+        if (this.resizing) {
+            document.exitPointerLock();
+        }
+
+        this.resizing = false;
         this.drawing = false;
-    };
+    }
 
     public destroy(): void {
         this.stage.off("pointermove", this.onPointerMove);
@@ -163,10 +230,18 @@ export class Brush {
         this.stage.off("pointercancel", this.onPointerUp);
 
         this.camera.events.off("cameraState", this.onCameraState);
+
+        document.removeEventListener(
+            "pointerlockchange",
+            this.onPointerLockChange,
+        );
     }
 
     setSize(size: number): void {
-        this._size = Math.max(1, Math.round(size));
+        this._size = Math.min(
+            512,
+            Math.max(1, Math.round(size)),
+        );
         this.updateCursor();
     }
 
