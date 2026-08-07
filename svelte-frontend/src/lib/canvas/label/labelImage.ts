@@ -1,4 +1,7 @@
 import Konva from 'konva';
+import { CONTEXT, contextContainer } from '../container';
+import { Document } from '../document';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 export class LabelImage {
 
@@ -135,5 +138,27 @@ export class LabelImage {
         this.outputImage.opacity(
             Math.max(0, Math.min(1, opacity)),
         );
+    }
+
+    new(): void {
+
+        const document = contextContainer.resolve<Document>(CONTEXT.Document);
+
+        this.create(
+            document.state.width,
+            document.state.height,
+        );
+
+        this.setOpacity(sessionStore.labeling.globalOpacity / 100);
+
+        if (!document.group.children.includes(this.outputImage)) {
+            document.group.add(this.outputImage);
+        }
+
+        document.events.emit("layerRedraw");
+
+        document.events.emit("labelImageCreate", {
+            created: true,
+        });
     }
 }

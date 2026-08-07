@@ -1,4 +1,4 @@
-import {type Mode} from '$lib/types/mode';
+import { type Mode } from '$lib/types/mode';
 import { type ActiveLabel } from '$lib/types/label';
 
 class LabelingSession {
@@ -12,6 +12,7 @@ class SessionStore {
     lastDirectory = $state<string>();
     mode = $state<Mode>("editing");
     activeLabels = $state<ActiveLabel[]>([]);
+    hasLabelImage = $state(false);
 
     labeling = new LabelingSession();
 }

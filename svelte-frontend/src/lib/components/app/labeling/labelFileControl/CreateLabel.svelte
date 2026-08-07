@@ -24,7 +24,8 @@ function createLabel(): void {
     }
 
     if (!canvas.document.hasLabelImage()) {
-        canvas.document.createLabel();
+        canvas.document.labelImage.new();
+        sessionStore.hasLabelImage = true;
         return;
     }
 
@@ -32,7 +33,7 @@ function createLabel(): void {
 }
 
 function confirmCreateLabel(): void {
-    canvas.document.createLabel();
+    canvas.document.labelImage.new();
     sessionStore.activeLabels = [];
     replaceDialogOpen = false;
 }

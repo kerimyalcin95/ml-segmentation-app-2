@@ -24,15 +24,15 @@ function toggleVisibility(): void {
     sessionStore.labeling.enabled = !sessionStore.labeling.globalHidden;
 
     canvas.document.labelImage.setVisible(!sessionStore.labeling.globalHidden);
-    canvas.document.events.emit("layerRedraw");
+    canvas.document.events.emit('layerRedraw');
 }
 
 function handleSliderChange(value: number): void {
     sessionStore.labeling.globalOpacity = value;
-    sessionStore.labeling.enabled = (value !== 0);
+    sessionStore.labeling.enabled = value !== 0;
 
     canvas.document.labelImage.setOpacity(value / 100);
-    canvas.document.events.emit("layerRedraw");
+    canvas.document.events.emit('layerRedraw');
 }
 
 function handleInput(event: Event): void {
@@ -43,9 +43,11 @@ function handleInput(event: Event): void {
         Math.min(100, Math.round(value) || 0),
     );
 
-    sessionStore.labeling.enabled = (sessionStore.labeling.globalOpacity !== 0);
-    canvas.document.labelImage.setOpacity(sessionStore.labeling.globalOpacity / 100);
-    canvas.document.events.emit("layerRedraw");
+    sessionStore.labeling.enabled = sessionStore.labeling.globalOpacity !== 0;
+    canvas.document.labelImage.setOpacity(
+        sessionStore.labeling.globalOpacity / 100,
+    );
+    canvas.document.events.emit('layerRedraw');
 }
 </script>
 
@@ -54,7 +56,9 @@ function handleInput(event: Event): void {
         <span class="text-sm font-medium"> Display </span>
 
         <Button
-            variant={!sessionStore.labeling.globalHidden ? 'default' : 'secondary'}
+            variant={!sessionStore.labeling.globalHidden
+                ? 'default'
+                : 'secondary'}
             onclick={toggleVisibility}
             class={!sessionStore.labeling.globalHidden
                 ? 'ring-2 bg-primary/10 ring-primary/40 hover:bg-primary/30'
