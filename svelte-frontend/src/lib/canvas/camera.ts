@@ -69,6 +69,23 @@ export class Camera {
         );
     }
 
+    public getDocumentPointer(): { x: number; y: number } | null {
+        const pointer = this.stage.getPointerPosition();
+
+        if (!pointer) {
+            return null;
+        }
+
+        return {
+            x:
+                (pointer.x + this.state.x) / this.state.zoom
+                + this.workspace.left,
+            y:
+                (pointer.y + this.state.y) / this.state.zoom
+                + this.workspace.top,
+        };
+    }
+
     center(): void {
         const viewportWidth =
             this.stage.width() / this.state.zoom;

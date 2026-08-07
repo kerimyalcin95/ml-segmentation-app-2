@@ -1,11 +1,16 @@
 import Konva from "konva";
+
 import { Camera } from "../camera";
+import { Document } from "../document";
+
+import { sessionStore } from "$lib/components/stores/sessionStore.svelte";
 
 export class Brush {
 
     private readonly cursor: Konva.Circle;
 
     private enabled = false;
+    private drawing = false;
 
     private _size = 32;
 
@@ -21,6 +26,7 @@ export class Brush {
         private stage: Konva.Stage,
         private layer: Konva.Layer,
         private camera: Camera,
+        private document: Document,
     ) {
         this.cursor = new Konva.Circle({
             radius: this._size / 2,
@@ -42,6 +48,47 @@ export class Brush {
 
     private updateCursor(): void {
         this.cursor.radius((this._size * this.camera.state.zoom) / 2);
+        this.layer.batchDraw();
+    }
+
+    private paint(): void {
+
+        const point = this.camera.getDocumentPointer();
+
+        if (!point) {
+            return;
+        }
+
+        const label = sessionStore.activeLabels.find(
+            (label) => label.selected,
+        );
+
+        if (!label) {
+            return;
+        }
+
+        this.document.labelImage.drawCircle(
+            point.x,
+            point.y,
+            this.size / 2,
+            label.color,
+        );
+
+        const pointer = this.stage.getPointerPosition();
+        console.log("stage", pointer);
+
+        const documentPoint = this.camera.getDocumentPointer();
+        console.log("camera", documentPoint);
+
+        console.log("document group", this.document.group.position());
+        console.log("document offset", this.document.group.offset());
+
+        console.log("image", this.document.image.outputImage?.position());
+        console.log("image offset", this.document.image.outputImage?.offset());
+
+        console.log("label", this.document.labelImage.outputImage.position());
+        console.log("label offset", this.document.labelImage.outputImage.offset());
+
         this.layer.batchDraw();
     }
 
@@ -69,6 +116,11 @@ export class Brush {
 
         this.show();
         this.cursor.position(pointer);
+
+        if (this.drawing) {
+            this.paint();
+        }
+
         this.layer.batchDraw();
     };
 
@@ -90,8 +142,24 @@ export class Brush {
         this.layer.batchDraw();
     };
 
-    private onPointerDown = (): void => { };
-    private onPointerUp = (): void => { };
+    private onPointerDown = (event: Konva.KonvaEventObject<PointerEvent>): void => {
+
+        if (!this.enabled) {
+            return;
+        }
+
+        if (event.evt.button !== 0) {
+            return;
+        }
+
+        this.drawing = true;
+
+        this.paint();
+    };
+
+    private onPointerUp = (): void => {
+        this.drawing = false;
+    };
 
     public destroy(): void {
         this.stage.off("pointermove", this.onPointerMove);

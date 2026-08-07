@@ -62,6 +62,7 @@ export class CanvasManager {
             this.stage,
             this.uiLayer,
             this._camera,
+            this._document,
         );
 
         this._camera.group.add(this._document.group);
