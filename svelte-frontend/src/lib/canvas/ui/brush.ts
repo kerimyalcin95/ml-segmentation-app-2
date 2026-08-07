@@ -14,8 +14,10 @@ export class Brush {
         return this.cursor;
     }
 
-    constructor() {
-
+    constructor(
+        private stage: Konva.Stage,
+        private layer: Konva.Layer,
+    ) {
         this.cursor = new Konva.Circle({
             radius: this._size / 2,
             stroke: "white",
@@ -24,6 +26,42 @@ export class Brush {
             listening: false,
             visible: false,
         });
+
+        this.registerEvents();
+    }
+
+    private registerEvents(): void {
+        this.stage.on("pointermove", this.onPointerMove);
+        this.stage.on("pointerenter", this.onPointerEnter);
+        this.stage.on("pointerleave", this.onPointerLeave);
+        this.stage.on("pointerdown", this.onPointerDown);
+        this.stage.on("pointerup", this.onPointerUp);
+        this.stage.on("pointercancel", this.onPointerUp);
+    }
+
+    private onPointerMove = (): void => {
+        const pointer = this.stage.getPointerPosition();
+
+        if (!pointer) {
+            return;
+        }
+
+        this.cursor.position(pointer);
+        this.layer.batchDraw();
+    };
+
+    private onPointerEnter = (): void => { };
+    private onPointerLeave = (): void => { };
+    private onPointerDown = (): void => { };
+    private onPointerUp = (): void => { };
+
+    public destroy(): void {
+        this.stage.off("pointermove", this.onPointerMove);
+        this.stage.off("pointerenter", this.onPointerEnter);
+        this.stage.off("pointerleave", this.onPointerLeave);
+        this.stage.off("pointerdown", this.onPointerDown);
+        this.stage.off("pointerup", this.onPointerUp);
+        this.stage.off("pointercancel", this.onPointerUp);
     }
 
     setSize(size: number): void {

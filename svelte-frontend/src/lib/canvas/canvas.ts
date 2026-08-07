@@ -58,7 +58,10 @@ export class CanvasManager {
             this._document,
         );
 
-        this._brush = new Brush();
+        this._brush = new Brush(
+            this.stage,
+            this.layer
+        );
 
         this._camera.group.add(this._document.group);
 
@@ -123,5 +126,6 @@ export class CanvasManager {
 
     destroy() {
         this.stage.destroy();
+        this.brush.destroy();
     }
 }
