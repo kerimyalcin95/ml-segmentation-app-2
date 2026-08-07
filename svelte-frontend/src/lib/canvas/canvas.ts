@@ -3,6 +3,7 @@ import { Camera } from "./camera";
 import { Document } from './document';
 import { CONTEXT, contextContainer } from './container';
 import { CropOverlay } from "./ui/cropOverlay";
+import { Brush } from "./ui/brush";
 
 export class CanvasManager {
     private stage: Konva.Stage;
@@ -25,6 +26,12 @@ export class CanvasManager {
 
     get cropOverlay(): CropOverlay {
         return this._cropOverlay;
+    }
+
+    private readonly _brush: Brush;
+
+    get brush(): Brush {
+        return this._brush;
     }
 
     constructor(container: HTMLDivElement) {
@@ -51,13 +58,17 @@ export class CanvasManager {
             this._document,
         );
 
+        this._brush = new Brush();
+
         this._camera.group.add(this._document.group);
 
         this.layer.add(this.camera.group);
         this.uiLayer.add(this.cropOverlay.group);
 
         this.stage.add(this.layer);
+
         this.stage.add(this.uiLayer);
+        this.uiLayer.add(this.brush.node);
 
         this.document.events.on("cameraRefresh", () => {
             this.camera.refresh();

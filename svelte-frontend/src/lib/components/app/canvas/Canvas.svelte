@@ -10,11 +10,14 @@ import {
 import HorizontalScrollBar from './HorizontalScrollBar.svelte';
 import VerticalScrollBar from './VerticalScrollBar.svelte';
 
+import type { Mode } from '$lib/types/mode';
+
 interface Props {
     onCanvasReady?: (canvas: CanvasManager) => void;
+    mode: Mode
 }
 
-let { onCanvasReady }: Props = $props();
+let { onCanvasReady, mode }: Props = $props();
 
 let viewport: HTMLDivElement;
 let canvasElement: HTMLDivElement;
@@ -184,8 +187,15 @@ function stopPanning() {
     panning = false;
 }
 
+$effect(() => {
+
+    
+});
+
 onMount(() => {
     canvas = new CanvasManager(canvasElement);
+
+    canvas.brush.setEnabled(mode === "labeling");
 
     canvas.camera.events.on('cameraState', ({ state }) => {
         zoom = state.zoom;
@@ -205,6 +215,10 @@ onMount(() => {
     canvas.document.events.on('documentResize', ({ width, height }) => {
         documentSize.width = width;
         documentSize.height = height;
+    });
+
+    canvas.document.events.on('brushEnable', (enabled) => {
+        canvas.brush.setEnabled(enabled);
     });
 
     const observer = new ResizeObserver(() => {

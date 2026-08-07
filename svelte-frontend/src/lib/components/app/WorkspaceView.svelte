@@ -41,7 +41,7 @@ let {
                     : 'opacity-100',
             ]}
         >
-            <Canvas {onCanvasReady} />
+            <Canvas {onCanvasReady} {mode}/>
         </div>
 
         <div

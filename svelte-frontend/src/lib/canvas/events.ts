@@ -25,4 +25,6 @@ export type CanvasEvents = {
     }
 
     wheel: undefined;
+
+    brushEnable: boolean;
 };

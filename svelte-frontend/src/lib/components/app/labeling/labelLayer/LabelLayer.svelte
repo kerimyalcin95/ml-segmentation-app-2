@@ -26,6 +26,7 @@ $effect(() => {
 
     const handler = () => {
         labelsEnabled = canvas.document.hasLabelImage();
+        activeLabels = [];
     };
 
     canvas.document.events.on('labelImageCreate', handler);
@@ -33,6 +34,13 @@ $effect(() => {
     return () => {
         canvas.document.events.off('labelImageCreate', handler);
     };
+});
+
+$effect(() => {
+    canvas.document.events.emit(
+        "brushEnable",
+        labelsEnabled && activeLabels.length > 0,
+    );
 });
 </script>
 
