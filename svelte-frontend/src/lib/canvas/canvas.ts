@@ -60,7 +60,8 @@ export class CanvasManager {
 
         this._brush = new Brush(
             this.stage,
-            this.layer
+            this.uiLayer,
+            container,
         );
 
         this._camera.group.add(this._document.group);

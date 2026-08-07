@@ -4,6 +4,8 @@ export class Brush {
 
     private readonly cursor: Konva.Circle;
 
+    private enabled = false;
+
     private _size = 32;
 
     get size(): number {
@@ -17,6 +19,7 @@ export class Brush {
     constructor(
         private stage: Konva.Stage,
         private layer: Konva.Layer,
+        private container: HTMLDivElement,
     ) {
         this.cursor = new Konva.Circle({
             radius: this._size / 2,
@@ -40,18 +43,39 @@ export class Brush {
     }
 
     private onPointerMove = (): void => {
-        const pointer = this.stage.getPointerPosition();
-
-        if (!pointer) {
+        if (!this.enabled) {
             return;
         }
 
+        const pointer = this.stage.getPointerPosition();
+
+        if (!pointer) {
+            this.hide();
+            this.layer.batchDraw();
+            return;
+        }
+
+        this.show();
         this.cursor.position(pointer);
         this.layer.batchDraw();
     };
 
-    private onPointerEnter = (): void => { };
-    private onPointerLeave = (): void => { };
+    private onPointerEnter = (): void => {
+        if (!this.enabled) {
+            return;
+        }
+
+        this.container.style.cursor = "none";
+        this.show();
+        this.layer.batchDraw();
+    };
+
+    private onPointerLeave = (): void => {
+        this.container.style.cursor = "";
+        this.hide();
+        this.layer.batchDraw();
+    };
+
     private onPointerDown = (): void => { };
     private onPointerUp = (): void => { };
 
@@ -80,6 +104,10 @@ export class Brush {
     }
 
     setEnabled(enabled: boolean): void {
-        this.cursor.visible(enabled);
+        this.enabled = enabled;
+
+        if (!enabled) {
+            this.hide();
+        }
     }
 }
