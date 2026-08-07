@@ -74,4 +74,32 @@ contextBridge.exposeInMainWorld('electronAPI', {
             );
         };
     },
+
+    showOpenLabelDialog: () =>
+        ipcRenderer.invoke(
+            "show-open-label-dialog",
+        ),
+
+    showSaveLabelDialog: () =>
+        ipcRenderer.invoke(
+            "show-save-label-dialog",
+        ),
+
+    writeLabels: (
+        filePath: string,
+        json: string,
+    ) =>
+        ipcRenderer.invoke(
+            "write-labels",
+            filePath,
+            json,
+        ),
+
+    readLabels: (
+        filePath: string,
+    ) =>
+        ipcRenderer.invoke(
+            "read-labels",
+            filePath,
+        ),
 });

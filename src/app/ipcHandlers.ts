@@ -161,6 +161,72 @@ export class IpcHandlers {
                 );
             },
         );
+
+        ipcMain.handle(
+            "show-open-label-dialog",
+            async () => {
+                const result = await dialog.showOpenDialog({
+                    properties: ["openFile"],
+                    filters: [
+                        {
+                            name: "Label Files",
+                            extensions: ["json"],
+                        },
+                    ],
+                });
+
+                if (result.canceled) {
+                    return null;
+                }
+
+                return result.filePaths[0];
+            },
+        );
+
+        ipcMain.handle(
+            "show-save-label-dialog",
+            async () => {
+                const result = await dialog.showSaveDialog({
+                    title: "Save Labels",
+                    defaultPath: "labels.json",
+                    filters: [
+                        {
+                            name: "Label Files",
+                            extensions: ["json"],
+                        },
+                    ],
+                });
+
+                if (result.canceled || !result.filePath) {
+                    return null;
+                }
+
+                return {
+                    filePath: result.filePath,
+                };
+            },
+        );
+
+        ipcMain.handle(
+            "write-labels",
+            (
+                _event,
+                filePath: string,
+                json: string,
+            ) => {
+                fs.writeFileSync(filePath, json, "utf8");
+            },
+        );
+
+        ipcMain.handle(
+            "read-labels",
+            (
+                _event,
+                filePath: string,
+            ) => {
+                return fs.readFileSync(filePath, "utf8");
+            },
+        );
     }
 
 }

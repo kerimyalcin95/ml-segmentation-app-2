@@ -18,11 +18,30 @@ export interface ElectronAPI {
     onTerminalData: (
         callback: (chunk: Uint8Array) => void,
     ) => () => void;
+
+    showOpenLabelDialog(): Promise<string | null>;
+
+    showSaveLabelDialog(): Promise<{
+        filePath: string;
+    } | null>;
+
+    writeLabels(
+        filePath: string,
+        json: string,
+    ): Promise<void>;
+
+    readLabels(
+        filePath: string,
+    ): Promise<string>;
 }
 
 export interface SaveImageDialogResult {
     filePath: string;
     extension: string;
+}
+
+export interface SaveLabelDialogResult {
+    filePath: string;
 }
 
 declare global {

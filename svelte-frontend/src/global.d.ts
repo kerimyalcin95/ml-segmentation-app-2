@@ -4,6 +4,10 @@ declare global {
         extension: string;
     }
 
+    interface SaveLabelDialogResult {
+        filePath: string;
+    }
+
     interface ElectronAPI {
         onMessage(callback: (message: string) => void): () => void;
         sendMessage(message: string): void;
@@ -29,6 +33,19 @@ declare global {
         onTerminalData(
             callback: (chunk: Uint8Array) => void,
         ): () => void;
+
+        showOpenLabelDialog(): Promise<string | null>;
+
+        showSaveLabelDialog(): Promise<SaveLabelDialogResult | null>;
+
+        writeLabels(
+            filePath: string,
+            json: string,
+        ): Promise<void>;
+
+        readLabels(
+            filePath: string,
+        ): Promise<string>;
     }
 
     interface Window {
