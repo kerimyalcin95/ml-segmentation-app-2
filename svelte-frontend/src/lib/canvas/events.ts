@@ -6,10 +6,6 @@ export type CanvasEvents = {
     cameraRefresh: undefined;
     layerRedraw: undefined;
 
-    labelImageCreate: { 
-        created: boolean; 
-    };
-
     documentResize: {
         width: number;
         height: number;

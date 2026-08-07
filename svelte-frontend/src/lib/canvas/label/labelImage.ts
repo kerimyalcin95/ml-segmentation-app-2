@@ -157,8 +157,18 @@ export class LabelImage {
 
         document.events.emit("layerRedraw");
 
-        document.events.emit("labelImageCreate", {
-            created: true,
-        });
+        sessionStore.labeling.enabled = true;
+    }
+
+    delete(): void {
+        const document = contextContainer.resolve<Document>(CONTEXT.Document);
+
+        this.clear();
+
+        this.outputImage.remove();
+
+        sessionStore.activeLabels = [];
+
+        document.events.emit("layerRedraw");
     }
 }

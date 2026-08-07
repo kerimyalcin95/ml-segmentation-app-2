@@ -11,27 +11,12 @@ import SaveLabelFile from './SaveLabelFile.svelte';
 import LoadLabelFile from './LoadLabelFile.svelte';
 import Separator from '$lib/components/ui/separator/separator.svelte';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
-import { onMount } from 'svelte';
 
 interface Props {
     canvas: CanvasManager;
 }
 
 let { canvas }: Props = $props();
-
-onMount(() => {
-    sessionStore.labeling.enabled = canvas.document.hasLabelImage();
-
-    const handler = () => {
-        sessionStore.labeling.enabled = canvas.document.hasLabelImage();
-    };
-
-    canvas.document.events.on('labelImageCreate', handler);
-
-    return () => {
-        canvas.document.events.off('labelImageCreate', handler);
-    };
-});
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">
