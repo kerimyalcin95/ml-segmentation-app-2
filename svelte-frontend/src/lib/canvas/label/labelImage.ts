@@ -97,6 +97,32 @@ export class LabelImage {
         this.refresh();
     }
 
+    eraseCircle(
+        x: number,
+        y: number,
+        radius: number,
+    ): void {
+
+        this.context.save();
+
+        this.context.globalCompositeOperation = "destination-out";
+
+        this.context.beginPath();
+        this.context.arc(
+            x,
+            y,
+            radius,
+            0,
+            Math.PI * 2,
+        );
+
+        this.context.fill();
+
+        this.context.restore();
+
+        this.refresh();
+    }
+
     refresh(): void {
         this.outputImage.image(this.canvas);
     }
