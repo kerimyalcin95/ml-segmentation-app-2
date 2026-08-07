@@ -20,7 +20,6 @@ export class Brush {
     constructor(
         private stage: Konva.Stage,
         private layer: Konva.Layer,
-        private container: HTMLDivElement,
         private camera: Camera,
     ) {
         this.cursor = new Konva.Circle({
@@ -48,8 +47,8 @@ export class Brush {
 
     private registerEvents(): void {
         this.stage.on("pointermove", this.onPointerMove);
-        this.stage.on("pointerenter", this.onPointerEnter);
-        this.stage.on("pointerleave", this.onPointerLeave);
+        this.stage.on("mouseenter", this.onMouseEnter);
+        this.stage.on("mouseleave", this.onMouseLeave);
         this.stage.on("pointerdown", this.onPointerDown);
         this.stage.on("pointerup", this.onPointerUp);
         this.stage.on("pointercancel", this.onPointerUp);
@@ -73,20 +72,20 @@ export class Brush {
         this.layer.batchDraw();
     };
 
-    private onPointerEnter = (): void => {
+    private onMouseEnter = (): void => {
         if (!this.enabled) {
             return;
         }
 
         console.log("pointerenter", this.enabled);
 
-        this.container.style.cursor = "none";
+        this.stage.container().style.cursor = "none";
         this.show();
         this.layer.batchDraw();
     };
 
-    private onPointerLeave = (): void => {
-        this.container.style.cursor = "";
+    private onMouseLeave = (): void => {
+        this.stage.container().style.cursor = "default";
         this.hide();
         this.layer.batchDraw();
     };
@@ -96,8 +95,8 @@ export class Brush {
 
     public destroy(): void {
         this.stage.off("pointermove", this.onPointerMove);
-        this.stage.off("pointerenter", this.onPointerEnter);
-        this.stage.off("pointerleave", this.onPointerLeave);
+        this.stage.off("pointerenter", this.onMouseEnter);
+        this.stage.off("pointerleave", this.onMouseLeave);
         this.stage.off("pointerdown", this.onPointerDown);
         this.stage.off("pointerup", this.onPointerUp);
         this.stage.off("pointercancel", this.onPointerUp);
@@ -122,7 +121,7 @@ export class Brush {
         this.enabled = enabled;
 
         if (!enabled) {
-            this.container.style.cursor = "";
+            this.stage.container().style.cursor = "default";
             this.hide();
         }
 

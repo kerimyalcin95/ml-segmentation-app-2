@@ -32,14 +32,6 @@ onMount(() => {
         canvas.document.events.off('labelImageCreate', handler);
     };
 });
-
-$effect(() => {
-    canvas.brush.setEnabled(
-        sessionStore.labelsEnabled &&
-            sessionStore.activeLabels.length > 0 &&
-            sessionStore.mode === 'labeling',
-    );
-});
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">

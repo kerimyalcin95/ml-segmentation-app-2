@@ -61,7 +61,6 @@ export class CanvasManager {
         this._brush = new Brush(
             this.stage,
             this.uiLayer,
-            container,
             this._camera,
         );
 

@@ -20,10 +20,8 @@ let { onCanvasReady }: Props = $props();
 
 let canvas!: CanvasManager;
 
-
 let viewport: HTMLDivElement;
 let canvasElement: HTMLDivElement;
-
 
 let viewportSize = $state({
     width: 0,
@@ -67,7 +65,7 @@ const contentWidth = $derived(workspaceSize.width * zoom);
 const contentHeight = $derived(workspaceSize.height * zoom);
 
 const maxScrollX = $derived(Math.max(0, contentWidth - viewportSize.width));
-const maxScrollY = $derived(Math.max(0, contentHeight - viewportSize.height))
+const maxScrollY = $derived(Math.max(0, contentHeight - viewportSize.height));
 
 let mounted = $state(false);
 
@@ -193,11 +191,14 @@ function stopPanning() {
 $effect(() => {
     if (!mounted) return;
 
-    //canvas.brush.setEnabled(sessionStore.mode === "labeling");
+    canvas.brush.setEnabled(
+        sessionStore.labelsEnabled &&
+            sessionStore.activeLabels.length > 0 &&
+            sessionStore.mode === 'labeling',
+    );
 });
 
 onMount(() => {
-
     canvas = new CanvasManager(canvasElement);
     mounted = true;
 

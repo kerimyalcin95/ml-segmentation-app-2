@@ -5,6 +5,7 @@ import { Input } from '$lib/components/ui/input';
 import { Label } from '$lib/components/ui/label';
 
 import { CanvasManager } from "$lib/canvas/canvas";
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -12,16 +13,15 @@ interface Props {
 
 let { canvas }: Props = $props();
 
-let brushSize = $state(32);
-
 function handleSliderChange(value: number) {
-    brushSize = value;
+    sessionStore.brushSize = value;
+    canvas.brush.setSize(value);
 }
 
 function handleInput(event: Event) {
     const value = Number((event.currentTarget as HTMLInputElement).value);
 
-    brushSize = Math.max(1, Math.min(1024, Math.round(value) || 1));
+    sessionStore.brushSize = Math.max(1, Math.min(1024, Math.round(value) || 1));
 }
 </script>
 
@@ -39,7 +39,7 @@ function handleInput(event: Event) {
                     min={1}
                     max={512}
                     step={1}
-                    value={brushSize}
+                    value={sessionStore.brushSize}
                     onValueChange={handleSliderChange}
                 />
 
@@ -51,7 +51,7 @@ function handleInput(event: Event) {
                         min="1"
                         max="512"
                         step="1"
-                        value={brushSize}
+                        value={sessionStore.brushSize}
                         oninput={handleInput}
                     />
 
