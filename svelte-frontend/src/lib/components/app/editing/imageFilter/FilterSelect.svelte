@@ -169,7 +169,7 @@ function addFilter() {
     <div class="flex gap-2">
         <Select.Root
             type="single"
-            disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}
+            disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
             bind:value={selectedFilter}
         >
             <Select.Trigger class="flex-1">
@@ -185,7 +185,11 @@ function addFilter() {
             </Select.Content>
         </Select.Root>
 
-        <Button size="icon" onclick={addFilter} disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}>
+        <Button
+            size="icon"
+            onclick={addFilter}
+            disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
+        >
             <PlusIcon weight="bold" />
         </Button>
     </div>

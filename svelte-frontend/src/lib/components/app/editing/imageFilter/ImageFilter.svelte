@@ -26,7 +26,6 @@ let currentFilter = $derived(
     activeFilters.find((filter) => filter.id === selectedFilterId),
 );
 
-
 function applyFilters(): void {
     canvas.document.image.setFilters(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -54,9 +53,16 @@ function applyFilters(): void {
             }}
         />
 
-        <FilterSettings {currentFilter} disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage} />
+        <FilterSettings
+            {currentFilter}
+            disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
+        />
 
-        <Button class="mt-2" onclick={applyFilters} disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}>
+        <Button
+            class="mt-2"
+            onclick={applyFilters}
+            disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
+        >
             <CircleHalfIcon weight="bold" />
             Apply filters
         </Button>

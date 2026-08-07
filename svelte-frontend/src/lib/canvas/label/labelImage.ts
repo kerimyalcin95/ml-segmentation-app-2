@@ -155,9 +155,12 @@ export class LabelImage {
             document.group.add(this.outputImage);
         }
 
+        sessionStore.activeLabels = [];
+
         document.events.emit("layerRedraw");
 
         sessionStore.labeling.enabled = true;
+        sessionStore.hasLabelImage = true;
     }
 
     delete(): void {
@@ -170,5 +173,8 @@ export class LabelImage {
         sessionStore.activeLabels = [];
 
         document.events.emit("layerRedraw");
+
+        sessionStore.labeling.enabled = false;
+        sessionStore.hasLabelImage = false;
     }
 }

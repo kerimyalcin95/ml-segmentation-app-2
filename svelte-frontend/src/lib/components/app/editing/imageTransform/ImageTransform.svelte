@@ -26,7 +26,7 @@ let { canvas }: Props = $props();
                 onclick={() => {
                     canvas.document.rotate90();
                 }}
-                disabled={(!sessionStore.hasImage && !sessionStore.hasLabelImage)}
+                disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
             >
                 <ArrowClockwiseIcon weight="bold" />
                 Rotate CW
@@ -36,7 +36,7 @@ let { canvas }: Props = $props();
                 onclick={() => {
                     canvas.document.rotate90(false);
                 }}
-                disabled={(!sessionStore.hasImage && !sessionStore.hasLabelImage)}
+                disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
             >
                 <ArrowCounterClockwiseIcon weight="bold" />
                 Rotate CCW
@@ -47,7 +47,7 @@ let { canvas }: Props = $props();
                 onclick={() => {
                     canvas.document.flip(true, false);
                 }}
-                disabled={(!sessionStore.hasImage && !sessionStore.hasLabelImage)}
+                disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
             >
                 <FlipHorizontalIcon weight="bold" />
                 Flip Horizontal
@@ -58,7 +58,7 @@ let { canvas }: Props = $props();
                 onclick={() => {
                     canvas.document.flip(false, true);
                 }}
-                disabled={(!sessionStore.hasImage && !sessionStore.hasLabelImage)}
+                disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
             >
                 <FlipVerticalIcon weight="bold" />
                 Flip Vertical

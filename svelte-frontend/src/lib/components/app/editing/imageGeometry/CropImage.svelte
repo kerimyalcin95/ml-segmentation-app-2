@@ -66,7 +66,7 @@ function crop() {
         onValueChange={(value) => {
             cropMode = value === 'crop';
         }}
-        disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}
+        disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
     >
         <ToggleGroup.Item
             value="crop"
@@ -80,8 +80,8 @@ function crop() {
             type="number"
             placeholder="Width"
             bind:value={width}
-            disabled={!sessionStore.hasImage &&
-                !sessionStore.hasLabelImage &&
+            disabled={!sessionStore.hasImage ||
+                sessionStore.hasLabelImage ||
                 !cropMode}
         />
 
@@ -89,14 +89,14 @@ function crop() {
             type="number"
             placeholder="Height"
             bind:value={height}
-            disabled={!sessionStore.hasImage &&
-                !sessionStore.hasLabelImage &&
+            disabled={!sessionStore.hasImage ||
+                sessionStore.hasLabelImage ||
                 !cropMode}
         />
     </div>
     <Button
         onclick={crop}
-        disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}
+        disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
         >Apply Crop</Button
     >
 </div>

@@ -7,6 +7,7 @@ import SaveLabelImage from './SaveLabelImage.svelte';
 import CreateLabel from './CreateLabel.svelte';
 import Separator from '$lib/components/ui/separator/separator.svelte';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import DeleteLabel from './DeleteLabel.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -24,5 +25,6 @@ let { canvas }: Props = $props();
         <SaveLabelImage {canvas} enabled={sessionStore.labeling.enabled} />
         <Separator />
         <CreateLabel {canvas} />
+        <DeleteLabel {canvas} />
     </div>
 </Card>
