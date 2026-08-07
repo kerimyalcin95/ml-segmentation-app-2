@@ -576,7 +576,7 @@ export class Document {
             this.state.height,
         );
 
-        this.labelImage.setOpacity(sessionStore.labeling.globalOpacity);
+        this.labelImage.setOpacity(sessionStore.labeling.globalOpacity / 100);
 
         if (!this.group.children.includes(this.labelImage.outputImage)) {
             this.group.add(this.labelImage.outputImage);
