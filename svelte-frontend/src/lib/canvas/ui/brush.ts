@@ -106,8 +106,13 @@ export class Brush {
     setEnabled(enabled: boolean): void {
         this.enabled = enabled;
 
-        if (!enabled) {
+        if (enabled) {
+            this.show();
+        } else {
+            this.container.style.cursor = "";
             this.hide();
         }
+
+        this.layer.batchDraw();
     }
 }
