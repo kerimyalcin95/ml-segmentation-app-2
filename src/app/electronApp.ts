@@ -44,6 +44,27 @@ export class ElectronApp {
 
     public start(): void {
 
+        const gotLock = app.requestSingleInstanceLock();
+
+        if (!gotLock) {
+            app.quit();
+            return;
+        }
+
+        app.on("second-instance", () => {
+            const window = this.windowManager.getMainWindow();
+
+            if (!window) {
+                return;
+            }
+
+            if (window.isMinimized()) {
+                window.restore();
+            }
+
+            window.focus();
+        });
+
         void app.whenReady()
             .then(async () => {
                 try {
