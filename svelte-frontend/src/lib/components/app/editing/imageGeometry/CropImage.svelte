@@ -9,6 +9,7 @@ import {
     documentCrop,
     documentSize,
 } from '$lib/components/stores/canvasStore.svelte';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -25,8 +26,7 @@ $effect(() => {
     if (!cropMode) {
         width = documentSize.width;
         height = documentSize.height;
-    }
-    else {
+    } else {
         width = documentCrop.width;
         height = documentCrop.height;
     }
@@ -53,7 +53,8 @@ function crop() {
         documentCrop.x,
         documentCrop.y,
         documentCrop.width,
-        documentCrop.height);
+        documentCrop.height,
+    );
 }
 </script>
 
@@ -65,6 +66,7 @@ function crop() {
         onValueChange={(value) => {
             cropMode = value === 'crop';
         }}
+        disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}
     >
         <ToggleGroup.Item
             value="crop"
@@ -78,15 +80,23 @@ function crop() {
             type="number"
             placeholder="Width"
             bind:value={width}
-            disabled={!cropMode}
+            disabled={!sessionStore.hasImage &&
+                !sessionStore.hasLabelImage &&
+                !cropMode}
         />
 
         <Input
             type="number"
             placeholder="Height"
             bind:value={height}
-            disabled={!cropMode}
+            disabled={!sessionStore.hasImage &&
+                !sessionStore.hasLabelImage &&
+                !cropMode}
         />
     </div>
-    <Button onclick={crop}>Apply Crop</Button>
+    <Button
+        onclick={crop}
+        disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}
+        >Apply Crop</Button
+    >
 </div>

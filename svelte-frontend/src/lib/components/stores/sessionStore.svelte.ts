@@ -13,6 +13,7 @@ class SessionStore {
     mode = $state<Mode>("editing");
     activeLabels = $state<ActiveLabel[]>([]);
     hasLabelImage = $state(false);
+    hasImage = $state(false);
 
     labeling = new LabelingSession();
 }

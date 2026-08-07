@@ -8,6 +8,7 @@ import {
     type FilterState,
     type ActiveFilter,
 } from '$lib/types/filter';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 interface Props {
     activeFilters: ActiveFilter[];
@@ -29,7 +30,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Blur,
             blurRadius: 10,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -37,7 +38,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Brighten,
             brightness: 0,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -45,7 +46,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Contrast,
             contrast: 0,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -53,14 +54,14 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Enhance,
             enhance: 0,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
         name: 'Grayscale',
         create: () => ({
             type: FilterType.Grayscale,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -70,14 +71,14 @@ const availableFilters: {
             hue: 0,
             saturation: 0,
             luminance: 0,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
         name: 'Invert',
         create: () => ({
             type: FilterType.Invert,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -85,7 +86,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Mask,
             threshold: 0.5,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -93,7 +94,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Noise,
             noise: 0,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -101,7 +102,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Pixelate,
             pixelSize: 8,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -109,7 +110,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Posterize,
             levels: 0.5,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -119,21 +120,21 @@ const availableFilters: {
             red: 0,
             green: 0,
             blue: 0,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
         name: 'Sepia',
         create: () => ({
             type: FilterType.Sepia,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
         name: 'Solarize',
         create: () => ({
             type: FilterType.Solarize,
-            ...defaultFilterSettings
+            ...defaultFilterSettings,
         }),
     },
     {
@@ -141,7 +142,7 @@ const availableFilters: {
         create: () => ({
             type: FilterType.Threshold,
             threshold: 0.5,
-            ...defaultFilterSettings    
+            ...defaultFilterSettings,
         }),
     },
 ];
@@ -166,7 +167,11 @@ function addFilter() {
 
 <div class="space-y-2">
     <div class="flex gap-2">
-        <Select.Root type="single" bind:value={selectedFilter}>
+        <Select.Root
+            type="single"
+            disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}
+            bind:value={selectedFilter}
+        >
             <Select.Trigger class="flex-1">
                 {selectedFilter || 'Select filter'}
             </Select.Trigger>
@@ -180,7 +185,7 @@ function addFilter() {
             </Select.Content>
         </Select.Root>
 
-        <Button size="icon" onclick={addFilter}>
+        <Button size="icon" onclick={addFilter} disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}>
             <PlusIcon weight="bold" />
         </Button>
     </div>

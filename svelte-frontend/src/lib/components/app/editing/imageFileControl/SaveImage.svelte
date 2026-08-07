@@ -48,7 +48,7 @@ async function saveImage() {
 }
 </script>
 
-<Button onclick={saveImage}>
+<Button onclick={saveImage} disabled={!sessionStore.hasImage}>
     <FloppyDiskIcon weight="bold" />
     Save Image
 </Button>

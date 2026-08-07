@@ -8,6 +8,7 @@ import ArrowClockwiseIcon from 'phosphor-svelte/lib/ArrowClockwiseIcon';
 import ArrowCounterClockwiseIcon from 'phosphor-svelte/lib/ArrowCounterClockwiseIcon';
 import FlipHorizontalIcon from 'phosphor-svelte/lib/FlipHorizontalIcon';
 import FlipVerticalIcon from 'phosphor-svelte/lib/FlipVerticalIcon';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -25,6 +26,7 @@ let { canvas }: Props = $props();
                 onclick={() => {
                     canvas.document.rotate90();
                 }}
+                disabled={(!sessionStore.hasImage && !sessionStore.hasLabelImage)}
             >
                 <ArrowClockwiseIcon weight="bold" />
                 Rotate CW
@@ -34,6 +36,7 @@ let { canvas }: Props = $props();
                 onclick={() => {
                     canvas.document.rotate90(false);
                 }}
+                disabled={(!sessionStore.hasImage && !sessionStore.hasLabelImage)}
             >
                 <ArrowCounterClockwiseIcon weight="bold" />
                 Rotate CCW
@@ -44,6 +47,7 @@ let { canvas }: Props = $props();
                 onclick={() => {
                     canvas.document.flip(true, false);
                 }}
+                disabled={(!sessionStore.hasImage && !sessionStore.hasLabelImage)}
             >
                 <FlipHorizontalIcon weight="bold" />
                 Flip Horizontal
@@ -54,6 +58,7 @@ let { canvas }: Props = $props();
                 onclick={() => {
                     canvas.document.flip(false, true);
                 }}
+                disabled={(!sessionStore.hasImage && !sessionStore.hasLabelImage)}
             >
                 <FlipVerticalIcon weight="bold" />
                 Flip Vertical

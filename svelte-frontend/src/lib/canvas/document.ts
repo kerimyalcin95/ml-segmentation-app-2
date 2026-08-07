@@ -7,6 +7,7 @@ import { Camera } from "./camera";
 import { Workspace } from './workspace';
 import { Image } from './image';
 import { LabelImage } from "./label/labelImage";
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 export interface CropState {
     x: number;
@@ -326,6 +327,8 @@ export class Document {
         this.setSize(bitmap.width, bitmap.height);
 
         this._group.add(this.image.outputImage);
+
+        sessionStore.hasImage = true;
 
         this.refresh({
             redraw: false,

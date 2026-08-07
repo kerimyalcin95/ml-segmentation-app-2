@@ -10,6 +10,7 @@ import type { ActiveFilter } from '$lib/types/filter';
 import { CanvasManager } from '$lib/canvas/canvas';
 
 import CircleHalfIcon from 'phosphor-svelte/lib/CircleHalfIcon';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -53,9 +54,9 @@ function applyFilters(): void {
             }}
         />
 
-        <FilterSettings {currentFilter} />
+        <FilterSettings {currentFilter} disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage} />
 
-        <Button class="mt-2" onclick={applyFilters}>
+        <Button class="mt-2" onclick={applyFilters} disabled={!sessionStore.hasImage && !sessionStore.hasLabelImage}>
             <CircleHalfIcon weight="bold" />
             Apply filters
         </Button>
