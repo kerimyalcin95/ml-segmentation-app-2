@@ -5,6 +5,7 @@ import * as AlertDialog from '$lib/components/ui/alert-dialog';
 import PlusCircleIcon from 'phosphor-svelte/lib/PlusCircleIcon';
 
 import { CanvasManager } from '$lib/canvas/canvas';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -31,6 +32,7 @@ function createLabel(): void {
 
 function confirmCreateLabel(): void {
     canvas.document.createLabel();
+    sessionStore.activeLabels = [];
     replaceDialogOpen = false;
 }
 </script>

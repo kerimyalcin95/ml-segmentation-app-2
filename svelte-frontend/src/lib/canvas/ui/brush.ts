@@ -78,6 +78,8 @@ export class Brush {
             return;
         }
 
+        console.log("pointerenter", this.enabled);
+
         this.container.style.cursor = "none";
         this.show();
         this.layer.batchDraw();

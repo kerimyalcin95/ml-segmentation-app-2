@@ -2,27 +2,22 @@
 import * as ToggleGroup from '$lib/components/ui/toggle-group';
 import { Card } from '$lib/components/ui/card';
 import type { Mode } from '$lib/types/mode';
-
-interface Props {
-    mode: Mode;
-}
-
-let { mode = $bindable() }: Props = $props();
+import {sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 let lastMode: Mode = 'editing';
 
 function onValueChange(value: string) {
     if (value == '') {
-        mode = lastMode;
+        sessionStore.mode = lastMode;
     } else {
-        lastMode = mode;
+        lastMode = sessionStore.mode;
     }
 }
 </script>
 
 <div data-e2e="mode-selector" class="absolute top-4 left-4 z-20">
     <Card class="p-1">
-        <ToggleGroup.Root type="single" bind:value={mode} {onValueChange}>
+        <ToggleGroup.Root type="single" bind:value={sessionStore.mode} {onValueChange}>
             <ToggleGroup.Item
                 value="editing"
                 class="data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"

@@ -10,6 +10,8 @@ import LabelDragList from './LabelDragList.svelte';
 import SaveLabelFile from './SaveLabelFile.svelte';
 import LoadLabelFile from './LoadLabelFile.svelte';
 import Separator from '$lib/components/ui/separator/separator.svelte';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import { onMount } from 'svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -17,16 +19,11 @@ interface Props {
 
 let { canvas }: Props = $props();
 
-let activeLabels = $state<ActiveLabel[]>([]);
-
-let labelsEnabled = $state(false);
-
-$effect(() => {
-    labelsEnabled = canvas.document.hasLabelImage();
+onMount(() => {
+    sessionStore.labelsEnabled = canvas.document.hasLabelImage();
 
     const handler = () => {
-        labelsEnabled = canvas.document.hasLabelImage();
-        activeLabels = [];
+        sessionStore.labelsEnabled = canvas.document.hasLabelImage();
     };
 
     canvas.document.events.on('labelImageCreate', handler);
@@ -37,9 +34,11 @@ $effect(() => {
 });
 
 $effect(() => {
-    if (labelsEnabled && activeLabels.length > 0) {
-        canvas.brush.setEnabled(true);
-    }
+    canvas.brush.setEnabled(
+        sessionStore.labelsEnabled &&
+            sessionStore.activeLabels.length > 0 &&
+            sessionStore.mode === 'labeling',
+    );
 });
 </script>
 
@@ -47,22 +46,33 @@ $effect(() => {
     <div class="flex flex-col gap-2 mx-4">
         <span class="text-sm font-medium mb-2"> Labels </span>
 
-        <LabelSelect {activeLabels} enabled={labelsEnabled} />
+        <LabelSelect
+            activeLabels={sessionStore.activeLabels}
+            enabled={sessionStore.labelsEnabled}
+        />
 
         <LabelDragList
             {canvas}
-            {activeLabels}
+            activeLabels={sessionStore.activeLabels}
             onLabelsChanged={(labels: ActiveLabel[]) => {
-                activeLabels = labels;
+                sessionStore.activeLabels = labels;
             }}
             onReorder={(labels: ActiveLabel[]) => {
-                activeLabels = labels;
+                sessionStore.activeLabels = labels;
             }}
         />
 
         <Separator class="mb-2" />
 
-        <LoadLabelFile {canvas} {activeLabels} enabled={labelsEnabled} />
-        <SaveLabelFile {canvas} {activeLabels} enabled={labelsEnabled} />
+        <LoadLabelFile
+            {canvas}
+            activeLabels={sessionStore.activeLabels}
+            enabled={sessionStore.labelsEnabled}
+        />
+        <SaveLabelFile
+            {canvas}
+            activeLabels={sessionStore.activeLabels}
+            enabled={sessionStore.labelsEnabled}
+        />
     </div>
 </Card>

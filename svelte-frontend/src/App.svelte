@@ -8,15 +8,14 @@ import { CanvasManager } from '$lib/canvas/canvas';
 import Sidebar from '$lib/components/app/sidebar/Sidebar.svelte';
 import Statusbar from '$lib/components/app/Statusbar.svelte';
 import WorkspaceView from '$lib/components/app/WorkspaceView.svelte';
-import type { Mode } from '$lib/types/mode';
 import type { WorkspaceViewMode } from '$lib/types/workspace';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 let canvas = $state<CanvasManager>();
-let mode = $state<Mode>('editing');
 let workspaceViewMode = $state<WorkspaceViewMode>('canvas');
 
 $effect(() => {
-    document.documentElement.dataset.mode = mode;
+    document.documentElement.dataset.mode = sessionStore.mode;
 });
 
 onMount(() => {
@@ -32,11 +31,10 @@ onMount(() => {
     <!-- Workspace -->
     <div class="flex-1 flex overflow-hidden min-h-0 min-w-0">
         {#if canvas}
-            <Sidebar {mode} {canvas} />
+            <Sidebar {canvas} />
         {/if}
         <Separator orientation="vertical" />
         <WorkspaceView
-            bind:mode
             bind:workspaceViewMode
             onCanvasReady={(canvasManager: CanvasManager) =>
                 (canvas = canvasManager)}

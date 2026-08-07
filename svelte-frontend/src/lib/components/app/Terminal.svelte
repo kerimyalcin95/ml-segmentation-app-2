@@ -21,8 +21,6 @@ onMount(() => {
     void (async () => {
         await tick();
 
-        console.log('Mounted:', container.clientWidth, container.clientHeight);
-
         terminal = new TerminalManager(container);
 
         onTerminalReady?.(terminal);

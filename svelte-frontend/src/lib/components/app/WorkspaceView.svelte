@@ -6,19 +6,15 @@ import Canvas from '$lib/components/app/canvas/Canvas.svelte';
 import Terminal from '$lib/components/app/Terminal.svelte';
 
 import { CanvasManager } from '$lib/canvas/canvas';
-
-import type { Mode } from '$lib/types/mode';
 import type { WorkspaceViewMode } from '$lib/types/workspace';
 
 interface Props {
     onCanvasReady?: (canvas: CanvasManager) => void;
-    mode: Mode;
     workspaceViewMode: WorkspaceViewMode;
 }
 
 let {
     onCanvasReady,
-    mode = $bindable(),
     workspaceViewMode = $bindable(),
 }: Props = $props();
 
@@ -28,7 +24,7 @@ let {
     data-e2e="workspace-view"
     class="flex-1 relative flex flex-col min-h-0 min-w-0"
 >
-    <ModeSelector bind:mode />
+    <ModeSelector />
 
     <WorkspaceToggle bind:workspaceViewMode />
 
@@ -41,7 +37,7 @@ let {
                     : 'opacity-100',
             ]}
         >
-            <Canvas {onCanvasReady} {mode}/>
+            <Canvas {onCanvasReady}/>
         </div>
 
         <div
@@ -50,7 +46,7 @@ let {
                 workspaceViewMode === 'canvas'
                     ? 'opacity-0 pointer-events-none'
                     : 'opacity-100',
-            ]}
+                ]}
         >
             <Terminal/>
         </div>

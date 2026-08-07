@@ -7,22 +7,23 @@ import {
     workspaceSize,
 } from '$lib/components/stores/canvasStore.svelte';
 
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+
 import HorizontalScrollBar from './HorizontalScrollBar.svelte';
 import VerticalScrollBar from './VerticalScrollBar.svelte';
 
-import type { Mode } from '$lib/types/mode';
-
 interface Props {
     onCanvasReady?: (canvas: CanvasManager) => void;
-    mode: Mode
 }
 
-let { onCanvasReady, mode }: Props = $props();
+let { onCanvasReady }: Props = $props();
+
+let canvas!: CanvasManager;
+
 
 let viewport: HTMLDivElement;
 let canvasElement: HTMLDivElement;
 
-let canvas!: CanvasManager;
 
 let viewportSize = $state({
     width: 0,
@@ -192,7 +193,7 @@ function stopPanning() {
 $effect(() => {
     if (!mounted) return;
 
-    canvas.brush.setEnabled(mode === "labeling");
+    //canvas.brush.setEnabled(sessionStore.mode === "labeling");
 });
 
 onMount(() => {
@@ -200,7 +201,7 @@ onMount(() => {
     canvas = new CanvasManager(canvasElement);
     mounted = true;
 
-    canvas.brush.setEnabled(mode === "labeling");
+    //canvas.brush.setEnabled(sessionStore.mode === "labeling");
 
     canvas.camera.events.on('cameraState', ({ state }) => {
         zoom = state.zoom;

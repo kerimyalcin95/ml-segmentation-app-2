@@ -1,7 +1,7 @@
 <!-- svelte-frontend/src/lib/components/app/sidebar/Sidebar.svelte -->
 <script lang="ts">
 import { Card } from '$lib/components/ui/card';
-import type { Mode } from '$lib/types/mode';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import { CanvasManager } from '$lib/canvas/canvas';
 
 import ImageFileControl from '$lib/components/app/editing/imageFileControl/ImageFileControl.svelte';
@@ -17,10 +17,9 @@ import LabelDisplay from '../labeling/labelDisplay/LabelDisplay.svelte';
 
 interface Props {
     canvas: CanvasManager;
-    mode: Mode;
 }
 
-let { canvas, mode }: Props = $props();
+let { canvas }: Props = $props();
 
 let viewport: HTMLDivElement | undefined;
 
@@ -125,25 +124,25 @@ function handleMouseMove() {
                 transform: translateY(-{scrollY}px);
             "
         >
-            {#if mode === 'editing'}
+            {#if sessionStore.mode === 'editing'}
                 <h2 class="text-md font-bold mb-3">Editing</h2>
 
                 <ImageFileControl {canvas} />
                 <ImageFilter {canvas} />
                 <ImageTransform {canvas} />
                 <ImageGeometry {canvas} />
-            {:else if mode === 'labeling'}
+            {:else if sessionStore.mode === 'labeling'}
                 <h2 class="text-md font-bold mb-3">Labeling</h2>
 
                 <LabelFileControl {canvas} />
                 <LabelBrush {canvas} />
                 <LabelLayer {canvas} />
                 <LabelDisplay {canvas} />
-            {:else if mode === 'training'}
+            {:else if sessionStore.mode === 'training'}
                 <h2 class="text-md font-bold mb-3">Training</h2>
 
                 <Card class="h-min flex flex-col gap-4"></Card>
-            {:else if mode === 'prediction'}
+            {:else if sessionStore.mode === 'prediction'}
                 <h2 class="text-md font-bold mb-3">Prediction</h2>
 
                 <Card class="h-min flex flex-col gap-4"></Card>
