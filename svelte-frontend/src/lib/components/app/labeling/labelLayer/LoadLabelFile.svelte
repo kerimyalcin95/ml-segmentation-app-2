@@ -2,8 +2,6 @@
 import { Button } from '$lib/components/ui/button';
 
 import TagSimpleIcon from 'phosphor-svelte/lib/TagSimpleIcon';
-
-import { CanvasManager } from '$lib/canvas/canvas';
 import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 
 import {
@@ -12,12 +10,11 @@ import {
 } from '$lib/types/label';
 
 interface Props {
-    canvas: CanvasManager;
     activeLabels: ActiveLabel[];
     enabled: boolean;
 }
 
-let { canvas, activeLabels, enabled = false }: Props = $props();
+let { activeLabels, enabled = false }: Props = $props();
 
 let dialogOpen = $state(false);
 

@@ -57,12 +57,10 @@ onMount(() => {
         <Separator class="mb-2" />
 
         <LoadLabelFile
-            {canvas}
             activeLabels={sessionStore.activeLabels}
             enabled={sessionStore.labeling.enabled}
         />
         <SaveLabelFile
-            {canvas}
             activeLabels={sessionStore.activeLabels}
             enabled={sessionStore.labeling.enabled}
         />

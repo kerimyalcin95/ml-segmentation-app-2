@@ -1,17 +1,15 @@
 <script lang="ts">
 import { Button } from '$lib/components/ui/button';
 import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon';
-import { CanvasManager } from '$lib/canvas/canvas';
 import type { ActiveLabel } from '$lib/types/label';
 import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 
 interface Props {
-    canvas: CanvasManager;
     activeLabels: ActiveLabel[];
     enabled: boolean;
 }
 
-let { canvas, activeLabels, enabled = false }: Props = $props();
+let { activeLabels, enabled = false }: Props = $props();
 
 let dialogOpen = $state(false);
 
