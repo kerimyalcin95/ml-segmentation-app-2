@@ -20,10 +20,10 @@ interface Props {
 let { canvas }: Props = $props();
 
 onMount(() => {
-    sessionStore.labelsEnabled = canvas.document.hasLabelImage();
+    sessionStore.labeling.enabled = canvas.document.hasLabelImage();
 
     const handler = () => {
-        sessionStore.labelsEnabled = canvas.document.hasLabelImage();
+        sessionStore.labeling.enabled = canvas.document.hasLabelImage();
     };
 
     canvas.document.events.on('labelImageCreate', handler);
@@ -40,7 +40,7 @@ onMount(() => {
 
         <LabelSelect
             activeLabels={sessionStore.activeLabels}
-            enabled={sessionStore.labelsEnabled}
+            enabled={sessionStore.labeling.enabled}
         />
 
         <LabelDragList
@@ -59,12 +59,12 @@ onMount(() => {
         <LoadLabelFile
             {canvas}
             activeLabels={sessionStore.activeLabels}
-            enabled={sessionStore.labelsEnabled}
+            enabled={sessionStore.labeling.enabled}
         />
         <SaveLabelFile
             {canvas}
             activeLabels={sessionStore.activeLabels}
-            enabled={sessionStore.labelsEnabled}
+            enabled={sessionStore.labeling.enabled}
         />
     </div>
 </Card>

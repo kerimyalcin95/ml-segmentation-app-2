@@ -8,6 +8,8 @@ import { Workspace } from './workspace';
 import { Image } from './image';
 import { LabelImage } from "./label/labelImage";
 
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte'
+
 export interface CropState {
     x: number;
     y: number;
@@ -573,6 +575,8 @@ export class Document {
             this.state.width,
             this.state.height,
         );
+
+        this.labelImage.setOpacity(sessionStore.labeling.globalOpacity);
 
         if (!this.group.children.includes(this.labelImage.outputImage)) {
             this.group.add(this.labelImage.outputImage);

@@ -11,36 +11,41 @@ import EyeSlashIcon from 'phosphor-svelte/lib/EyeSlashIcon';
 import { CanvasManager } from '$lib/canvas/canvas';
 import Separator from '$lib/components/ui/separator/separator.svelte';
 
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+
 interface Props {
     canvas: CanvasManager;
 }
 
 let { canvas }: Props = $props();
 
-let visible = $state(true);
-let opacity = $state(63);
-
 function toggleVisibility(): void {
-    visible = !visible;
+    sessionStore.labeling.globalHidden = !sessionStore.labeling.globalHidden;
+    sessionStore.labeling.enabled = !sessionStore.labeling.globalHidden;
 
-    // TODO:
-    // canvas.document.labelImage.setVisible(visible);
+    canvas.document.labelImage.setVisible(!sessionStore.labeling.globalHidden);
+    canvas.document.events.emit("layerRedraw");
 }
 
 function handleSliderChange(value: number): void {
-    opacity = value;
+    sessionStore.labeling.globalOpacity = value;
+    sessionStore.labeling.enabled = (value !== 0);
 
-    // TODO:
-    // canvas.document.labelImage.setOpacity(opacity / 100);
+    canvas.document.labelImage.setOpacity(value / 100);
+    canvas.document.events.emit("layerRedraw");
 }
 
 function handleInput(event: Event): void {
     const value = Number((event.currentTarget as HTMLInputElement).value);
 
-    opacity = Math.max(0, Math.min(100, Math.round(value) || 0));
+    sessionStore.labeling.globalOpacity = Math.max(
+        0,
+        Math.min(100, Math.round(value) || 0),
+    );
 
-    // TODO:
-    // canvas.document.labelImage.setOpacity(opacity / 100);
+    sessionStore.labeling.enabled = (sessionStore.labeling.globalOpacity !== 0);
+    canvas.document.labelImage.setOpacity(sessionStore.labeling.globalOpacity / 100);
+    canvas.document.events.emit("layerRedraw");
 }
 </script>
 
@@ -49,11 +54,13 @@ function handleInput(event: Event): void {
         <span class="text-sm font-medium"> Display </span>
 
         <Button
-            variant={visible ? 'default' : 'secondary'}
+            variant={!sessionStore.labeling.globalHidden ? 'default' : 'secondary'}
             onclick={toggleVisibility}
-            class={visible ? 'ring-2 bg-primary/10 ring-primary/40 hover:bg-primary/30' : ''}
+            class={!sessionStore.labeling.globalHidden
+                ? 'ring-2 bg-primary/10 ring-primary/40 hover:bg-primary/30'
+                : ''}
         >
-            {#if visible}
+            {#if !sessionStore.labeling.globalHidden}
                 <EyeIcon weight="bold" />
                 Hide Labels
             {:else}
@@ -62,7 +69,7 @@ function handleInput(event: Event): void {
             {/if}
         </Button>
 
-        <Separator class="mt-2"/>
+        <Separator class="mt-2" />
 
         <div class="flex flex-col mt-2 gap-1">
             <Label for="label-opacity">Opacity</Label>
@@ -74,7 +81,7 @@ function handleInput(event: Event): void {
                     min={0}
                     max={100}
                     step={1}
-                    value={opacity}
+                    value={sessionStore.labeling.globalOpacity}
                     onValueChange={handleSliderChange}
                 />
 
@@ -86,10 +93,9 @@ function handleInput(event: Event): void {
                         min="0"
                         max="100"
                         step="1"
-                        value={opacity}
+                        value={sessionStore.labeling.globalOpacity}
                         oninput={handleInput}
                     />
-
                     <span class="text-sm text-muted-foreground"> % </span>
                 </div>
             </div>

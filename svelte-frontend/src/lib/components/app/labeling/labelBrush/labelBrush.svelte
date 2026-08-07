@@ -14,14 +14,14 @@ interface Props {
 let { canvas }: Props = $props();
 
 function handleSliderChange(value: number) {
-    sessionStore.brushSize = value;
+    sessionStore.labeling.brushSize = value;
     canvas.brush.setSize(value);
 }
 
 function handleInput(event: Event) {
     const value = Number((event.currentTarget as HTMLInputElement).value);
 
-    sessionStore.brushSize = Math.max(1, Math.min(1024, Math.round(value) || 1));
+    sessionStore.labeling.brushSize = Math.max(1, Math.min(1024, Math.round(value) || 1));
 }
 </script>
 
@@ -39,7 +39,7 @@ function handleInput(event: Event) {
                     min={1}
                     max={512}
                     step={1}
-                    value={sessionStore.brushSize}
+                    value={sessionStore.labeling.brushSize}
                     onValueChange={handleSliderChange}
                 />
 
@@ -51,7 +51,7 @@ function handleInput(event: Event) {
                         min="1"
                         max="512"
                         step="1"
-                        value={sessionStore.brushSize}
+                        value={sessionStore.labeling.brushSize}
                         oninput={handleInput}
                     />
 

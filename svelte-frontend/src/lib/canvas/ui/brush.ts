@@ -138,8 +138,8 @@ export class Brush {
             const delta = -event.evt.movementY;
 
             if (delta !== 0) {
-                sessionStore.brushSize += delta;
-                this.setSize(sessionStore.brushSize);
+                sessionStore.labeling.brushSize += delta;
+                this.setSize(sessionStore.labeling.brushSize);
             }
 
             return;

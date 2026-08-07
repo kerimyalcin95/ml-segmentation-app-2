@@ -126,4 +126,14 @@ export class LabelImage {
     refresh(): void {
         this.outputImage.image(this.canvas);
     }
+
+    setVisible(visible: boolean): void {
+        this.outputImage.visible(visible);
+    }
+
+    setOpacity(opacity: number): void {
+        this.outputImage.opacity(
+            Math.max(0, Math.min(1, opacity)),
+        );
+    }
 }
