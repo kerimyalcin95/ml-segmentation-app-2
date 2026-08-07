@@ -37,10 +37,9 @@ $effect(() => {
 });
 
 $effect(() => {
-    canvas.document.events.emit(
-        "brushEnable",
-        labelsEnabled && activeLabels.length > 0,
-    );
+    if (labelsEnabled && activeLabels.length > 0) {
+        canvas.brush.setEnabled(true);
+    }
 });
 </script>
 

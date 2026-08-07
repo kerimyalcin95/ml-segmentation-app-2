@@ -66,7 +66,9 @@ const contentWidth = $derived(workspaceSize.width * zoom);
 const contentHeight = $derived(workspaceSize.height * zoom);
 
 const maxScrollX = $derived(Math.max(0, contentWidth - viewportSize.width));
-const maxScrollY = $derived(Math.max(0, contentHeight - viewportSize.height));
+const maxScrollY = $derived(Math.max(0, contentHeight - viewportSize.height))
+
+let mounted = $state(false);
 
 function updateViewport() {
     const width = viewport.clientWidth;
@@ -188,12 +190,15 @@ function stopPanning() {
 }
 
 $effect(() => {
+    if (!mounted) return;
 
-    
+    canvas.brush.setEnabled(mode === "labeling");
 });
 
 onMount(() => {
+
     canvas = new CanvasManager(canvasElement);
+    mounted = true;
 
     canvas.brush.setEnabled(mode === "labeling");
 
@@ -215,10 +220,6 @@ onMount(() => {
     canvas.document.events.on('documentResize', ({ width, height }) => {
         documentSize.width = width;
         documentSize.height = height;
-    });
-
-    canvas.document.events.on('brushEnable', (enabled) => {
-        canvas.brush.setEnabled(enabled);
     });
 
     const observer = new ResizeObserver(() => {

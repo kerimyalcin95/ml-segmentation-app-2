@@ -1,4 +1,5 @@
 import Konva from "konva";
+import { Camera } from "../camera";
 
 export class Brush {
 
@@ -20,6 +21,7 @@ export class Brush {
         private stage: Konva.Stage,
         private layer: Konva.Layer,
         private container: HTMLDivElement,
+        private camera: Camera,
     ) {
         this.cursor = new Konva.Circle({
             radius: this._size / 2,
@@ -30,7 +32,18 @@ export class Brush {
             visible: false,
         });
 
+        this.camera.events.on("cameraState", this.onCameraState);
+
         this.registerEvents();
+    }
+
+    private onCameraState = (): void => {
+        this.updateCursor();
+    };
+
+    private updateCursor(): void {
+        this.cursor.radius((this._size * this.camera.state.zoom) / 2);
+        this.layer.batchDraw();
     }
 
     private registerEvents(): void {
@@ -86,13 +99,13 @@ export class Brush {
         this.stage.off("pointerdown", this.onPointerDown);
         this.stage.off("pointerup", this.onPointerUp);
         this.stage.off("pointercancel", this.onPointerUp);
+
+        this.camera.events.off("cameraState", this.onCameraState);
     }
 
     setSize(size: number): void {
-
         this._size = Math.max(1, Math.round(size));
-
-        this.cursor.radius(this._size / 2);
+        this.updateCursor();
     }
 
     show(): void {
@@ -106,9 +119,7 @@ export class Brush {
     setEnabled(enabled: boolean): void {
         this.enabled = enabled;
 
-        if (enabled) {
-            this.show();
-        } else {
+        if (!enabled) {
             this.container.style.cursor = "";
             this.hide();
         }
