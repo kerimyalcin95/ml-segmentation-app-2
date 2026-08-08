@@ -1,6 +1,9 @@
 <script lang="ts">
     import { Button } from '$lib/components/ui/button';
     import { CanvasManager } from '$lib/canvas/canvas';
+    import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+
+    import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 
     import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon';
 
@@ -11,15 +14,69 @@
 
     let { canvas, enabled = false }: Props = $props();
 
-    async function saveLabel() {
-        // TODO:
-        // const result = await window.electronAPI.showSaveImageDialog(...);
-        // const imageBytes = await canvas.document.saveAsset("label");
-        // await window.electronAPI.writeImage(result.filePath, imageBytes);
+    let messageDialogOpen = $state(false);
+    let messageDialogTitle = $state('');
+    let messageDialogMessage = $state('');
+
+    function showError(
+        title: string,
+        message: string,
+    ): void {
+        messageDialogTitle = title;
+        messageDialogMessage = message;
+        messageDialogOpen = true;
+    }
+
+    async function saveLabel(): Promise<void> {
+        try {
+            const imageBytes =
+                await canvas.document.saveLabelImage();
+
+            const result =
+                await window.electronAPI.showSaveLabelImageDialog(
+                    sessionStore.labeling.labelImageSaveDirectory,
+                );
+
+            if (!result) {
+                return;
+            }
+
+            await window.electronAPI.writeLabelImage(
+                result.filePath,
+                imageBytes,
+            );
+
+            sessionStore.labeling.labelImageSaveDirectory =
+                result.filePath;
+        } catch (error) {
+            const message =
+                error instanceof Error
+                    ? error.message
+                    : 'Failed to save label image.';
+
+            console.error(
+                'Failed to save label image:',
+                error,
+            );
+
+            showError(
+                'Save Label Image',
+                message,
+            );
+        }
     }
 </script>
 
-<Button onclick={saveLabel} disabled={!enabled}>
+<Button
+    onclick={saveLabel}
+    disabled={!enabled}
+>
     <FloppyDiskIcon weight="bold" />
     Save Label Image
 </Button>
+
+<MessageDialog
+    bind:open={messageDialogOpen}
+    title={messageDialogTitle}
+    message={messageDialogMessage}
+/>

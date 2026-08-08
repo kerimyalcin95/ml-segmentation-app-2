@@ -93,11 +93,12 @@ export class Brush {
                 this.size / 2,
             );
         } else {
-            const label = sessionStore.labeling.activeLabels.find(
-                (label) => label.selected,
-            );
+            const labelIndex =
+                sessionStore.labeling.activeLabels.findIndex(
+                    (label) => label.selected,
+                );
 
-            if (!label) {
+            if (labelIndex === -1) {
                 return;
             }
 
@@ -105,7 +106,7 @@ export class Brush {
                 point.x,
                 point.y,
                 this.size / 2,
-                label.color,
+                labelIndex,
             );
         }
 

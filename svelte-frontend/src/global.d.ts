@@ -44,6 +44,23 @@ declare global {
         readLabels(
             filePath: string,
         ): Promise<string>;
+
+        showOpenLabelImageDialog(
+            defaultPath?: string,
+        ): Promise<string | null>;
+
+        showSaveLabelImageDialog(
+            defaultPath?: string,
+        ): Promise<SaveImageDialogResult | null>;
+
+        writeLabelImage(
+            filePath: string,
+            imageBytes: Uint8Array,
+        ): Promise<string>;
+
+        readLabelImage(
+            filePath: string,
+        ): Promise<Uint8Array>;
     }
 
     interface Window {

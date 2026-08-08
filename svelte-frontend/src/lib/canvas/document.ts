@@ -9,6 +9,7 @@ import { Image } from './image';
 import { LabelImage } from "./label/labelImage";
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
+
 export interface CropState {
     x: number;
     y: number;
@@ -572,5 +573,63 @@ export class Document {
 
     hasImage(): boolean {
         return this.state.width > 0 && this.state.height > 0;
+    }
+
+    public async loadLabelImage(
+        imageBytes: Uint8Array,
+    ): Promise<void> {
+        if (!this.hasImage()) {
+            throw new Error(
+                'Cannot load label image without an image.',
+            );
+        }
+
+        await this.labelImage.load(
+            imageBytes,
+            this.state.width,
+            this.state.height,
+        );
+
+        this.events.emit("layerRedraw");
+    }
+
+    public async saveLabelImage(): Promise<Uint8Array> {
+        if (!this.hasImage()) {
+            throw new Error(
+                'Cannot save label image without an image.',
+            );
+        }
+
+        if (!this.labelImage.created) {
+            throw new Error(
+                'No label image exists.',
+            );
+        }
+
+        const width =
+            this.labelImage.mask.width;
+
+        const height =
+            this.labelImage.mask.height;
+
+        if (
+            width !== this.state.width ||
+            height !== this.state.height
+        ) {
+            throw new Error(
+                'Label image dimensions do not match the document. ' +
+                'Expected ' +
+                String(this.state.width) +
+                'x' +
+                String(this.state.height) +
+                ', got ' +
+                String(width) +
+                'x' +
+                String(height) +
+                '.',
+            );
+        }
+
+        return this.labelImage.save();
     }
 }

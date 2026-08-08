@@ -254,6 +254,109 @@ export class IpcHandlers {
                 return fs.readFileSync(filePath, "utf8");
             },
         );
+
+        ipcMain.handle(
+            "show-open-label-image-dialog",
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
+
+                const result =
+                    await dialog.showOpenDialog({
+
+                        ...(defaultPath && { defaultPath }),
+
+                        properties: ["openFile"],
+
+                        filters: [
+                            {
+                                name: "Label Images",
+                                extensions: ["png"],
+                            },
+                        ],
+                    });
+
+                if (result.canceled) {
+                    return null;
+                }
+
+                return result.filePaths[0];
+            },
+        );
+
+        ipcMain.handle(
+            "show-save-label-image-dialog",
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
+
+                const options: Electron.SaveDialogOptions = {
+                    title: "Save Label Image",
+                    defaultPath: "label-image.png",
+
+                    filters: [
+                        {
+                            name: "PNG Label Image",
+                            extensions: ["png"],
+                        },
+                    ],
+                };
+
+                if (defaultPath) {
+                    options.defaultPath = path.join(
+                        defaultPath,
+                        "label-image.png",
+                    );
+                }
+
+                const result =
+                    await dialog.showSaveDialog(options);
+
+                if (
+                    result.canceled ||
+                    !result.filePath
+                ) {
+                    return null;
+                }
+
+                return {
+                    filePath: result.filePath,
+                    extension: "png",
+                };
+            },
+        );
+
+        ipcMain.handle(
+            "read-label-image",
+            (
+                _event,
+                filePath: string,
+            ) => {
+
+                return new Uint8Array(
+                    fs.readFileSync(filePath),
+                );
+            },
+        );
+
+        ipcMain.handle(
+            "write-label-image",
+            (
+                _event,
+                filePath: string,
+                imageBytes: Uint8Array,
+            ) => {
+
+                fs.writeFileSync(
+                    filePath,
+                    Buffer.from(imageBytes),
+                );
+
+                return filePath;
+            },
+        );
     }
 
 }

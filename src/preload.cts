@@ -113,4 +113,38 @@ contextBridge.exposeInMainWorld('electronAPI', {
             "read-labels",
             filePath,
         ),
+
+    showOpenLabelImageDialog: (
+        defaultPath?: string,
+    ) =>
+        ipcRenderer.invoke(
+            'show-open-label-image-dialog',
+            defaultPath,
+        ),
+
+    showSaveLabelImageDialog: (
+        defaultPath?: string,
+    ) =>
+        ipcRenderer.invoke(
+            'show-save-label-image-dialog',
+            defaultPath,
+        ),
+
+    writeLabelImage: (
+        filePath: string,
+        imageBytes: Uint8Array,
+    ) =>
+        ipcRenderer.invoke(
+            'write-label-image',
+            filePath,
+            imageBytes,
+        ),
+
+    readLabelImage: (
+        filePath: string,
+    ) =>
+        ipcRenderer.invoke(
+            'read-label-image',
+            filePath,
+        ),
 });
