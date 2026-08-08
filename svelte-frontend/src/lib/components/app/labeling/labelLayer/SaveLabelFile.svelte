@@ -3,6 +3,7 @@ import { Button } from '$lib/components/ui/button';
 import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon';
 import type { ActiveLabel } from '$lib/types/label';
 import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 interface Props {
     activeLabels: ActiveLabel[];
@@ -41,6 +42,8 @@ async function saveLabels(): Promise<void> {
     if (!result) {
         return;
     }
+
+    sessionStore.labeling.labelSaveDirectory = result.filePath;
 
     try {
         await window.electronAPI.writeLabels(

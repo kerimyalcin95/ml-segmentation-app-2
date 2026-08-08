@@ -90,12 +90,12 @@ export class ElectronApp {
                         }
                     });
                 } catch (error) {
-                    console.error("Failed to start Python server:", error);
+                    console.error("Electron: Failed to start Python server:", error);
                     app.quit();
                 }
             })
             .catch((error: unknown) => {
-                console.error("Unexpected startup error:", error);
+                console.error("Electron: Unexpected startup error:", error);
                 app.quit();
             });
 
@@ -106,7 +106,7 @@ export class ElectronApp {
                 try {
                     await this.pythonServer.stop();
                 } catch (error) {
-                    console.error("Failed to stop Python server:", error);
+                    console.error("Electron: Failed to stop Python server:", error);
                 }
 
                 if (process.platform !== "darwin") {
@@ -130,7 +130,7 @@ export class ElectronApp {
                 !this.window.webContents.isLoading()
             ) {
                 this.window.webContents.send(
-                    "update-button",
+                    "message-from-server",
                     message
                 );
             }

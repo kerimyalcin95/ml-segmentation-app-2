@@ -24,29 +24,29 @@ let { canvas }: Props = $props();
         <span class="text-sm font-medium mb-2"> Labels </span>
 
         <LabelSelect
-            activeLabels={sessionStore.activeLabels}
+            activeLabels={sessionStore.labeling.activeLabels}
             enabled={sessionStore.labeling.enabled}
         />
 
         <LabelDragList
             {canvas}
-            activeLabels={sessionStore.activeLabels}
+            activeLabels={sessionStore.labeling.activeLabels}
             onLabelsChanged={(labels: ActiveLabel[]) => {
-                sessionStore.activeLabels = labels;
+                sessionStore.labeling.activeLabels = labels;
             }}
             onReorder={(labels: ActiveLabel[]) => {
-                sessionStore.activeLabels = labels;
+                sessionStore.labeling.activeLabels = labels;
             }}
         />
 
         <Separator class="mb-2" />
 
         <LoadLabelFile
-            activeLabels={sessionStore.activeLabels}
+            activeLabels={sessionStore.labeling.activeLabels}
             enabled={sessionStore.labeling.enabled}
         />
         <SaveLabelFile
-            activeLabels={sessionStore.activeLabels}
+            activeLabels={sessionStore.labeling.activeLabels}
             enabled={sessionStore.labeling.enabled}
         />
     </div>

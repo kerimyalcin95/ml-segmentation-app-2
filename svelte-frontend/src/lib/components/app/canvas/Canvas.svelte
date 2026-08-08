@@ -193,7 +193,7 @@ $effect(() => {
 
     canvas.brush.setEnabled(
         sessionStore.labeling.enabled &&
-            sessionStore.activeLabels.length > 0 &&
+            sessionStore.labeling.activeLabels.length > 0 &&
             sessionStore.mode === 'labeling',
     );
 });

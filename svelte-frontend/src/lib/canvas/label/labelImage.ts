@@ -155,7 +155,7 @@ export class LabelImage {
             document.group.add(this.outputImage);
         }
 
-        sessionStore.activeLabels = [];
+        sessionStore.labeling.activeLabels = [];
 
         document.events.emit("layerRedraw");
 
@@ -170,7 +170,7 @@ export class LabelImage {
 
         this.outputImage.remove();
 
-        sessionStore.activeLabels = [];
+        sessionStore.labeling.activeLabels = [];
 
         document.events.emit("layerRedraw");
 

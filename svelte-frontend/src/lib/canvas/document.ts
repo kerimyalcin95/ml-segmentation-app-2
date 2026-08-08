@@ -288,7 +288,7 @@ export class Document {
 
     // Image operations
 
-    public async loadAsset(
+    public async loadImage(
         imageBytes: Uint8Array,
     ): Promise<void> {
 
@@ -336,7 +336,7 @@ export class Document {
         })
     }
 
-    async saveAsset(
+    async saveImage(
         mimeType: string = "image/png",
         quality?: number,
     ): Promise<Uint8Array> {

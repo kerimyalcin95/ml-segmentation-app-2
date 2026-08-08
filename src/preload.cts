@@ -7,54 +7,29 @@ contextBridge.exposeInMainWorld('versions', {
 });
 
 contextBridge.exposeInMainWorld('electronAPI', {
-    onMessage: (callback: (message: string) => void) => {
+    subscribeServerMessages: (callback: (message: string) => void) => {
+
+        // After receiving message from server send as event
         const listener = (_event: IpcRendererEvent, message: string) => {
             callback(message);
         };
 
-        ipcRenderer.on('update-button', listener);
+        ipcRenderer.on('message-from-server', listener);
 
         return () => {
-            ipcRenderer.removeListener('update-button', listener);
+            ipcRenderer.removeListener('message-from-server', listener);
         };
     },
-    sendMessage: (message: string) => {
-        ipcRenderer.send('send-to-python', message);
+    sendToServer: (message: string) => {
+        console.log("Electron: Sending message to server");
+        ipcRenderer.send('send-to-server', message);
     },
+
+    // enables the front-end to log over electron which in term forwarded to xterm
     log: (...args: unknown[]) => {
         ipcRenderer.send("renderer-log", ...args);
     },
-    openImage: (defaultPath?: string) =>
-        ipcRenderer.invoke(
-            "open-image",
-            defaultPath,
-        ),
-    showSaveImageDialog: (
-        defaultPath?: string,
-    ) =>
-        ipcRenderer.invoke(
-            "show-save-image-dialog",
-            defaultPath,
-        ),
-
-    writeImage: (
-        filePath: string,
-        imageBytes: Uint8Array,
-    ) =>
-        ipcRenderer.invoke(
-            "write-image",
-            filePath,
-            imageBytes,
-        ),
-
-    readImage: (
-        filePath: string,
-    ) =>
-        ipcRenderer.invoke(
-            "read-image",
-            filePath,
-        ),
-
+    // callback for xterm
     onTerminalData: (
         callback: (chunk: Uint8Array) => void,
     ) => {
@@ -75,6 +50,35 @@ contextBridge.exposeInMainWorld('electronAPI', {
         };
     },
 
+    showOpenImageDialog: (defaultPath?: string) =>
+        ipcRenderer.invoke(
+            "open-image",
+            defaultPath,
+        ),
+    showSaveImageDialog: (
+        defaultPath?: string,
+    ) =>
+        ipcRenderer.invoke(
+            "show-save-image-dialog",
+            defaultPath,
+        ),
+    writeImage: (
+        filePath: string,
+        imageBytes: Uint8Array,
+    ) =>
+        ipcRenderer.invoke(
+            "write-image",
+            filePath,
+            imageBytes,
+        ),
+    readImage: (
+        filePath: string,
+    ) =>
+        ipcRenderer.invoke(
+            "read-image",
+            filePath,
+        ),
+
     showOpenLabelDialog: () =>
         ipcRenderer.invoke(
             "show-open-label-dialog",
@@ -94,7 +98,6 @@ contextBridge.exposeInMainWorld('electronAPI', {
             filePath,
             json,
         ),
-
     readLabels: (
         filePath: string,
     ) =>

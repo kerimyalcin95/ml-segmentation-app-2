@@ -18,25 +18,21 @@ export class IpcHandlers {
     public register(): void {
 
         ipcMain.on(
-            "send-to-python",
+            "send-to-server",
             (_event: IpcMainEvent, message: string) => {
-
                 this.pythonServer.send(message);
-
             }
         );
 
         ipcMain.on(
             "renderer-log",
             (_event: IpcMainEvent, ...args: unknown[]) => {
-
-                console.log("Electron:", ...args);
-
+                console.log(...args);
             }
         );
 
         ipcMain.handle(
-            "open-image",
+            "show-open-image-dialog",
             async (
                 _event,
                 defaultPath?: string,

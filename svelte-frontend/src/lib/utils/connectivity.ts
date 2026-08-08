@@ -14,28 +14,43 @@ export function setupConnectivity() {
         };
     }
 
-    let received = false;
+    let firstReceived = false;
+    let firstAttempt = true;
 
     const retry = setInterval(() => {
-        if (!received) {
-            electronAPI.sendMessage("Test message received");
-            electronAPI.log("Retrying to connect");
+
+        if (!firstReceived) {
+            electronAPI.log("FE: Sending test message");
+            electronAPI.sendToServer("Test message received");
+
+            if (!firstAttempt) {
+                electronAPI.log("FE: Retrying to send test message");
+            }
         }
+
+        firstAttempt = false;
+        
     }, 1000);
 
-    const unsubscribe = electronAPI.onMessage((msg: string) => {
-        received = true;
-        clearInterval(retry);
+    const unsubscribe = electronAPI.subscribeServerMessages((msg: string) => {
 
-        electronAPI.log("Connection between Electron and Python server successful");
+        if (!firstReceived) {
+            firstReceived = true;
+            clearInterval(retry);
 
-        let state = parseInt(msg) || 0;
+            electronAPI.log("FE: " + msg);
+            electronAPI.log("FE: Connection between Electron and Python server successful");
 
-        if (state === 0) {
-            state = 1;
+            let state = parseInt(msg) || 0;
+
+            if (state === 0) {
+                state = 1;
+            }
+
+            isOnline.set(state);
+        } else {
+            electronAPI.log("FE: Server message received");
         }
-
-        isOnline.set(state);
     });
 
     return () => {

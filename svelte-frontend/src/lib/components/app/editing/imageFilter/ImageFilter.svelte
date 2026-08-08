@@ -18,18 +18,16 @@ interface Props {
 
 let { canvas }: Props = $props();
 
-let activeFilters = $state<ActiveFilter[]>([]);
-
-let selectedFilterId = $state<number | null>(null);
-
 let currentFilter = $derived(
-    activeFilters.find((filter) => filter.id === selectedFilterId),
+    sessionStore.editing.activeFilters.find(
+        (filter) => filter.id === sessionStore.editing.selectedFilterId,
+    ),
 );
 
 function applyFilters(): void {
     canvas.document.image.setFilters(
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        activeFilters.map(({ id, ...filter }) => filter),
+        sessionStore.editing.activeFilters.map(({ id, ...filter }) => filter),
     );
 }
 </script>
@@ -37,19 +35,19 @@ function applyFilters(): void {
 <Card class="h-min flex flex-col gap-4 py-4">
     <div class="flex flex-col gap-2 mx-4">
         <span class="text-sm font-medium mb-2"> Filters </span>
-        <FilterSelect {activeFilters} />
+        <FilterSelect activeFilters={sessionStore.editing.activeFilters} />
 
         <FilterDragList
-            {activeFilters}
-            {selectedFilterId}
+            activeFilters={sessionStore.editing.activeFilters}
+            selectedFilterId={sessionStore.editing.selectedFilterId}
             onSelectFilter={(id: number | null) => {
-                selectedFilterId = id;
+                sessionStore.editing.selectedFilterId = id;
             }}
             onFiltersChanged={(filters: ActiveFilter[]) => {
-                activeFilters = filters;
+                sessionStore.editing.activeFilters = filters;
             }}
             onReorder={(filters: ActiveFilter[]) => {
-                activeFilters = filters;
+                sessionStore.editing.activeFilters = filters;
             }}
         />
 

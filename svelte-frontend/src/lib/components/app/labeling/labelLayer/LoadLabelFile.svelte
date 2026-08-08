@@ -8,6 +8,7 @@ import {
     validateLabelFile,
     type ActiveLabel,
 } from '$lib/types/label';
+import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 interface Props {
     activeLabels: ActiveLabel[];
@@ -37,6 +38,8 @@ async function loadLabels(): Promise<void> {
     if (!filePath) {
         return;
     }
+
+    sessionStore.labeling.labelLoadDirectory = filePath
 
     try {
         const json =

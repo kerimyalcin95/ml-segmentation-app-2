@@ -1,13 +1,20 @@
 export interface ElectronAPI {
-    onMessage: (callback: (message: string) => void) => () => void;
-    sendMessage: (message: string) => void;
+    subscribeServerMessages: (callback: (message: string) => void) => () => void;
+    sendToServer: (message: string) => void;
+
     log: (...args: unknown[]) => void;
-    openImage: (
+    onTerminalData: (
+        callback: (chunk: Uint8Array) => void,
+    ) => () => void;
+
+    showOpenImageDialog: (
         defaultPath?: string,
     ) => Promise<string | null>;
+
     showSaveImageDialog: (
         defaultPath?: string,
     ) => Promise<SaveImageDialogResult | null>;
+
     writeImage: (
         filePath: string,
         imageBytes: Uint8Array,
@@ -15,12 +22,8 @@ export interface ElectronAPI {
     readImage: (
         filePath: string,
     ) => Promise<Uint8Array>;
-    onTerminalData: (
-        callback: (chunk: Uint8Array) => void,
-    ) => () => void;
 
     showOpenLabelDialog(): Promise<string | null>;
-
     showSaveLabelDialog(): Promise<{
         filePath: string;
     } | null>;
@@ -29,7 +32,6 @@ export interface ElectronAPI {
         filePath: string,
         json: string,
     ): Promise<void>;
-
     readLabels(
         filePath: string,
     ): Promise<string>;

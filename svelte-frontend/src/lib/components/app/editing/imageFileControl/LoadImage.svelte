@@ -13,19 +13,19 @@ interface Props {
 let { canvas }: Props = $props();
 
 async function loadImage() {
-    const filePath = await window.electronAPI.openImage(
-        sessionStore.lastDirectory,
+    const filePath = await window.electronAPI.showOpenImageDialog(
+        sessionStore.editing.loadDirectory,
     );
 
     if (!filePath) {
         return;
     }
 
-    sessionStore.lastDirectory = dirname(filePath);
+    sessionStore.editing.loadDirectory = dirname(filePath);
 
     const imageBytes = await window.electronAPI.readImage(filePath);
 
-    await canvas.document.loadAsset(imageBytes);
+    await canvas.document.loadImage(imageBytes);
 }
 </script>
 

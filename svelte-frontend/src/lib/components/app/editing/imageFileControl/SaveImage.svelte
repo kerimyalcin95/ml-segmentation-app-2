@@ -15,14 +15,14 @@ let { canvas }: Props = $props();
 
 async function saveImage() {
     const result = await window.electronAPI.showSaveImageDialog(
-        sessionStore.lastDirectory,
+        sessionStore.editing.saveDirectory,
     );
 
     if (!result) {
         return;
     }
 
-    sessionStore.lastDirectory = dirname(result.filePath);
+    sessionStore.editing.saveDirectory = dirname(result.filePath);
 
     let mimeType = 'image/png';
     let quality: number | undefined;
@@ -40,7 +40,7 @@ async function saveImage() {
             break;
     }
 
-    const imageBytes = await canvas.document.saveAsset(mimeType, quality);
+    const imageBytes = await canvas.document.saveImage(mimeType, quality);
 
     await window.electronAPI.writeImage(result.filePath, imageBytes);
 

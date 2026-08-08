@@ -32,7 +32,7 @@ export class PythonServer {
 
         this.pythonProcess = process;
 
-        console.log("Python: Server started.");
+        console.log("Electron: Server started");
 
         await new Promise<void>((resolve, reject) => {
 
@@ -68,7 +68,7 @@ export class PythonServer {
 
                 reject(
                     new Error(
-                        `Python exited before becoming ready (code ${String(code)}).`
+                        `Electron: Server exited before becoming ready (code ${String(code)}).`
                     )
                 );
 
@@ -115,7 +115,7 @@ export class PythonServer {
 
             socket.once("open", () => {
 
-                console.log("Electron: Connected");
+                console.log("Electron: WebSocket connected");
 
                 this.onConnected?.();
 
@@ -148,7 +148,7 @@ export class PythonServer {
 
                 this.webSocket = undefined;
 
-                console.error("WebSocket error:", error);
+                console.error("Electron: WebSocket error:", error);
 
                 this.onError?.(error);
 
@@ -205,7 +205,7 @@ export class PythonServer {
             !this.webSocket ||
             this.webSocket.readyState !== WebSocket.OPEN
         ) {
-            console.error("WebSocket not connected");
+            console.error("Electron: WebSocket not connected");
             return;
         }
 
