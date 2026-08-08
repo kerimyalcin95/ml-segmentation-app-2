@@ -1288,4 +1288,41 @@ export class LabelImage {
             0,
         );
     }
+
+    public getHighestLabelValue(): number {
+        const width = this.maskCanvas.width;
+        const height = this.maskCanvas.height;
+
+        if (width === 0 || height === 0) {
+            return -1;
+        }
+
+        const imageData =
+            this.maskContext.getImageData(
+                0,
+                0,
+                width,
+                height,
+            );
+
+        let highestValue = -1;
+
+        for (
+            let index = 0;
+            index < imageData.data.length;
+            index += 4
+        ) {
+            const value =
+                imageData.data[index];
+
+            if (
+                value !== 255 &&
+                value > highestValue
+            ) {
+                highestValue = value;
+            }
+        }
+
+        return highestValue;
+    }
 }

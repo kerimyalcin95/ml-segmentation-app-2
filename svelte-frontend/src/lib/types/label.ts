@@ -67,8 +67,8 @@ export function validateLabelFile(json: string): ActiveLabel[] {
         validatedLabels.push(label);
     }
 
-    if (selectedCount !== 1) {
-        throw new Error('Exactly one label must be selected.');
+    if (selectedCount > 1) {
+        throw new Error('More than one label is selected.');
     }
 
     return validatedLabels;
