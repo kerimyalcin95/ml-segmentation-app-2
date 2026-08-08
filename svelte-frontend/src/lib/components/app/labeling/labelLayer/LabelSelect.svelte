@@ -9,10 +9,10 @@ import { LABEL_COLORS, type LabelColor } from '$lib/types/labelColors';
 
 interface Props {
     activeLabels: ActiveLabel[];
-    enabled: boolean;
+    disabled: boolean;
 }
 
-let { activeLabels, enabled = false }: Props = $props();
+let { activeLabels, disabled = false }: Props = $props();
 
 let selectedColor = $state('');
 
@@ -47,7 +47,11 @@ function addLabel(): void {
 
 <div class="space-y-2">
     <div class="flex gap-2">
-        <Select.Root disabled={!enabled} type="single" bind:value={selectedColor}>
+        <Select.Root
+            {disabled}
+            type="single"
+            bind:value={selectedColor}
+        >
             <Select.Trigger class="flex-1">
                 {selectedColor || 'Select label color'}
             </Select.Trigger>
@@ -74,7 +78,7 @@ function addLabel(): void {
             </Select.Content>
         </Select.Root>
 
-        <Button size="icon" onclick={addLabel} disabled={!enabled}>
+        <Button size="icon" onclick={addLabel} {disabled}>
             <PlusIcon weight="bold" />
         </Button>
     </div>

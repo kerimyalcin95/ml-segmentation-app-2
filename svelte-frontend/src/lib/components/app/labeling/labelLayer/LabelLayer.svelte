@@ -1,8 +1,6 @@
 <script lang="ts">
 import { Card } from '$lib/components/ui/card';
 
-import { CanvasManager } from '$lib/canvas/canvas';
-
 import type { ActiveLabel } from '$lib/types/label';
 
 import LabelSelect from './LabelSelect.svelte';
@@ -11,12 +9,6 @@ import SaveLabelFile from './SaveLabelFile.svelte';
 import LoadLabelFile from './LoadLabelFile.svelte';
 import Separator from '$lib/components/ui/separator/separator.svelte';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
-
-interface Props {
-    canvas: CanvasManager;
-}
-
-let { canvas }: Props = $props();
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">
@@ -25,11 +17,10 @@ let { canvas }: Props = $props();
 
         <LabelSelect
             activeLabels={sessionStore.labeling.activeLabels}
-            enabled={sessionStore.labeling.enabled}
+            disabled={!sessionStore.labeling.enabled}
         />
 
         <LabelDragList
-            {canvas}
             activeLabels={sessionStore.labeling.activeLabels}
             onLabelsChanged={(labels: ActiveLabel[]) => {
                 sessionStore.labeling.activeLabels = labels;
@@ -43,11 +34,11 @@ let { canvas }: Props = $props();
 
         <LoadLabelFile
             activeLabels={sessionStore.labeling.activeLabels}
-            enabled={sessionStore.labeling.enabled}
+            disabled={!sessionStore.labeling.enabled}
         />
         <SaveLabelFile
             activeLabels={sessionStore.labeling.activeLabels}
-            enabled={sessionStore.labeling.enabled}
+            disabled={!sessionStore.labeling.enabled}
         />
     </div>
 </Card>

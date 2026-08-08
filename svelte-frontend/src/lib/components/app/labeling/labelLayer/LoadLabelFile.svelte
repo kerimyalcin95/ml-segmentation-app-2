@@ -10,10 +10,10 @@ import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 
 interface Props {
     activeLabels: ActiveLabel[];
-    enabled: boolean;
+    disabled: boolean;
 }
 
-let { activeLabels, enabled = false }: Props = $props();
+let { activeLabels, disabled = false }: Props = $props();
 
 let dialogOpen = $state(false);
 
@@ -55,7 +55,7 @@ async function loadLabels(): Promise<void> {
 }
 </script>
 
-<Button onclick={loadLabels} disabled={!enabled}>
+<Button onclick={loadLabels} {disabled}>
     <TagSimpleIcon weight="bold" />
     Load Labels
 </Button>

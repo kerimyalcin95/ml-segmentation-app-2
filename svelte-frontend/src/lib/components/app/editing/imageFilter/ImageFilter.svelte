@@ -49,6 +49,7 @@ function applyFilters(): void {
             onReorder={(filters: ActiveFilter[]) => {
                 sessionStore.editing.activeFilters = filters;
             }}
+            disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
         />
 
         <FilterSettings

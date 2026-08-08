@@ -4,8 +4,6 @@ import { Card } from '$lib/components/ui/card';
 import { dndzone } from 'svelte-dnd-action';
 import type { DndEvent } from 'svelte-dnd-action';
 
-import { CanvasManager } from '$lib/canvas/canvas';
-
 import type { ActiveLabel } from '$lib/types/label';
 import { Input } from '$lib/components/ui/input';
 
@@ -13,15 +11,13 @@ import EyeIcon from 'phosphor-svelte/lib/EyeIcon';
 import EyeSlashIcon from 'phosphor-svelte/lib/EyeSlashIcon';
 
 interface Props {
-    canvas: CanvasManager;
-
     activeLabels: ActiveLabel[];
 
     onLabelsChanged: (labels: ActiveLabel[]) => void;
     onReorder: (labels: ActiveLabel[]) => void;
 }
 
-let { canvas, activeLabels, onLabelsChanged, onReorder }: Props = $props();
+let { activeLabels, onLabelsChanged, onReorder}: Props = $props();
 
 let editingLabelId = $state<number | null>(null);
 let editingName = $state('');

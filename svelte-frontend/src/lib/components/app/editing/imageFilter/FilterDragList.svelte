@@ -13,6 +13,8 @@ interface Props {
     onSelectFilter: (id: number | null) => void;
     onFiltersChanged: (filters: ActiveFilter[]) => void;
     onReorder: (filters: ActiveFilter[]) => void;
+
+    disabled: boolean;
 }
 
 let {
@@ -21,6 +23,7 @@ let {
     onSelectFilter,
     onFiltersChanged,
     onReorder,
+    disabled = false,
 }: Props = $props();
 
 function handleFilterReorder(event: CustomEvent<DndEvent<ActiveFilter>>): void {
@@ -44,6 +47,7 @@ function removeFilter(id: number) {
         items: activeFilters,
         flipDurationMs: 200,
         dropTargetStyle: {},
+        dragDisabled: disabled,
     }}
     onconsider={handleFilterReorder}
     onfinalize={handleFilterReorder}
@@ -53,12 +57,16 @@ function removeFilter(id: number) {
             class="
             p-3
             my-2
-            cursor-pointer
             transition-colors
-            hover:bg-accent
+            {disabled ? 'cursor-not-allowed' : 'cursor-grab'}
+            {disabled
+            ? 'opacity-50 cursor-not-allowed'
+            : 'cursor-pointer hover:bg-accent'}
             {selectedFilterId === filter.id ? 'bg-accent' : ''}
             "
             onclick={() => {
+                if (disabled) return;
+                
                 onSelectFilter(
                     selectedFilterId === filter.id ? null : filter.id,
                 );
@@ -66,7 +74,12 @@ function removeFilter(id: number) {
         >
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
-                    <span class="cursor-grab select-none text-muted-foreground">
+                    <span class="
+                    cursor-grab
+                    select-none
+                    text-muted-foreground
+                    {disabled ? 'cursor-not-allowed' : 'cursor-grab'}
+                    ">
                         ☰
                     </span>
 
@@ -82,6 +95,7 @@ function removeFilter(id: number) {
                         event.stopPropagation();
                         removeFilter(filter.id);
                     }}
+                    {disabled}
                 >
                     ×
                 </Button>

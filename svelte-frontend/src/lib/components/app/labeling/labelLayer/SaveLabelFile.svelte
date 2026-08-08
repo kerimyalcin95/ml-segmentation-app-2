@@ -8,10 +8,10 @@ import { dirname } from '$lib/utils/path';
 
 interface Props {
     activeLabels: ActiveLabel[];
-    enabled: boolean;
+    disabled: boolean;
 }
 
-let { activeLabels, enabled = false }: Props = $props();
+let { activeLabels, disabled = false }: Props = $props();
 
 let dialogOpen = $state(false);
 
@@ -58,7 +58,7 @@ async function saveLabels(): Promise<void> {
 }
 </script>
 
-<Button onclick={saveLabels} disabled={!enabled}>
+<Button onclick={saveLabels} {disabled}>
     <FloppyDiskIcon weight="bold" />
     Save Labels
 </Button>
