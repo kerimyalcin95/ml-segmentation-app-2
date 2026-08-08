@@ -31,8 +31,12 @@ declare global {
             filePath: string,
         ): Promise<Uint8Array>;
 
-        showOpenLabelDialog(): Promise<string | null>;
-        showSaveLabelDialog(): Promise<SaveLabelDialogResult | null>;
+        showOpenLabelDialog(
+            defaultPath?: string,
+        ): Promise<string | null>;
+        showSaveLabelDialog(
+            defaultPath?: string,
+        ): Promise<SaveLabelDialogResult | null>;
         writeLabels(
             filePath: string,
             json: string,

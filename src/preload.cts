@@ -50,9 +50,11 @@ contextBridge.exposeInMainWorld('electronAPI', {
         };
     },
 
-    showOpenImageDialog: (defaultPath?: string) =>
+    showOpenImageDialog: (
+        defaultPath?: string
+    ) =>
         ipcRenderer.invoke(
-            "open-image",
+            "show-open-image-dialog",
             defaultPath,
         ),
     showSaveImageDialog: (
@@ -79,14 +81,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
             filePath,
         ),
 
-    showOpenLabelDialog: () =>
+    showOpenLabelDialog: (
+        defaultPath?: string
+    ) =>
         ipcRenderer.invoke(
             "show-open-label-dialog",
+            defaultPath,
         ),
 
-    showSaveLabelDialog: () =>
+    showSaveLabelDialog: (
+        defaultPath?: string
+    ) =>
         ipcRenderer.invoke(
             "show-save-label-dialog",
+            defaultPath,
         ),
 
     writeLabels: (

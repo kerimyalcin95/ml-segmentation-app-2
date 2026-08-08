@@ -23,8 +23,12 @@ export interface ElectronAPI {
         filePath: string,
     ) => Promise<Uint8Array>;
 
-    showOpenLabelDialog(): Promise<string | null>;
-    showSaveLabelDialog(): Promise<{
+    showOpenLabelDialog(
+        defaultPath?: string,
+    ): Promise<string | null>;
+    showSaveLabelDialog(
+        defaultPath?: string,
+    ): Promise<{
         filePath: string;
     } | null>;
 

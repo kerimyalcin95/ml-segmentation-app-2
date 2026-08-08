@@ -4,6 +4,7 @@ import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon';
 import type { ActiveLabel } from '$lib/types/label';
 import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import { dirname } from '$lib/utils/path';
 
 interface Props {
     activeLabels: ActiveLabel[];
@@ -17,10 +18,7 @@ let dialogOpen = $state(false);
 let dialogTitle = $state('');
 let dialogMessage = $state('');
 
-function showDialog(
-    title: string,
-    message: string,
-): void {
+function showDialog(title: string, message: string): void {
     dialogTitle = title;
     dialogMessage = message;
     dialogOpen = true;
@@ -28,22 +26,20 @@ function showDialog(
 
 async function saveLabels(): Promise<void> {
     if (activeLabels.length === 0) {
-        showDialog(
-            'No Labels',
-            'There are no labels to save.',
-        );
+        showDialog('No Labels', 'There are no labels to save.');
 
         return;
     }
 
-    const result =
-        await window.electronAPI.showSaveLabelDialog();
+    const result = await window.electronAPI.showSaveLabelDialog(
+        sessionStore.labeling.labelSaveDirectory,
+    );
 
     if (!result) {
         return;
     }
 
-    sessionStore.labeling.labelSaveDirectory = result.filePath;
+    sessionStore.labeling.labelSaveDirectory = dirname(result.filePath);
 
     try {
         await window.electronAPI.writeLabels(
@@ -57,10 +53,7 @@ async function saveLabels(): Promise<void> {
             ),
         );
     } catch {
-        showDialog(
-            'Save Failed',
-            'The labels could not be saved.',
-        );
+        showDialog('Save Failed', 'The labels could not be saved.');
     }
 }
 </script>

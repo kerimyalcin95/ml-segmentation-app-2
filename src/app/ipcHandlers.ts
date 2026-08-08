@@ -160,15 +160,26 @@ export class IpcHandlers {
 
         ipcMain.handle(
             "show-open-label-dialog",
-            async () => {
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
+
                 const result = await dialog.showOpenDialog({
+
+                    ...(defaultPath && { defaultPath }),
+
                     properties: ["openFile"],
+
                     filters: [
+
                         {
                             name: "Label Files",
                             extensions: ["json"],
                         },
+
                     ],
+
                 });
 
                 if (result.canceled) {
@@ -176,30 +187,50 @@ export class IpcHandlers {
                 }
 
                 return result.filePaths[0];
+
             },
         );
 
         ipcMain.handle(
             "show-save-label-dialog",
-            async () => {
-                const result = await dialog.showSaveDialog({
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
+
+                const options: Electron.SaveDialogOptions = {
                     title: "Save Labels",
                     defaultPath: "labels.json",
+
                     filters: [
                         {
                             name: "Label Files",
                             extensions: ["json"],
                         },
                     ],
-                });
+                };
 
-                if (result.canceled || !result.filePath) {
+                if (defaultPath) {
+                    options.defaultPath = path.join(
+                        defaultPath,
+                        "labels.json",
+                    );
+                }
+
+                const result =
+                    await dialog.showSaveDialog(options);
+
+                if (
+                    result.canceled ||
+                    !result.filePath
+                ) {
                     return null;
                 }
 
                 return {
                     filePath: result.filePath,
                 };
+
             },
         );
 
