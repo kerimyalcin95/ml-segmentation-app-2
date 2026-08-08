@@ -11,9 +11,9 @@ import VerticalScrollBar from '$lib/components/app/sidebar/VerticalScrollBar.sve
 import ImageFilter from '../editing/imageFilter/ImageFilter.svelte';
 
 import LabelFileControl from '$lib/components/app/labeling/labelFileControl/LabelFileControl.svelte';
-import LabelBrush from '../labeling/labelBrush/LabelBrush.svelte';
-import LabelLayer from '../labeling/labelLayer/LabelLayer.svelte';
-import LabelDisplay from '../labeling/labelDisplay/LabelDisplay.svelte';
+import LabelBrush from '$lib/components/app/labeling/labelBrush/LabelBrush.svelte';
+import LabelLayer from '$lib/components/app/labeling/labelLayer/LabelLayer.svelte';
+import LabelDisplay from '$lib/components/app/labeling/labelDisplay/LabelDisplay.svelte';
 
 interface Props {
     canvas: CanvasManager;
