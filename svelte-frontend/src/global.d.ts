@@ -8,6 +8,13 @@ declare global {
         filePath: string;
     }
 
+    interface LabelImageData {
+        width: number;
+        height: number;
+        mask: Uint8Array;
+        palette: string[];
+    }
+
     interface ElectronAPI {
         subscribeServerMessages(callback: (message: string) => void): () => void;
         sendToServer(message: string): void;
@@ -53,14 +60,16 @@ declare global {
             defaultPath?: string,
         ): Promise<SaveImageDialogResult | null>;
 
-        writeLabelImage(
-            filePath: string,
-            imageBytes: Uint8Array,
-        ): Promise<string>;
+        writeLabelImage: (
+            width: number,
+            height: number,
+            mask: Uint8Array,
+            palette: string[],
+        ) => Promise<Uint8Array>;
 
         readLabelImage(
             filePath: string,
-        ): Promise<Uint8Array>;
+        ): Promise<LabelImageData>;
     }
 
     interface Window {

@@ -49,13 +49,15 @@ export interface ElectronAPI {
     ) => Promise<SaveImageDialogResult | null>;
 
     writeLabelImage: (
-        filePath: string,
-        imageBytes: Uint8Array,
-    ) => Promise<string>;
+        width: number,
+        height: number,
+        mask: Uint8Array,
+        palette: string[],
+    ) => Promise<Uint8Array>;
 
     readLabelImage: (
         filePath: string,
-    ) => Promise<Uint8Array>;
+    ) => Promise<LabelImageData>;
 }
 
 export interface SaveImageDialogResult {
@@ -65,6 +67,13 @@ export interface SaveImageDialogResult {
 
 export interface SaveLabelDialogResult {
     filePath: string;
+}
+
+export interface LabelImageData {
+    width: number;
+    height: number;
+    mask: Uint8Array;
+    palette: string[];
 }
 
 declare global {

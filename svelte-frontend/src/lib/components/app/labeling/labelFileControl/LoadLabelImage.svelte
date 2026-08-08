@@ -37,7 +37,7 @@
                 return;
             }
 
-            const imageBytes =
+            const imageData =
                 await window.electronAPI.readLabelImage(
                     filePath,
                 );
@@ -46,8 +46,8 @@
                 canvas.document.labelImage.new();
             }
 
-            await canvas.document.loadLabelImage(
-                imageBytes,
+            canvas.document.loadLabelImage(
+                imageData,
             );
 
             sessionStore.labeling.labelImageLoadDirectory =

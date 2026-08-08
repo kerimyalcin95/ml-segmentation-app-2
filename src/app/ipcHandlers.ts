@@ -6,6 +6,8 @@ import {
 
 import fs from "node:fs";
 import path from "node:path";
+import PNGlib from "node-pnglib";
+import { decode } from 'fast-png';
 
 import { PythonServer } from "../python/pythonServer.js";
 
@@ -334,10 +336,186 @@ export class IpcHandlers {
                 _event,
                 filePath: string,
             ) => {
+                const imageBytes =
+                    fs.readFileSync(filePath);
 
-                return new Uint8Array(
-                    fs.readFileSync(filePath),
-                );
+                const image =
+                    decode(imageBytes);
+
+                if (
+                    image.channels !== 1 ||
+                    image.depth !== 8
+                ) {
+                    throw new Error(
+                        "Label image must be an 8-bit indexed PNG.",
+                    );
+                }
+
+                const palette =
+                    image.palette;
+
+                if (
+                    palette === undefined ||
+                    palette.length === 0
+                ) {
+                    throw new Error(
+                        "Label image does not contain a palette.",
+                    );
+                }
+
+                const expectedLength =
+                    image.width *
+                    image.height;
+
+                if (
+                    image.data.length !==
+                    expectedLength
+                ) {
+                    throw new Error(
+                        "Invalid label image pixel data.",
+                    );
+                }
+
+                const mask =
+                    new Uint8Array(
+                        expectedLength,
+                    );
+
+                let highestLabelValue = -1;
+
+                for (
+                    let index = 0;
+                    index < expectedLength;
+                    index++
+                ) {
+                    const paletteIndex =
+                        image.data[index];
+
+                    if (
+                        paletteIndex === undefined
+                    ) {
+                        throw new Error(
+                            "Invalid label pixel value.",
+                        );
+                    }
+
+                    /*
+                     * PNG palette index 0 is the
+                     * background.
+                     *
+                     * Internal canvas background is 255.
+                     */
+                    if (
+                        paletteIndex === 0
+                    ) {
+                        mask[index] = 255;
+                        continue;
+                    }
+
+                    /*
+                     * PNG index 1 → canvas label 0
+                     * PNG index 2 → canvas label 1
+                     * ...
+                     */
+                    const labelValue =
+                        paletteIndex - 1;
+
+                    if (
+                        labelValue > 254
+                    ) {
+                        throw new Error(
+                            "Label image contains too many labels.",
+                        );
+                    }
+
+                    if (
+                        paletteIndex >=
+                        palette.length
+                    ) {
+                        throw new Error(
+                            "Label image contains a pixel " +
+                            "without a corresponding palette color.",
+                        );
+                    }
+
+                    mask[index] =
+                        labelValue;
+
+                    if (
+                        labelValue >
+                        highestLabelValue
+                    ) {
+                        highestLabelValue =
+                            labelValue;
+                    }
+                }
+
+                const labelCount =
+                    highestLabelValue + 1;
+
+                const labelPalette: string[] = [];
+
+                for (
+                    let index = 1;
+                    index <= labelCount;
+                    index++
+                ) {
+                    const color =
+                        palette[index];
+
+                    if (
+                        color === undefined ||
+                        color.length < 4
+                    ) {
+                        throw new Error(
+                            "Invalid label palette entry.",
+                        );
+                    }
+
+                    const red = color[0];
+                    const green = color[1];
+                    const blue = color[2];
+                    const alpha = color[3];
+
+                    if (
+                        red === undefined ||
+                        green === undefined ||
+                        blue === undefined ||
+                        alpha === undefined
+                    ) {
+                        throw new Error(
+                            "Invalid label palette entry.",
+                        );
+                    }
+
+                    if (
+                        alpha !== 255
+                    ) {
+                        throw new Error(
+                            "Label palette entries must be opaque.",
+                        );
+                    }
+
+                    labelPalette.push(
+                        "#" +
+                        red
+                            .toString(16)
+                            .padStart(2, "0") +
+                        green
+                            .toString(16)
+                            .padStart(2, "0") +
+                        blue
+                            .toString(16)
+                            .padStart(2, "0"),
+                    );
+                }
+
+                return {
+                    width: image.width,
+                    height: image.height,
+                    mask,
+                    palette: labelPalette,
+                };
             },
         );
 
@@ -345,16 +523,202 @@ export class IpcHandlers {
             "write-label-image",
             (
                 _event,
-                filePath: string,
-                imageBytes: Uint8Array,
+                width: number,
+                height: number,
+                mask: Uint8Array,
+                palette: string[],
             ) => {
+                if (
+                    !Number.isInteger(width) ||
+                    !Number.isInteger(height) ||
+                    width <= 0 ||
+                    height <= 0
+                ) {
+                    throw new Error(
+                        "Invalid label image dimensions",
+                    );
+                }
 
-                fs.writeFileSync(
-                    filePath,
-                    Buffer.from(imageBytes),
+                if (
+                    mask.length !==
+                    width * height
+                ) {
+                    throw new Error(
+                        "Label mask dimensions do not match " +
+                        "the supplied mask length.",
+                    );
+                }
+
+                if (
+                    palette.length === 0 ||
+                    palette.length > 255
+                ) {
+                    throw new Error(
+                        "Label palette must contain between " +
+                        "1 and 255 colors.",
+                    );
+                }
+
+                /*
+                 * Mask values:
+                 *
+                 * 0 = background
+                 * 1 = palette[0]
+                 * 2 = palette[1]
+                 * ...
+                 */
+                let highestLabelValue = 0;
+
+                for (
+                    let index = 0;
+                    index < mask.length;
+                    index++
+                ) {
+                    const value =
+                        mask[index];
+
+                    if (
+                        value === undefined
+                    ) {
+                        throw new Error(
+                            "Missing label value at pixel " +
+                            String(index) +
+                            ".",
+                        );
+                    }
+
+                    if (
+                        value > highestLabelValue
+                    ) {
+                        highestLabelValue =
+                            value;
+                    }
+                }
+
+                /*
+                 * A mask value N requires palette[N - 1].
+                 */
+                if (
+                    highestLabelValue >
+                    palette.length
+                ) {
+                    throw new Error(
+                        "The label mask contains a label without " +
+                        "a corresponding palette color.",
+                    );
+                }
+
+                const png =
+                    new PNGlib(
+                        width,
+                        height,
+                        8,
+                        [0, 0, 0, 255],
+                    );
+
+                /*
+                 * PNG palette index 0 is the background.
+                 *
+                 * png.color() starts registering additional
+                 * colors after the background color.
+                 */
+                const paletteIndices =
+                    new Uint8Array(
+                        palette.length + 1,
+                    );
+
+                for (
+                    let labelValue = 1;
+                    labelValue <=
+                    highestLabelValue;
+                    labelValue++
+                ) {
+                    const color =
+                        palette[
+                        labelValue - 1
+                        ];
+
+                    if (
+                        color === undefined
+                    ) {
+                        throw new Error(
+                            "Missing palette color for label " +
+                            String(labelValue - 1) +
+                            ".",
+                        );
+                    }
+
+                    paletteIndices[
+                        labelValue
+                    ] =
+                        png.color(color);
+                }
+
+                /*
+                 * Write palette indices into the PNG.
+                 */
+                for (
+                    let index = 0;
+                    index < mask.length;
+                    index++
+                ) {
+                    const value =
+                        mask[index];
+
+                    if (
+                        value === undefined
+                    ) {
+                        throw new Error(
+                            "Missing label value at pixel " +
+                            String(index) +
+                            ".",
+                        );
+                    }
+
+                    const x =
+                        index % width;
+
+                    const y =
+                        Math.floor(
+                            index / width,
+                        );
+
+                    /*
+                     * Mask value 0 is the background,
+                     * which is already PNG palette index 0.
+                     */
+                    if (
+                        value === 0
+                    ) {
+                        png.buffer[
+                            png.index(x, y)
+                        ] = 0;
+
+                        continue;
+                    }
+
+                    const paletteIndex =
+                        paletteIndices[value];
+
+                    if (
+                        paletteIndex === undefined
+                    ) {
+                        throw new Error(
+                            "Missing PNG palette index for label " +
+                            String(value) +
+                            ".",
+                        );
+                    }
+
+                    png.buffer[
+                        png.index(x, y)
+                    ] =
+                        paletteIndex;
+                }
+
+                return new Uint8Array(
+                    png.getBuffer(),
                 );
-
-                return filePath;
             },
         );
     }

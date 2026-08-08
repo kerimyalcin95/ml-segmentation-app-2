@@ -131,13 +131,17 @@ contextBridge.exposeInMainWorld('electronAPI', {
         ),
 
     writeLabelImage: (
-        filePath: string,
-        imageBytes: Uint8Array,
+        width: number,
+        height: number,
+        mask: Uint8Array,
+        palette: string[],
     ) =>
         ipcRenderer.invoke(
             'write-label-image',
-            filePath,
-            imageBytes,
+            width,
+            height,
+            mask,
+            palette,
         ),
 
     readLabelImage: (

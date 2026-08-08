@@ -575,22 +575,22 @@ export class Document {
         return this.state.width > 0 && this.state.height > 0;
     }
 
-    public async loadLabelImage(
-        imageBytes: Uint8Array,
-    ): Promise<void> {
+        public loadLabelImage(
+        imageData: LabelImageData,
+    ): void {
         if (!this.hasImage()) {
             throw new Error(
                 'Cannot load label image without an image.',
             );
         }
 
-        await this.labelImage.load(
-            imageBytes,
+        this.labelImage.load(
+            imageData,
             this.state.width,
             this.state.height,
         );
 
-        this.events.emit("layerRedraw");
+        this.events.emit('layerRedraw');
     }
 
     public async saveLabelImage(): Promise<Uint8Array> {

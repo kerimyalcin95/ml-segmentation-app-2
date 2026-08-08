@@ -3,7 +3,6 @@ import Konva from 'konva';
 import { CONTEXT, contextContainer } from '../container';
 import { Document } from '../document';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
-import { LABEL_COLORS } from '$lib/types/labelColors';
 
 export class LabelImage {
 
@@ -700,272 +699,77 @@ export class LabelImage {
     }
 
     async save(): Promise<Uint8Array> {
-        const width = this.maskCanvas.width;
-        const height = this.maskCanvas.height;
+        const width =
+            this.maskCanvas.width;
 
-        if (width <= 0 || height <= 0) {
+        const height =
+            this.maskCanvas.height;
+
+        if (
+            width <= 0 ||
+            height <= 0
+        ) {
             throw new Error(
                 'Cannot save an empty label image.',
             );
         }
 
-        /*
-         * The mask canvas contains:
-         *
-         * 0   = label 0
-         * 1   = label 1
-         * 2   = label 2
-         * ...
-         * 255 = background
-         *
-         * We explicitly create an 8-bit grayscale PNG.
-         */
+        const source =
+            this.maskContext.getImageData(
+                0,
+                0,
+                width,
+                height,
+            );
 
-        const source = this.maskContext.getImageData(
-            0,
-            0,
-            width,
-            height,
-        );
+        const mask =
+            new Uint8Array(
+                width * height,
+            );
 
-        /*
-         * PNG scanlines:
-         *
-         * one filter byte + one grayscale byte per pixel.
-         */
-        const scanlines = new Uint8Array(
-            height * (width + 1),
-        );
+        for (
+            let index = 0;
+            index < mask.length;
+            index++
+        ) {
+            const value =
+                source.data[index * 4];
 
-        for (let y = 0; y < height; y++) {
-            const scanlineOffset =
-                y * (width + 1);
-
-            const sourceOffset =
-                y * width * 4;
-
-            scanlines[scanlineOffset] = 0;
-
-            for (let x = 0; x < width; x++) {
-                scanlines[
-                    scanlineOffset + 1 + x
-                ] =
-                    source.data[
-                    sourceOffset + x * 4
-                    ];
-            }
+            mask[index] =
+                value === 255
+                    ? 0
+                    : value + 1;
         }
 
-        const compressedStream =
-            new Blob([scanlines])
-                .stream()
-                .pipeThrough(
-                    new CompressionStream('deflate'),
-                );
-
-        const compressed =
-            new Uint8Array(
-                await new Response(
-                    compressedStream,
-                ).arrayBuffer(),
+        const palette =
+            sessionStore.labeling.activeLabels.map(
+                (label) => label.color,
             );
 
-        const signature = new Uint8Array([
-            0x89,
-            0x50,
-            0x4e,
-            0x47,
-            0x0d,
-            0x0a,
-            0x1a,
-            0x0a,
-        ]);
-
-        /*
-         * IHDR:
-         *
-         * bit depth  = 8
-         * color type = 0 (grayscale)
-         */
-        const ihdr = new Uint8Array(13);
-
-        const ihdrView =
-            new DataView(ihdr.buffer);
-
-        ihdrView.setUint32(
-            0,
+        return window.electronAPI.writeLabelImage(
             width,
-        );
-
-        ihdrView.setUint32(
-            4,
             height,
+            mask,
+            palette,
         );
-
-        ihdr[8] = 8;
-        ihdr[9] = 0;
-        ihdr[10] = 0;
-        ihdr[11] = 0;
-        ihdr[12] = 0;
-
-        const createChunk = (
-            type: string,
-            data: Uint8Array,
-        ): Uint8Array => {
-            const typeBytes =
-                new TextEncoder().encode(type);
-
-            const chunk = new Uint8Array(
-                4 +
-                typeBytes.length +
-                data.length +
-                4,
-            );
-
-            const view =
-                new DataView(chunk.buffer);
-
-            view.setUint32(
-                0,
-                data.length,
-            );
-
-            chunk.set(
-                typeBytes,
-                4,
-            );
-
-            chunk.set(
-                data,
-                4 + typeBytes.length,
-            );
-
-            let crc = 0xffffffff;
-
-            for (
-                let i = 4;
-                i <
-                4 +
-                typeBytes.length +
-                data.length;
-                i++
-            ) {
-                crc ^= chunk[i];
-
-                for (
-                    let bit = 0;
-                    bit < 8;
-                    bit++
-                ) {
-                    const mask = -(crc & 1);
-
-                    crc =
-                        (crc >>> 1) ^
-                        (0xedb88320 & mask);
-                }
-            }
-
-            crc =
-                (crc ^ 0xffffffff) >>> 0;
-
-            view.setUint32(
-                4 +
-                typeBytes.length +
-                data.length,
-                crc,
-            );
-
-            return chunk;
-        };
-
-        const ihdrChunk =
-            createChunk(
-                'IHDR',
-                ihdr,
-            );
-
-        const idatChunk =
-            createChunk(
-                'IDAT',
-                compressed,
-            );
-
-        const iendChunk =
-            createChunk(
-                'IEND',
-                new Uint8Array(0),
-            );
-
-        const result =
-            new Uint8Array(
-                signature.length +
-                ihdrChunk.length +
-                idatChunk.length +
-                iendChunk.length,
-            );
-
-        let offset = 0;
-
-        result.set(
-            signature,
-            offset,
-        );
-
-        offset += signature.length;
-
-        result.set(
-            ihdrChunk,
-            offset,
-        );
-
-        offset += ihdrChunk.length;
-
-        result.set(
-            idatChunk,
-            offset,
-        );
-
-        offset += idatChunk.length;
-
-        result.set(
-            iendChunk,
-            offset,
-        );
-
-        return result;
     }
 
-    async load(
-        imageBytes: Uint8Array,
+    load(
+        imageData: LabelImageData,
         expectedWidth: number,
         expectedHeight: number,
-    ): Promise<void> {
-        const buffer = new ArrayBuffer(imageBytes.byteLength);
+    ): void {
+        const {
+            width,
+            height,
+            mask,
+            palette,
+        } = imageData;
 
-        new Uint8Array(buffer).set(imageBytes);
-
-        const blob = new Blob([
-            buffer,
-        ], {
-            type: 'image/png',
-        });
-
-        const bitmap =
-            await createImageBitmap(blob);
-
-        const width = bitmap.width;
-        const height = bitmap.height;
-
-        /*
-         * The label image must have exactly the same
-         * dimensions as the document.
-         */
         if (
             width !== expectedWidth ||
             height !== expectedHeight
         ) {
-            bitmap.close();
-
             throw new Error(
                 'Label image dimensions do not match. ' +
                 'Expected ' +
@@ -980,124 +784,88 @@ export class LabelImage {
             );
         }
 
-        /*
-         * Ensure our internal canvases have the correct size.
-         */
-        this.setSize(
-            expectedWidth,
-            expectedHeight,
-        );
+        const expectedLength =
+            expectedWidth *
+            expectedHeight;
 
-        /*
-         * Decode the image into the mask canvas.
-         *
-         * IMPORTANT:
-         * imageSmoothingEnabled = false prevents interpolation.
-         */
-        this.maskContext.imageSmoothingEnabled = false;
-
-        this.maskContext.clearRect(
-            0,
-            0,
-            expectedWidth,
-            expectedHeight,
-        );
-
-        this.maskContext.drawImage(
-            bitmap,
-            0,
-            0,
-            expectedWidth,
-            expectedHeight,
-        );
-
-        bitmap.close();
-
-        /*
-         * Normalize the decoded image to an actual
-         * grayscale mask.
-         */
-        const imageData =
-            this.maskContext.getImageData(
-                0,
-                0,
-                expectedWidth,
-                expectedHeight,
-            );
-
-        for (
-            let index = 0;
-            index < imageData.data.length;
-            index += 4
+        if (
+            mask.length !== expectedLength
         ) {
-            const value =
-                imageData.data[index];
-
-            imageData.data[index] = value;
-            imageData.data[index + 1] = value;
-            imageData.data[index + 2] = value;
-            imageData.data[index + 3] = 255;
+            throw new Error(
+                'Invalid label image mask dimensions.',
+            );
         }
 
-        this.maskContext.putImageData(
-            imageData,
-            0,
-            0,
-        );
-
-        this.rebuildLabelsFromMask(
-            imageData,
-        );
-
-        this.renderFromMask();
-
-        this._created = true;
-
-        this.refresh();
-    }
-
-    private rebuildLabelsFromMask(
-        imageData: ImageData,
-    ): void {
-        let maxValue = -1;
+        /*
+         * Find the highest canvas label value
+         * actually present in the mask.
+         *
+         * 255 = background.
+         *
+         * Example:
+         *
+         * 255 = background
+         * 0   = label 0
+         * 1   = label 1
+         * 2   = label 2
+         */
+        let highestLabelValue = -1;
 
         for (
             let index = 0;
-            index < imageData.data.length;
-            index += 4
+            index < mask.length;
+            index++
         ) {
             const value =
-                imageData.data[index];
+                mask[index];
 
             if (
                 value !== 255 &&
-                value > maxValue
+                value > highestLabelValue
             ) {
-                maxValue = value;
+                highestLabelValue =
+                    value;
             }
         }
 
-        if (maxValue < 0) {
-            sessionStore.labeling.activeLabels = [];
-            return;
+        const labelCount =
+            highestLabelValue + 1;
+
+        if (
+            palette.length < labelCount
+        ) {
+            throw new Error(
+                'Label image contains labels without ' +
+                'corresponding palette colors.',
+            );
         }
 
-        const activeLabels = [];
+        /*
+         * The Electron PNG reader already removed
+         * palette index 0 (background).
+         *
+         * Therefore:
+         *
+         * palette[0] = canvas label 0
+         * palette[1] = canvas label 1
+         * palette[2] = canvas label 2
+         * ...
+         */
+        const activeLabels =
+            [];
 
         for (
             let value = 0;
-            value <= maxValue;
+            value < labelCount;
             value++
         ) {
-            const labelColor =
-                LABEL_COLORS[
-                value % LABEL_COLORS.length
-                ];
+            const color =
+                palette[value];
 
             activeLabels.push({
                 id: value + 1,
                 name: `Label ${String(value)}`,
-                color: labelColor.color,
+                color,
                 visible: true,
                 selected: value === 0,
             });
@@ -1105,6 +873,76 @@ export class LabelImage {
 
         sessionStore.labeling.activeLabels =
             activeLabels;
+
+        this.setSize(
+            expectedWidth,
+            expectedHeight,
+        );
+
+        const maskData =
+            this.maskContext.createImageData(
+                expectedWidth,
+                expectedHeight,
+            );
+
+        for (
+            let index = 0;
+            index < mask.length;
+            index++
+        ) {
+            const value =
+                mask[index];
+
+            const offset =
+                index * 4;
+
+            maskData.data[offset] =
+                value;
+
+            maskData.data[offset + 1] =
+                value;
+
+            maskData.data[offset + 2] =
+                value;
+
+            maskData.data[offset + 3] =
+                255;
+        }
+
+        this.maskContext.putImageData(
+            maskData,
+            0,
+            0,
+        );
+
+        this.renderFromMask();
+
+        this._created = true;
+
+        this.setOpacity(
+            sessionStore.labeling.globalOpacity /
+            100,
+        );
+
+        const document =
+            contextContainer.resolve<Document>(
+                CONTEXT.Document,
+            );
+
+        if (
+            !document.group.children.includes(
+                this.outputImage,
+            )
+        ) {
+            document.group.add(
+                this.outputImage,
+            );
+        }
+
+        sessionStore.labeling.enabled = true;
+        sessionStore.hasLabelImage = true;
+
+        this.refresh();
     }
 
     private renderFromMask(): void {
