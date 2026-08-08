@@ -93,7 +93,7 @@ export class Brush {
                 this.size / 2,
             );
         } else {
-            const label = sessionStore.activeLabels.find(
+            const label = sessionStore.labeling.activeLabels.find(
                 (label) => label.selected,
             );
 
