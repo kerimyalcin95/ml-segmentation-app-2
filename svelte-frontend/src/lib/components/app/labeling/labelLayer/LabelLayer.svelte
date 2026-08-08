@@ -44,6 +44,7 @@ let { canvas }: Props = $props();
         <LoadLabelFile
             activeLabels={sessionStore.labeling.activeLabels}
             disabled={!sessionStore.labeling.enabled}
+            {canvas}
         />
         <SaveLabelFile
             activeLabels={sessionStore.labeling.activeLabels}

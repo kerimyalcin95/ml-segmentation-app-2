@@ -7,13 +7,15 @@ import { dirname } from '$lib/utils/path';
 
 import { validateLabelFile, type ActiveLabel } from '$lib/types/label';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import type { CanvasManager } from '$lib/canvas/canvas';
 
 interface Props {
     activeLabels: ActiveLabel[];
     disabled: boolean;
+    canvas: CanvasManager
 }
 
-let { activeLabels, disabled = false }: Props = $props();
+let { activeLabels, disabled = false, canvas }: Props = $props();
 
 let dialogOpen = $state(false);
 
@@ -44,6 +46,7 @@ async function loadLabels(): Promise<void> {
 
         activeLabels.length = 0;
         activeLabels.push(...labels);
+        canvas.document.labelImage.refreshOutput();
     } catch (error) {
         showDialog(
             'Invalid Label File',

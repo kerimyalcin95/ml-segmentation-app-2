@@ -1213,6 +1213,7 @@ export class LabelImage {
             return;
         }
 
+        this.reconcileMaskLabels();
         this.renderFromMask();
         this.refresh();
 
@@ -1221,6 +1222,70 @@ export class LabelImage {
                 CONTEXT.Document,
             );
 
-        document.events.emit('layerRedraw');
+        document.events.emit(
+            'layerRedraw',
+        );
+    }
+
+    private reconcileMaskLabels(): void {
+        const labelCount =
+            sessionStore.labeling.activeLabels.length;
+
+        const width =
+            this.maskCanvas.width;
+
+        const height =
+            this.maskCanvas.height;
+
+        const imageData =
+            this.maskContext.getImageData(
+                0,
+                0,
+                width,
+                height,
+            );
+
+        const data =
+            imageData.data;
+
+        for (
+            let index = 0;
+            index < width * height;
+            index++
+        ) {
+            const offset =
+                index * 4;
+
+            const value =
+                data[offset];
+
+            /*
+             * 255 is always background.
+             */
+            if (value === 255) {
+                continue;
+            }
+
+            /*
+             * Valid values are:
+             *
+             * 0 ... labelCount - 1
+             *
+             * Everything above the currently
+             * available labels becomes background.
+             */
+            if (value >= labelCount) {
+                data[offset] = 255;
+                data[offset + 1] = 255;
+                data[offset + 2] = 255;
+                data[offset + 3] = 255;
+            }
+        }
+
+        this.maskContext.putImageData(
+            imageData,
+            0,
+            0,
+        );
     }
 }
