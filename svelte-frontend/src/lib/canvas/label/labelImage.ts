@@ -1099,7 +1099,7 @@ export class LabelImage {
                 name: `Label ${String(value)}`,
                 color: labelColor.color,
                 visible: true,
-                selected: false,
+                selected: value === 0,
             });
         }
 
