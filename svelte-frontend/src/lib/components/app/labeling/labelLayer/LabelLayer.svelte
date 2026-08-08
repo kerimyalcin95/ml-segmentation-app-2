@@ -9,6 +9,14 @@ import SaveLabelFile from './SaveLabelFile.svelte';
 import LoadLabelFile from './LoadLabelFile.svelte';
 import Separator from '$lib/components/ui/separator/separator.svelte';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import type { CanvasManager } from '$lib/canvas/canvas';
+
+interface Props {
+    canvas: CanvasManager;
+}
+
+let { canvas }: Props = $props();
+
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">
@@ -28,6 +36,7 @@ import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
             onReorder={(labels: ActiveLabel[]) => {
                 sessionStore.labeling.activeLabels = labels;
             }}
+            {canvas}
         />
 
         <Separator class="mb-2" />

@@ -136,7 +136,7 @@ function handleMouseMove() {
 
                 <LabelFileControl {canvas} />
                 <LabelBrush {canvas} />
-                <LabelLayer/>
+                <LabelLayer {canvas} />
                 <LabelDisplay {canvas} />
             {:else if sessionStore.mode === 'training'}
                 <h2 class="text-md font-bold mb-3">Training</h2>

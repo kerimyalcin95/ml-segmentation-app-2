@@ -1156,13 +1156,26 @@ export class LabelImage {
             const label =
                 activeLabels[value];
 
-            const color =
-                label.color;
+            if (!label.visible) {
+                outputData.data[outputIndex] = 0;
+                outputData.data[outputIndex + 1] = 0;
+                outputData.data[outputIndex + 2] = 0;
+                outputData.data[outputIndex + 3] = 0;
+
+                continue;
+            }
+
+            const color = label.color;
 
             if (
                 !color.startsWith('#') ||
                 color.length !== 7
             ) {
+                outputData.data[outputIndex] = 0;
+                outputData.data[outputIndex + 1] = 0;
+                outputData.data[outputIndex + 2] = 0;
+                outputData.data[outputIndex + 3] = 0;
+
                 continue;
             }
 
@@ -1193,5 +1206,21 @@ export class LabelImage {
             0,
             0,
         );
+    }
+
+    public refreshOutput(): void {
+        if (!this._created) {
+            return;
+        }
+
+        this.renderFromMask();
+        this.refresh();
+
+        const document =
+            contextContainer.resolve<Document>(
+                CONTEXT.Document,
+            );
+
+        document.events.emit('layerRedraw');
     }
 }

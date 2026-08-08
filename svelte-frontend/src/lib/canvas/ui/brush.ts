@@ -169,8 +169,6 @@ export class Brush {
             return;
         }
 
-        console.log("pointerenter", this.enabled);
-
         this.stage.container().style.cursor = "none";
         this.show();
         this.layer.batchDraw();

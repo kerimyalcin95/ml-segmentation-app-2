@@ -9,15 +9,18 @@ import { Input } from '$lib/components/ui/input';
 
 import EyeIcon from 'phosphor-svelte/lib/EyeIcon';
 import EyeSlashIcon from 'phosphor-svelte/lib/EyeSlashIcon';
+import type { CanvasManager } from '$lib/canvas/canvas';
+import { tick } from 'svelte';
 
 interface Props {
     activeLabels: ActiveLabel[];
+    canvas: CanvasManager;
 
     onLabelsChanged: (labels: ActiveLabel[]) => void;
     onReorder: (labels: ActiveLabel[]) => void;
 }
 
-let { activeLabels, onLabelsChanged, onReorder}: Props = $props();
+let { activeLabels, onLabelsChanged, onReorder, canvas }: Props = $props();
 
 let editingLabelId = $state<number | null>(null);
 let editingName = $state('');
@@ -49,20 +52,37 @@ function handleLabelReorder(event: CustomEvent<DndEvent<ActiveLabel>>): void {
     onReorder(event.detail.items);
 }
 
-function removeLabel(id: number): void {
+function handleLabelReorderFinished(
+    event: CustomEvent<DndEvent<ActiveLabel>>,
+): void {
+    onReorder(event.detail.items);
+
+    canvas.document.labelImage.refreshOutput();
+}
+
+async function removeLabel(id: number): Promise<void> {
     const newLabels = activeLabels.filter((label) => label.id !== id);
 
     onLabelsChanged(newLabels);
+
+    await tick();
+    canvas.document.labelImage.refreshOutput();
 }
 
-function toggleVisibility(id: number): void {
-    const label = activeLabels.find((item) => item.id === id);
+async function toggleVisibility(id: number): Promise<void> {
+    const label = activeLabels.find(
+        (item) => item.id === id,
+    );
 
     if (!label) {
         return;
     }
 
     label.visible = !label.visible;
+
+    await tick();
+
+    canvas.document.labelImage.refreshOutput();
 }
 
 function selectLabel(id: number): void {
@@ -80,7 +100,7 @@ function selectLabel(id: number): void {
         dropTargetStyle: {},
     }}
     onconsider={handleLabelReorder}
-    onfinalize={handleLabelReorder}
+    onfinalize={handleLabelReorderFinished}
 >
     {#each activeLabels as label (label.id)}
         <Card
@@ -167,7 +187,7 @@ function selectLabel(id: number): void {
                         variant="outline"
                         onclick={(event: MouseEvent) => {
                             event.stopPropagation();
-                            toggleVisibility(label.id);
+                            void toggleVisibility(label.id);
                         }}
                     >
                         {#if label.visible}
@@ -182,7 +202,7 @@ function selectLabel(id: number): void {
                         variant="destructive"
                         onclick={(event: MouseEvent) => {
                             event.stopPropagation();
-                            removeLabel(label.id);
+                            void removeLabel(label.id);
                         }}
                     >
                         ×
