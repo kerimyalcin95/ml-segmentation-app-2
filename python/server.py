@@ -1,9 +1,12 @@
 from __future__ import annotations
 
 import asyncio
+import json
 
 import websockets
 from websockets.asyncio.server import ServerConnection
+
+from fastaiSegmentation import FastaiSegmentation
 
 
 class WebSocketServer:
@@ -15,22 +18,68 @@ class WebSocketServer:
         self.host = host
         self.port = port
 
-    async def handleConnection(self, websocket: ServerConnection) -> None:
-        print("Python: Received message")
+    async def handleConnection(
+        self,
+        websocket: ServerConnection,
+    ) -> None:
+        print("Python: Client connected")
 
         try:
             async for message in websocket:
-                # print(f"'{message}'", end="") for debugging
+                response = await self.processMessage(message)
+                await websocket.send(json.dumps(response))
 
-                await websocket.send(message)
+        except websockets.exceptions.ConnectionClosed:
+            print("Python: Connection closed")
 
-        except websockets.exceptions.ConnectionClosedOK as e:
-            print(
-                "Connection closed.\n"
-                f"Error message: {e.code}\n"
-                f"Reason message: {e.reason}",
-                end="",
-            )
+    async def processMessage(
+        self,
+        message: str,
+    ) -> dict:
+        try:
+            request = json.loads(message)
+        except json.JSONDecodeError:
+            return {
+                "action": "error",
+                "error": "Invalid JSON.",
+            }
+
+        action = request.get("action")
+
+        if action == "test":
+            return {
+                "action": "test-success",
+            }
+
+        if action == "train":
+            return await self.train(request)
+
+        return {
+            "action": "error",
+            "error": f"Unknown action: {action}",
+        }
+
+    async def train(
+        self,
+        request: dict,
+    ) -> dict:
+        segmentation = FastaiSegmentation(
+            dataset_path=request["datasetPath"],
+            model_path=request["modelPath"],
+            batch_size=request["batchSize"],
+            num_workers=request["numWorkers"],
+        )
+
+        await asyncio.to_thread(
+            segmentation.train,
+            request["epochs"],
+        )
+
+        return {
+            "success": True,
+            "action": "train",
+            "modelPath": request["modelPath"],
+        }
 
     async def start(self) -> None:
         async with websockets.serve(
@@ -38,7 +87,11 @@ class WebSocketServer:
             self.host,
             self.port,
         ):
-            print(f"Python: Listening on ws://{self.host}:{self.port}")
+            print(
+                f"Python: Listening on ws://"
+                f"{self.host}:{self.port}"
+            )
+
             await asyncio.Future()
 
 

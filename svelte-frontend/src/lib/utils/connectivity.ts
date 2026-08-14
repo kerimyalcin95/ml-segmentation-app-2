@@ -20,38 +20,74 @@ export function setupConnectivity() {
     const retry = setInterval(() => {
 
         if (!firstReceived) {
-            electronAPI.log("FE: Sending test message");
-            electronAPI.sendToServer("Test message received");
+
+            electronAPI.log(
+                "FE: Sending test message",
+            );
+
+            electronAPI.sendToServer(
+                JSON.stringify({
+                    action: "test",
+                }),
+            );
 
             if (!firstAttempt) {
-                electronAPI.log("FE: Retrying to send test message");
+                electronAPI.log(
+                    "FE: Retrying to send test message",
+                );
             }
         }
 
         firstAttempt = false;
-        
-    }, 1000);
 
-    const unsubscribe = electronAPI.subscribeServerMessages((msg: string) => {
+    }, 5000);
 
-        if (!firstReceived) {
-            firstReceived = true;
-            clearInterval(retry);
+    const unsubscribe =
+        electronAPI.subscribeServerMessages(
+            (msg: string) => {
 
-            electronAPI.log("FE: " + msg);
-            electronAPI.log("FE: Connection between Electron and Python server successful");
+                if (firstReceived) {
+                    electronAPI.log(
+                        "FE: Server message received",
+                    );
+                    return;
+                }
 
-            let state = parseInt(msg) || 0;
+                let response: unknown;
 
-            if (state === 0) {
-                state = 1;
-            }
+                try {
+                    response = JSON.parse(msg);
+                } catch {
+                    electronAPI.log(
+                        "FE: Invalid server response",
+                    );
+                    return;
+                }
 
-            isOnline.set(state);
-        } else {
-            electronAPI.log("FE: Server message received");
-        }
-    });
+                if (
+                    typeof response !== "object" ||
+                    response === null ||
+                    !("action" in response) ||
+                    response.action !== "test-success"
+                ) {
+                    return;
+                }
+
+                firstReceived = true;
+                clearInterval(retry);
+
+                electronAPI.log(
+                    "FE: " + msg,
+                );
+
+                electronAPI.log(
+                    "FE: Connection between Electron " +
+                    "and Python server successful",
+                );
+
+                isOnline.set(1);
+            },
+        );
 
     return () => {
         clearInterval(retry);
