@@ -34,8 +34,6 @@ Train segmentation models with labeled images, reference images and live termina
 
 ![Labeling Mode](snapshots/snapshot-3.png)
 
-<div align="center">
-
 ## Table of Contents
 
 - [Segmentation App 2.0.0-alpha.10](#segmentation-app-200-alpha10)
