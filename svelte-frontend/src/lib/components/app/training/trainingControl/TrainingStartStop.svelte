@@ -11,7 +11,7 @@ function startTraining(): void {
         return;
     }
 
-    if (!sessionStore.training.datasetPath) {
+    if (!sessionStore.training.configured) {
         return;
     }
 
@@ -20,8 +20,12 @@ function startTraining(): void {
     window.electronAPI.sendToServer(
         JSON.stringify({
             action: 'train',
-            datasetPath:
-                sessionStore.training.datasetPath,
+            imagePath:
+                sessionStore.training.imagePath,
+            labelImagePath:
+                sessionStore.training.labelImagePath,
+            labelPath:
+                sessionStore.training.labelPath,
             modelPath:
                 sessionStore.training.modelPath,
             batchSize:
@@ -41,7 +45,7 @@ function startTraining(): void {
         onclick={startTraining}
         disabled={
             sessionStore.training.running ||
-            !sessionStore.training.datasetPath
+            !sessionStore.training.configured
         }
     >
         <PlayIcon weight="bold" />

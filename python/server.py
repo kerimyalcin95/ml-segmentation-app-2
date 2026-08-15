@@ -64,21 +64,22 @@ class WebSocketServer:
         request: dict,
     ) -> dict:
         segmentation = FastaiSegmentation(
-            dataset_path=request["datasetPath"],
+            image_path=request["imagePath"],
+            label_image_path=["labelImagePath"],
+            label_path=request["labelPath"],
             model_path=request["modelPath"],
             batch_size=request["batchSize"],
             num_workers=request["numWorkers"],
+            epochs=request["epochs"]
         )
 
         await asyncio.to_thread(
-            segmentation.train,
-            request["epochs"],
+            segmentation.train
         )
 
         return {
             "success": True,
-            "action": "train",
-            "modelPath": request["modelPath"],
+            "action": "train"
         }
 
     async def start(self) -> None:

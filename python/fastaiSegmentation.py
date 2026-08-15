@@ -7,23 +7,28 @@ class FastaiSegmentation:
 
     def __init__(
         self,
-        dataset_path=".",
-        model_path="model/resnet32_336x336_defaultMaterial.pkl",
+        image_path="./image",
+        image_label_path="./label",
+        label_path="./labels.json",
+        model_path="model/resnet34_224x224.pkl",
         batch_size=8,
         num_workers=0,
+        epochs=6,
     ):
-        self.dataset_path = fastai_vision.Path(dataset_path)
+        self.image_path = fastai_vision.Path(image_path)
+        self.image_label_path = fastai_vision.Path(image_label_path)
+        self.label_path = fastai_vision.Path(label_path)
         self.model_path = fastai_vision.Path(model_path)
         self.batch_size = batch_size
         self.num_workers = num_workers
+        self.epochs = epochs
 
         self.learner = None
 
     def _label_func(self, filename):
         """Return the segmentation mask path for an image."""
         return (
-            self.dataset_path
-            / "label"
+            self.image_label_path
             / f"{filename.stem}{filename.suffix}"
         )
 
@@ -35,7 +40,7 @@ class FastaiSegmentation:
         )
 
         image_files = fastai_vision.get_image_files(
-            self.dataset_path / "image"
+            self.image_path
         )
 
         return fastai_vision.SegmentationDataLoaders.from_label_func(
@@ -53,16 +58,16 @@ class FastaiSegmentation:
 
         self.learner = fastai_vision.unet_learner(
             dataloaders,
-            fastai_vision.resnet34,
+            fastai_vision.resnet34
         )
 
         return self.learner
 
-    def train(self, epochs=6):
+    def train(self):
         """Train the segmentation model and save it."""
         self._create_learner()
 
-        self.learner.fine_tune(epochs)
+        self.learner.fine_tune(self.epochs)
 
         fastai_vision.save_model(
             file=self.model_path,

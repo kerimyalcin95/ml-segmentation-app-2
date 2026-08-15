@@ -5,6 +5,7 @@ import Separator from '$lib/components/ui/separator/separator.svelte';
 import TrainingParameters from './TrainingParameters.svelte';
 import TrainingStartStop from './TrainingStartStop.svelte';
 import ModelControl from './ModelControl.svelte';
+import LabelControl from './LabelControl.svelte';
 </script>
 
 <Card class="h-min flex flex-col gap-4 py-4">
@@ -13,14 +14,18 @@ import ModelControl from './ModelControl.svelte';
             Training
         </span>
 
+        <LabelControl />
+
+        <Separator class="my-2" />
+
         <TrainingParameters />
 
         <Separator class="my-2" />
 
-        <TrainingStartStop />
+        <ModelControl />
 
         <Separator class="my-2" />
 
-        <ModelControl />
+        <TrainingStartStop />
     </div>
 </Card>

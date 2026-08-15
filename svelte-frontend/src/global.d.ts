@@ -70,6 +70,14 @@ declare global {
         readLabelImage(
             filePath: string,
         ): Promise<LabelImageData>;
+
+        showOpenDirectoryDialog(
+            defaultPath?: string,
+        ): Promise<string | null>;
+
+        showOpenModelDialog(
+            defaultPath?: string,
+        ): Promise<string | null>;
     }
 
     interface Window {

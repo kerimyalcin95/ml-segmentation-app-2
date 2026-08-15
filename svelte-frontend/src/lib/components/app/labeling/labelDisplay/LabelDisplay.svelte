@@ -92,7 +92,7 @@ function handleInput(event: Event): void {
                 <div class="flex items-center gap-2">
                     <Input
                         id="label-opacity"
-                        class="w-20 text-right"
+                        class="w-17 text-left"
                         type="number"
                         min="0"
                         max="100"

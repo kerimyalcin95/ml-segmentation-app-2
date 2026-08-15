@@ -22,15 +22,25 @@ class LabelingSession {
 }
 
 class TrainingSession {
-    datasetPath = $state('');
-    modelPath = $state('model/resnet34.pkl');
+    imagePath = $state('');
+    labelImagePath = $state('');
+    labelPath = $state('');
+    modelPath = $state('');
+    modelName = $state('');
+
+    configured = $derived(
+        !!this.imagePath &&
+        !!this.labelImagePath &&
+        !!this.labelPath &&
+        !!this.modelPath
+    );
+
     batchSize = $state(8);
     numWorkers = $state(0);
     epochs = $state(6);
 
     validationPercent = $state(20);
     seed = $state<number | undefined>(undefined);
-    codesPath = $state('codes.txt');
 
     architecture = $state('resnet34');
     pretrained = $state(true);

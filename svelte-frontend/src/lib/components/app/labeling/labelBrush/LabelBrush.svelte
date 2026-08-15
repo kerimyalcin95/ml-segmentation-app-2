@@ -46,7 +46,7 @@ function handleInput(event: Event) {
                 <div class="flex items-center gap-2">
                     <Input
                         id="brush-size"
-                        class="w-20 text-right"
+                        class="w-17 text-left"
                         type="number"
                         min="1"
                         max="512"

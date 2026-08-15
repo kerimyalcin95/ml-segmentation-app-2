@@ -721,6 +721,63 @@ export class IpcHandlers {
                 );
             },
         );
+
+        ipcMain.handle(
+            "show-open-directory-dialog",
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
+
+                const result =
+                    await dialog.showOpenDialog({
+
+                        ...(defaultPath && { defaultPath }),
+
+                        properties: ["openDirectory"],
+
+                    });
+
+                if (result.canceled) {
+                    return null;
+                }
+
+                return result.filePaths[0];
+
+            },
+        );
+
+        ipcMain.handle(
+            "show-open-model-dialog",
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
+
+                const result =
+                    await dialog.showOpenDialog({
+
+                        ...(defaultPath && { defaultPath }),
+
+                        properties: ["openFile"],
+
+                        filters: [
+                            {
+                                name: "Model Files",
+                                extensions: ["pkl"],
+                            },
+                        ],
+
+                    });
+
+                if (result.canceled) {
+                    return null;
+                }
+
+                return result.filePaths[0];
+
+            },
+        );
     }
 
 }

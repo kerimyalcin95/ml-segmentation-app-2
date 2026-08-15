@@ -151,4 +151,20 @@ contextBridge.exposeInMainWorld('electronAPI', {
             'read-label-image',
             filePath,
         ),
+
+    showOpenDirectoryDialog: (
+        defaultPath?: string,
+    ) =>
+        ipcRenderer.invoke(
+            "show-open-directory-dialog",
+            defaultPath,
+        ),
+
+    showOpenModelDialog: (
+        defaultPath?: string,
+    ) =>
+        ipcRenderer.invoke(
+            "show-open-model-dialog",
+            defaultPath,
+        ),
 });

@@ -58,6 +58,14 @@ export interface ElectronAPI {
     readLabelImage: (
         filePath: string,
     ) => Promise<LabelImageData>;
+
+    showOpenDirectoryDialog: (
+        defaultPath?: string,
+    ) => Promise<string | null>;
+
+    showOpenModelDialog: (
+        defaultPath?: string,
+    ) => Promise<string | null>;
 }
 
 export interface SaveImageDialogResult {

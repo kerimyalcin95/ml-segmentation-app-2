@@ -7,6 +7,7 @@ import * as ToggleGroup from '$lib/components/ui/toggle-group';
 import FolderOpenIcon from 'phosphor-svelte/lib/FolderOpenIcon';
 
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import path from 'node:path';
 
 let modelMode = $state<'new' | 'existing'>(
     sessionStore.training.trainExistingModel ? 'existing' : 'new',
@@ -15,41 +16,118 @@ let modelMode = $state<'new' | 'existing'>(
 let lastMode: 'new' | 'existing' = 'new';
 
 function onValueChange(value: string) {
-    if (value == '') {
+    if (value === '') {
         modelMode = lastMode;
-    } else {
-        lastMode = modelMode;
+        return;
     }
 
-    sessionStore.training.trainExistingModel = (modelMode === 'existing')
+    if (value !== 'new' && value !== 'existing') {
+        return;
+    }
+
+    lastMode = value;
+    modelMode = value;
+    sessionStore.training.trainExistingModel = value === 'existing';
+}
+
+async function selectModelPath(): Promise<void> {
+    if (modelMode === 'new') {
+        const path = await window.electronAPI.showOpenDirectoryDialog(
+            sessionStore.training.modelPath,
+        );
+
+        if (path !== null) {
+            sessionStore.training.modelPath = path;
+        }
+
+        return;
+    }
+
+    const path = await window.electronAPI.showOpenModelDialog(
+        sessionStore.training.modelPath,
+    );
+
+    if (path !== null) {
+        sessionStore.training.modelPath = path;
+    }
+}
+
+function onModelFileInput(
+    event: Event & {
+        currentTarget: EventTarget & HTMLInputElement;
+    },
+): void {
+    const value = event.currentTarget.value;
+
+    sessionStore.training.modelPath = path.join(
+        sessionStore.training.modelPath,
+        value,
+    );
 }
 
 $effect(() => {
-    sessionStore.training.trainExistingModel = (modelMode === 'existing')
+    sessionStore.training.trainExistingModel = modelMode === 'existing';
 });
 </script>
 
 <div class="flex flex-col gap-3">
-    <div class="flex flex-col gap-1">
-        <Label for="training-model-path">Model Path</Label>
+    {#if modelMode === 'new'}
+        <div class="flex flex-col gap-1">
+            <Label for="training-model-path">Model Path</Label>
 
-        <div class="flex items-center gap-2">
+            <div class="flex items-center gap-2">
+                <Input
+                    id="training-model-path"
+                    class="flex-1"
+                    bind:value={sessionStore.training.modelPath}
+                    placeholder="./model/"
+                    disabled={sessionStore.training.running}
+                />
+
+                <Button
+                    size="icon"
+                    disabled={sessionStore.training.running}
+                    onclick={selectModelPath}
+                >
+                    <FolderOpenIcon weight="bold" />
+                </Button>
+            </div>
+        </div>
+
+        <div class="flex flex-col gap-1">
+            <Label for="training-model-name">Model Name</Label>
+
             <Input
-                id="training-model-path"
-                class="flex-1 "
-                bind:value={sessionStore.training.modelPath}
-                placeholder="Model file"
+                id="training-model-name"
+                bind:value={sessionStore.training.modelName}
+                placeholder="resnet34_224x224.pkl"
                 disabled={sessionStore.training.running}
             />
-
-            <Button
-                size="icon"
-                disabled={sessionStore.training.running}
-            >
-                <FolderOpenIcon weight="bold" />
-            </Button>
         </div>
-    </div>
+    {:else}
+        <div class="flex flex-col gap-1">
+            <Label for="training-model-file">Model File</Label>
+
+            <div class="flex items-center gap-2">
+                <Input
+                    id="training-model-file"
+                    class="flex-1"
+                    bind:value={sessionStore.training.modelPath}
+                    oninput={onModelFileInput}
+                    placeholder="./model/resnet34_224x224.pkl"
+                    disabled={sessionStore.training.running}
+                />
+
+                <Button
+                    size="icon"
+                    disabled={sessionStore.training.running}
+                    onclick={selectModelPath}
+                >
+                    <FolderOpenIcon weight="bold" />
+                </Button>
+            </div>
+        </div>
+    {/if}
 
     <ToggleGroup.Root
         type="single"
