@@ -57,33 +57,16 @@ class FastaiSegmentation:
             )
         )
 
-        print(
-            "Python: Training batches:",
-            len(dataloaders.train),
-        )
-        print(
-            "Python: Validation batches:",
-            len(dataloaders.valid),
-        )
-
         return dataloaders
 
     def _create_learner(self):
         """Create the fastai U-Net learner."""
         dataloaders = self._create_dataloaders()
 
-        print("Python: Creating ResNet34")
-
-        model = fastai_vision.resnet34()
-
-        print("Python: ResNet34 created")
-
         self.learner = fastai_vision.unet_learner(
             dataloaders,
             fastai_vision.resnet34,
         )
-
-        print("Python: Learner created")
 
         return self.learner
 
