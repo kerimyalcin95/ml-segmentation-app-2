@@ -24,8 +24,10 @@ export class PythonServer {
             return;
         }
 
-        const process = spawn("py", [
-            "-3.12",
+        const python = this.getPythonCommand();
+
+        const process = spawn(python.command, [
+            ...python.args,
             "-u",
             this.pythonPath,
         ]);
@@ -112,8 +114,23 @@ export class PythonServer {
                         new Error(
                             "Required Python packages are missing.\n" +
                             "Please install the required packages for Python 3.12.\n" +
-                            "For more information see\n" + 
+                            "For more information see\n" +
                             "https://github.com/kerimyalcin95/ml-segmentation-app-2#install-python-packages"
+                        )
+                    );
+
+                    return;
+                }
+
+                if (
+                    output.includes("address already in use") ||
+                    output.includes("winerror 10048") ||
+                    output.includes("only one usage of each socket address")
+                ) {
+                    fail(
+                        new Error(
+                            "The Python server could not start because port 56767 is already in use.\n" +
+                            "Please close any other instance of ML-Segmentation and try again."
                         )
                     );
 
@@ -130,6 +147,31 @@ export class PythonServer {
         });
 
         await this.connect();
+    }
+
+    private getPythonCommand(): {
+        command: string;
+        args: string[];
+    } {
+        switch (process.platform) {
+            case "win32":
+                return {
+                    command: "py",
+                    args: ["-3.12"],
+                };
+
+            case "linux":
+            case "darwin":
+                return {
+                    command: "python3.12",
+                    args: [],
+                };
+
+            default:
+                throw new Error(
+                    `Unsupported operating system: ${process.platform}`,
+                );
+        }
     }
 
     public async connect(
