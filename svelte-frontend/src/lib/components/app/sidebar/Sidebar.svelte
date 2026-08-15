@@ -1,4 +1,3 @@
-<!-- svelte-frontend/src/lib/components/app/sidebar/Sidebar.svelte -->
 <script lang="ts">
 import { Card } from '$lib/components/ui/card';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
@@ -14,6 +13,10 @@ import LabelFileControl from '$lib/components/app/labeling/labelFileControl/Labe
 import LabelBrush from '$lib/components/app/labeling/labelBrush/LabelBrush.svelte';
 import LabelLayer from '$lib/components/app/labeling/labelLayer/LabelLayer.svelte';
 import LabelDisplay from '$lib/components/app/labeling/labelDisplay/LabelDisplay.svelte';
+
+import TrainingControl from '$lib/components/app/training/trainingControl/TrainingControl.svelte';
+import DataLoader from '$lib/components/app/training/dataloader/DataLoader.svelte';
+import Learner from '$lib/components/app/training/learner/Learner.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -31,14 +34,17 @@ let scrollY = $state(0);
 let viewportHeight = $state(0);
 let contentHeight = $state(0);
 
-const maxScroll = $derived(Math.max(0, contentHeight - viewportHeight));
+const maxScroll = $derived(
+    Math.max(0, contentHeight - viewportHeight),
+);
 
 let resizeObserver: ResizeObserver | undefined;
 
 $effect(() => {
     if (!viewport) return;
 
-    const content = viewport.firstElementChild as HTMLElement | null;
+    const content =
+        viewport.firstElementChild as HTMLElement | null;
 
     if (!content) return;
 
@@ -66,18 +72,26 @@ function updateSizes() {
 
     viewportHeight = viewport.clientHeight;
 
-    const content = viewport.firstElementChild as HTMLElement | null;
+    const content =
+        viewport.firstElementChild as HTMLElement | null;
 
-    contentHeight = content?.getBoundingClientRect().height ?? 0;
+    contentHeight =
+        content?.getBoundingClientRect().height ?? 0;
 
     scrollY = Math.max(
         0,
-        Math.min(scrollY, Math.max(0, contentHeight - viewportHeight)),
+        Math.min(
+            scrollY,
+            Math.max(0, contentHeight - viewportHeight),
+        ),
     );
 }
 
 function handleScroll(value: number) {
-    scrollY = Math.max(0, Math.min(maxScroll, value));
+    scrollY = Math.max(
+        0,
+        Math.min(maxScroll, value),
+    );
 }
 
 function handleWheel(event: WheelEvent) {
@@ -125,25 +139,38 @@ function handleMouseMove() {
             "
         >
             {#if sessionStore.mode === 'editing'}
-                <h2 class="text-md font-bold mb-3">Editing</h2>
+                <h2 class="text-md font-bold mb-3">
+                    Editing
+                </h2>
 
                 <ImageFileControl {canvas} />
                 <ImageFilter {canvas} />
                 <ImageTransform {canvas} />
                 <ImageGeometry {canvas} />
+
             {:else if sessionStore.mode === 'labeling'}
-                <h2 class="text-md font-bold mb-3">Labeling</h2>
+                <h2 class="text-md font-bold mb-3">
+                    Labeling
+                </h2>
 
                 <LabelFileControl {canvas} />
                 <LabelBrush {canvas} />
                 <LabelLayer {canvas} />
                 <LabelDisplay {canvas} />
-            {:else if sessionStore.mode === 'training'}
-                <h2 class="text-md font-bold mb-3">Training</h2>
 
-                <Card class="h-min flex flex-col gap-4"></Card>
+            {:else if sessionStore.mode === 'training'}
+                <h2 class="text-md font-bold mb-3">
+                    Training
+                </h2>
+
+                <TrainingControl />
+                <DataLoader />
+                <Learner />
+
             {:else if sessionStore.mode === 'prediction'}
-                <h2 class="text-md font-bold mb-3">Prediction</h2>
+                <h2 class="text-md font-bold mb-3">
+                    Prediction
+                </h2>
 
                 <Card class="h-min flex flex-col gap-4"></Card>
             {/if}

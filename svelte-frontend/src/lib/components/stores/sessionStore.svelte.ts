@@ -21,6 +21,23 @@ class LabelingSession {
     labelImageLoadDirectory = $state<string>();
 }
 
+class TrainingSession {
+    datasetPath = $state('');
+    modelPath = $state('model/resnet34.pkl');
+    batchSize = $state(8);
+    numWorkers = $state(0);
+    epochs = $state(6);
+
+    validationPercent = $state(20);
+    seed = $state<number | undefined>(undefined);
+    codesPath = $state('codes.txt');
+
+    architecture = $state('resnet34');
+    pretrained = $state(true);
+
+    running = $state(false);
+}
+
 class SessionStore {
     mode = $state<Mode>('editing');
 
@@ -29,6 +46,7 @@ class SessionStore {
 
     editing = new EditingSession();
     labeling = new LabelingSession();
+    training = new TrainingSession();
 }
 
 export const sessionStore = new SessionStore();

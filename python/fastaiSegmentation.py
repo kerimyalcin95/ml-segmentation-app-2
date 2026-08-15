@@ -23,8 +23,8 @@ class FastaiSegmentation:
         """Return the segmentation mask path for an image."""
         return (
             self.dataset_path
-            / "labels"
-            / f"{filename.stem}_P{filename.suffix}"
+            / "label"
+            / f"{filename.stem}{filename.suffix}"
         )
 
     def _create_dataloaders(self):
@@ -35,7 +35,7 @@ class FastaiSegmentation:
         )
 
         image_files = fastai_vision.get_image_files(
-            self.dataset_path / "images"
+            self.dataset_path / "image"
         )
 
         return fastai_vision.SegmentationDataLoaders.from_label_func(
