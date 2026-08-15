@@ -1,6 +1,9 @@
 export interface ElectronAPI {
     subscribeServerMessages: (callback: (message: string) => void) => () => void;
     sendToServer: (message: string) => void;
+    subscribePythonServerErrors: (
+        callback: (message: string) => void,
+    ) => () => void;
 
     log: (...args: unknown[]) => void;
     onTerminalData: (

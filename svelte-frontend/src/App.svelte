@@ -10,9 +10,13 @@ import Statusbar from '$lib/components/app/Statusbar.svelte';
 import WorkspaceView from '$lib/components/app/WorkspaceView.svelte';
 import type { WorkspaceViewMode } from '$lib/types/workspace';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 
 let canvas = $state<CanvasManager>();
 let workspaceViewMode = $state<WorkspaceViewMode>('canvas');
+
+let pythonError = $state('');
+let pythonErrorOpen = $state(false);
 
 $effect(() => {
     document.documentElement.dataset.mode = sessionStore.mode;
@@ -21,19 +25,31 @@ $effect(() => {
 onMount(() => {
     const darkThemeCleanup = darkThemeSetup();
 
+    const unsubscribePythonError =
+        window.electronAPI.subscribePythonServerErrors(
+            (message: string) => {
+                pythonError = message;
+                pythonErrorOpen = true;
+            },
+        );
+
     return () => {
         darkThemeCleanup();
+        unsubscribePythonError();
     };
 });
 </script>
 
 <div data-e2e="app" class="h-screen flex flex-col">
+
     <!-- Workspace -->
     <div class="flex-1 flex overflow-hidden min-h-0 min-w-0">
         {#if canvas}
             <Sidebar {canvas} />
         {/if}
+
         <Separator orientation="vertical" />
+
         <WorkspaceView
             bind:workspaceViewMode
             onCanvasReady={(canvasManager: CanvasManager) =>
@@ -43,3 +59,9 @@ onMount(() => {
 
     <Statusbar />
 </div>
+
+<MessageDialog
+    bind:open={pythonErrorOpen}
+    title="Python 3.12 Required"
+    message={pythonError}
+/>

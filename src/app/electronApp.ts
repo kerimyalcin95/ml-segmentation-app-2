@@ -77,7 +77,14 @@ export class ElectronApp {
                     this.consoleMirror.attach(this.window);
                     this.consoleMirror.install();
 
-                    await this.pythonServer.start();
+                    try {
+                        await this.pythonServer.start();
+                    } catch (error) {
+                        console.error(
+                            "Electron: Failed to start Python server:",
+                            error,
+                        );
+                    }
 
                     this.window.on("closed", () => {
                         this.window = undefined;
@@ -143,6 +150,19 @@ export class ElectronApp {
 
         this.pythonServer.onStderr = (chunk) => {
             this.consoleMirror.write(chunk.toString("utf8"));
+        };
+
+        this.pythonServer.onError = (error) => {
+            if (
+                this.window &&
+                !this.window.isDestroyed() &&
+                !this.window.webContents.isDestroyed()
+            ) {
+                this.window.webContents.send(
+                    "python-server-error",
+                    error.message,
+                );
+            }
         };
     }
 }

@@ -24,6 +24,28 @@ contextBridge.exposeInMainWorld('electronAPI', {
         console.log("Electron: Sending message to server");
         ipcRenderer.send('send-to-server', message);
     },
+    subscribePythonServerErrors: (
+        callback: (message: string) => void,
+    ) => {
+        const listener = (
+            _event: IpcRendererEvent,
+            message: string,
+        ) => {
+            callback(message);
+        };
+
+        ipcRenderer.on(
+            'python-server-error',
+            listener,
+        );
+
+        return () => {
+            ipcRenderer.removeListener(
+                'python-server-error',
+                listener,
+            );
+        };
+    },
 
     // enables the front-end to log over electron which in term forwarded to xterm
     log: (...args: unknown[]) => {

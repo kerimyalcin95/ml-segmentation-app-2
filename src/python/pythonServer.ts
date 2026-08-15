@@ -20,14 +20,14 @@ export class PythonServer {
     ) { }
 
     public async start(): Promise<void> {
-
         if (this.pythonProcess) {
             return;
         }
 
-        const process = spawn("python", [
+        const process = spawn("py", [
+            "-3.12",
             "-u",
-            this.pythonPath
+            this.pythonPath,
         ]);
 
         this.pythonProcess = process;
@@ -35,9 +35,23 @@ export class PythonServer {
         console.log("Electron: Server started");
 
         await new Promise<void>((resolve, reject) => {
+            let stderr = "";
+            let settled = false;
+
+            const fail = (error: Error): void => {
+                if (settled) {
+                    return;
+                }
+
+                settled = true;
+                this.pythonProcess = undefined;
+
+                this.onError?.(error);
+
+                reject(error);
+            };
 
             process.stdout.on("data", (data: Buffer) => {
-
                 globalThis.process.stdout.write(data);
 
                 this.onStdout?.(data);
@@ -45,35 +59,58 @@ export class PythonServer {
                 const output = data.toString();
 
                 if (output.includes("Listening on")) {
+                    settled = true;
                     resolve();
                 }
-
             });
 
             process.stderr.on("data", (data: Buffer) => {
-
                 globalThis.process.stderr.write(data);
 
                 this.onStderr?.(data);
 
+                stderr += data.toString();
             });
 
-            process.once("error", reject);
+            process.once("error", (error) => {
+                fail(error);
+            });
 
             process.once("exit", (code) => {
-
                 console.log("Python: exited with code", code);
 
                 this.pythonProcess = undefined;
 
-                reject(
+                if (settled) {
+                    return;
+                }
+
+                const output = stderr.toLowerCase();
+
+                if (
+                    output.includes("no runtime installed") ||
+                    output.includes("requested python version") ||
+                    output.includes("not installed") ||
+                    output.includes("could not be found")
+                ) {
+                    fail(
+                        new Error(
+                            "Python 3.12 is required to run ML-Segmentation.\n" +
+                            "Download Python 3.12.10:\n" +
+                            "https://www.python.org/downloads/release/python-31210/"
+                        )
+                    );
+
+                    return;
+                }
+
+                fail(
                     new Error(
-                        `Electron: Server exited before becoming ready (code ${String(code)}).`
+                        stderr.trim() ||
+                        `Python server exited before becoming ready (code ${String(code)}).`
                     )
                 );
-
             });
-
         });
 
         await this.connect();
