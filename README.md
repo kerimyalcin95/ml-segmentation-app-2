@@ -108,8 +108,9 @@ In future releases the python packages will be installed directly from the app.
 
 ### How to Install the Release
 
-- Download and install [Python](https://www.python.org/downloads/). During installation please **disable** the `MAX_PATH` limit.  
-- Download the latest release from GitHub and place it in your Desktop folder. Make sure to download both the compiled application binary (named according to the format ${productName}-${version}-${arch}) and the compressed source archive. The binary is required to install and run the application, while the source files are needed for the Python package installation steps.  
+- Download and install [Python 3.12.10](https://www.python.org/downloads/release/python-31210/). **Python 3.12.10 is required due to compatibility requirements with fastai.** During installation, please **disable** the `MAX_PATH` limit.
+- Verify that the correct Python version is installed by running `py -3.12 --version`. The output should be `Python 3.12.10`.
+- Download the latest release from GitHub and place it in your Desktop folder. Make sure to download both the compiled application binary (named according to the format `${productName}-${version}-${arch}`) and the compressed source archive. The binary is required to install and run the application, while the source files are needed for the Python package installation steps.  
 - The installation procedure depends on your operating system. Follow the platform-specific instructions: run the installer on Windows, move the application to the appropriate application directory on macOS, or follow the recommended installation steps for your Linux distribution.
 - Unzip the source files into your `Desktop` folder.  
 - Follow the instructions in [Install Python packages](#install-python-packages)
@@ -330,18 +331,15 @@ python -m pip install --upgrade pip
 Install the required packages:
 
 ```bash
-pip install websockets opencv-python fastai
+pip install websockets fastai
 ```
 
 Alternatively, install packages individually:
 
 ```bash
 pip install websockets
-pip install opencv-python
 pip install fastai
 ```
-
-> Note: The current development version of the project only requires the `websockets` package.
 
 To remove all installed packages from the current Python environment:
 
@@ -368,7 +366,7 @@ python3 -m pip install --upgrade pip
 Install the required packages:
 
 ```bash
-pip3 install websockets opencv-python fastai
+pip3 install websockets fastai
 ```
 
 **macOS:**
@@ -388,7 +386,7 @@ python3 -m pip install --upgrade pip
 Install the required packages:
 
 ```bash
-pip3 install websockets opencv-python fastai
+pip3 install websockets fastai
 ```
 
 To remove all installed packages from the current Python environment:
