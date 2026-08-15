@@ -277,28 +277,28 @@ cd ml-segmentation-app-2
 
 ### Install Node.js and Python
 
-Install [Node.js](https://nodejs.org/en/download) and [Python](https://www.python.org/downloads/).
+Install [Node.js](https://nodejs.org/en/download) and [Python](https://www.python.org/downloads/release/python-31210/).
 
 **Windows (console):**
 
 ```bash
 winget install OpenJS.NodeJS.LTS
-winget install Python.Python.3
 ```
 
-**Linux (Ubuntu/Debian):**
-
-```bash
-sudo apt update
-sudo apt install nodejs npm python3 python3-pip
-```
+Install [Python 3.12.10](https://www.python.org/downloads/release/python-31210/).
 
 Verify installation:
 
 ```bash
 node --version
 npm --version
-python --version
+py -3.12 --version
+```
+
+The Python version should be:
+
+```text
+Python 3.12.10
 ```
 
 ### Install Node.js packages
@@ -322,78 +322,99 @@ Install the required Python dependencies using `pip`.
 
 **Windows (console):**
 
-Update `pip` before installing packages:
+Update `pip` for Python 3.12:
 
 ```bash
-python -m pip install --upgrade pip
+py -3.12 -m pip install --upgrade pip
 ```
 
-Install the required packages:
+Install the required packages for Python 3.12:
 
 ```bash
-pip install websockets fastai
+py -3.12 -m pip install websockets fastai
 ```
 
 Alternatively, install packages individually:
 
 ```bash
-pip install websockets
-pip install fastai
+py -3.12 -m pip install websockets
+py -3.12 -m pip install fastai
 ```
 
-To remove all installed packages from the current Python environment:
+To remove all installed packages from the Python 3.12 environment:
 
 ```bash
-pip freeze > packages.txt
-pip uninstall -r packages.txt -y
+py -3.12 -m pip freeze > packages.txt
+py -3.12 -m pip uninstall -r packages.txt -y
 ```
 
 **Linux (Ubuntu/Debian):**
 
-Install Python and `pip` if not already installed:
+Install Python 3.12 and `pip` if not already installed:
 
 ```bash
 sudo apt update
-sudo apt install python3 python3-pip
+sudo apt install python3.12 python3.12-venv python3-pip
 ```
 
 Update `pip`:
 
 ```bash
-python3 -m pip install --upgrade pip
+python3.12 -m pip install --upgrade pip
 ```
 
 Install the required packages:
 
 ```bash
-pip3 install websockets fastai
+python3.12 -m pip install websockets fastai
+```
+
+Alternatively, install packages individually:
+
+```bash
+python3.12 -m pip install websockets
+python3.12 -m pip install fastai
+```
+
+To remove all installed packages from the Python 3.12 environment:
+
+```bash
+python3.12 -m pip freeze > packages.txt
+python3.12 -m pip uninstall -r packages.txt -y
 ```
 
 **macOS:**
 
-Install Python using [Homebrew](https://brew.sh/) if not already installed:
+Install Python 3.12 using [Homebrew](https://brew.sh/) if not already installed:
 
 ```bash
-brew install python
+brew install python@3.12
 ```
 
 Update `pip`:
 
 ```bash
-python3 -m pip install --upgrade pip
+python3.12 -m pip install --upgrade pip
 ```
 
 Install the required packages:
 
 ```bash
-pip3 install websockets fastai
+python3.12 -m pip install websockets fastai
 ```
 
-To remove all installed packages from the current Python environment:
+Alternatively, install packages individually:
 
 ```bash
-pip3 freeze > packages.txt
-pip3 uninstall -r packages.txt -y
+python3.12 -m pip install websockets
+python3.12 -m pip install fastai
+```
+
+To remove all installed packages from the Python 3.12 environment:
+
+```bash
+python3.12 -m pip freeze > packages.txt
+python3.12 -m pip uninstall -r packages.txt -y
 ```
 
 ### npm Commands Overview
