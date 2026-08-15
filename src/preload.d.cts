@@ -66,6 +66,10 @@ export interface ElectronAPI {
     showOpenModelDialog: (
         defaultPath?: string,
     ) => Promise<string | null>;
+
+    showSaveModelDialog: (
+        defaultPath?: string,
+    ) => Promise<string | null>;
 }
 
 export interface SaveImageDialogResult {

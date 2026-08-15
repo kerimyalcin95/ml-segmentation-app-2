@@ -46,13 +46,6 @@ export function setupConnectivity() {
         electronAPI.subscribeServerMessages(
             (msg: string) => {
 
-                if (firstReceived) {
-                    electronAPI.log(
-                        "FE: Server message received",
-                    );
-                    return;
-                }
-
                 let response: unknown;
 
                 try {

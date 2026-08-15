@@ -63,23 +63,33 @@ class WebSocketServer:
         self,
         request: dict,
     ) -> dict:
-        segmentation = FastaiSegmentation(
-            image_path=request["imagePath"],
-            label_image_path=["labelImagePath"],
-            label_path=request["labelPath"],
-            model_path=request["modelPath"],
-            batch_size=request["batchSize"],
-            num_workers=request["numWorkers"],
-            epochs=request["epochs"]
-        )
+        try:
+            segmentation = FastaiSegmentation(
+                image_path=request["imagePath"],
+                label_image_path=request["labelImagePath"],
+                label_path=request["labelPath"],
+                model_path=request["modelPath"],
+                batch_size=request["batchSize"],
+                num_workers=request["numWorkers"],
+                epochs=request["epochs"],
+            )
 
-        await asyncio.to_thread(
-            segmentation.train
-        )
+            await asyncio.to_thread(
+                segmentation.train
+            )
+
+        except Exception as error:
+            print(
+                f"Python: Training failed: {error}"
+            )
+
+            return {
+                "action": "train-error",
+                "error": str(error),
+            }
 
         return {
-            "success": True,
-            "action": "train"
+            "action": "train-success",
         }
 
     async def start(self) -> None:

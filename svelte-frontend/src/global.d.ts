@@ -78,6 +78,10 @@ declare global {
         showOpenModelDialog(
             defaultPath?: string,
         ): Promise<string | null>;
+
+        showSaveModelDialog(
+            defaultPath?: string,
+        ): Promise<string | null>;
     }
 
     interface Window {

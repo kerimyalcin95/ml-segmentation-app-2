@@ -778,6 +778,47 @@ export class IpcHandlers {
 
             },
         );
+
+        ipcMain.handle(
+            "show-save-model-dialog",
+            async (
+                _event,
+                defaultPath?: string,
+            ) => {
+
+                const options: Electron.SaveDialogOptions = {
+                    title: "Save Model",
+                    defaultPath: "model.pkl",
+
+                    filters: [
+                        {
+                            name: "Model Files",
+                            extensions: ["pkl"],
+                        },
+                    ],
+                };
+
+                if (defaultPath) {
+                    options.defaultPath = path.join(
+                        defaultPath,
+                        "model.pkl",
+                    );
+                }
+
+                const result =
+                    await dialog.showSaveDialog(options);
+
+                if (
+                    result.canceled ||
+                    !result.filePath
+                ) {
+                    return null;
+                }
+
+                return result.filePath;
+
+            },
+        );
     }
 
 }

@@ -167,4 +167,12 @@ contextBridge.exposeInMainWorld('electronAPI', {
             "show-open-model-dialog",
             defaultPath,
         ),
+
+    showSaveModelDialog: (
+        defaultPath?: string,
+    ) =>
+        ipcRenderer.invoke(
+            "show-save-model-dialog",
+            defaultPath,
+        ),
 });

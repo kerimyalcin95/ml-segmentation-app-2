@@ -1,3 +1,4 @@
+import json
 import numpy as np
 import fastai.vision.all as fastai_vision
 
@@ -8,7 +9,7 @@ class FastaiSegmentation:
     def __init__(
         self,
         image_path="./image",
-        image_label_path="./label",
+        label_image_path="./label",
         label_path="./labels.json",
         model_path="model/resnet34_224x224.pkl",
         batch_size=8,
@@ -16,7 +17,7 @@ class FastaiSegmentation:
         epochs=6,
     ):
         self.image_path = fastai_vision.Path(image_path)
-        self.image_label_path = fastai_vision.Path(image_label_path)
+        self.label_image_path = fastai_vision.Path(label_image_path)
         self.label_path = fastai_vision.Path(label_path)
         self.model_path = fastai_vision.Path(model_path)
         self.batch_size = batch_size
@@ -25,41 +26,64 @@ class FastaiSegmentation:
 
         self.learner = None
 
-    def _label_func(self, filename):
-        """Return the segmentation mask path for an image."""
-        return (
-            self.image_label_path
-            / f"{filename.stem}{filename.suffix}"
-        )
-
     def _create_dataloaders(self):
         """Create the fastai segmentation dataloaders."""
-        codes = np.loadtxt(
-            self.dataset_path / "codes.txt",
-            dtype=str,
-        )
+        codes = self._create_codes()
 
         image_files = fastai_vision.get_image_files(
             self.image_path
         )
 
-        return fastai_vision.SegmentationDataLoaders.from_label_func(
-            self.dataset_path,
-            bs=self.batch_size,
-            fnames=image_files,
-            label_func=self._label_func,
-            codes=codes,
-            num_workers=self.num_workers,
+        label_image_path = self.label_image_path
+
+        def label_func(filename):
+            return (
+                label_image_path
+                / f"{filename.stem}{filename.suffix}"
+            )
+
+        fastai_vision.PILMask._open_args = {
+            "mode": "P",
+        }
+
+        dataloaders = (
+            fastai_vision.SegmentationDataLoaders.from_label_func(
+                self.image_path,
+                bs=self.batch_size,
+                fnames=image_files,
+                label_func=label_func,
+                codes=codes,
+                num_workers=self.num_workers,
+            )
         )
+
+        print(
+            "Python: Training batches:",
+            len(dataloaders.train),
+        )
+        print(
+            "Python: Validation batches:",
+            len(dataloaders.valid),
+        )
+
+        return dataloaders
 
     def _create_learner(self):
         """Create the fastai U-Net learner."""
         dataloaders = self._create_dataloaders()
 
+        print("Python: Creating ResNet34")
+
+        model = fastai_vision.resnet34()
+
+        print("Python: ResNet34 created")
+
         self.learner = fastai_vision.unet_learner(
             dataloaders,
-            fastai_vision.resnet34
+            fastai_vision.resnet34,
         )
+
+        print("Python: Learner created")
 
         return self.learner
 
@@ -67,7 +91,9 @@ class FastaiSegmentation:
         """Train the segmentation model and save it."""
         self._create_learner()
 
-        self.learner.fine_tune(self.epochs)
+        self.learner.fine_tune(
+            self.epochs
+        )
 
         fastai_vision.save_model(
             file=self.model_path,
@@ -102,3 +128,20 @@ class FastaiSegmentation:
         mask[mask == 1] = 255
 
         return mask
+
+    def _create_codes(self):
+        """Create fastai class codes from the labels JSON file."""
+        with self.label_path.open(
+            "r",
+            encoding="utf-8",
+        ) as file:
+            data = json.load(file)
+
+        return np.array(
+            ["Background"] +
+            [
+                label["name"]
+                for label in data["labels"]
+            ],
+            dtype=str,
+        )
