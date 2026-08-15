@@ -72,11 +72,18 @@ class FastaiSegmentation:
 
     def train(self):
         """Train the segmentation model and save it."""
+
+        print("fastai: Model Training Start.")
+        print("")
+
         self._create_learner()
 
         self.learner.fine_tune(
             self.epochs
         )
+
+        print("")
+        print("fastai: Saving model.")
 
         fastai_vision.save_model(
             file=self.model_path,
@@ -84,6 +91,9 @@ class FastaiSegmentation:
             with_opt=False,
             opt=None,
         )
+
+        print("fastai: Training Finish.")
+        print("")
 
         return self.learner
 
