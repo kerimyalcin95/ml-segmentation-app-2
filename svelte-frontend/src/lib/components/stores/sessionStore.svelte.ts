@@ -35,6 +35,8 @@ class TrainingSession {
     architecture = $state('resnet34');
     pretrained = $state(true);
 
+    trainExistingModel = $state(false);
+
     running = $state(false);
 }
 

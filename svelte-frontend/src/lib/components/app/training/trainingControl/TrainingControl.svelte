@@ -15,11 +15,11 @@ import ModelControl from './ModelControl.svelte';
 
         <TrainingParameters />
 
-        <Separator />
+        <Separator class="my-2" />
 
         <TrainingStartStop />
 
-        <Separator />
+        <Separator class="my-2" />
 
         <ModelControl />
     </div>

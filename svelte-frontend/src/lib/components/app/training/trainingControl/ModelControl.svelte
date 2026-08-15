@@ -2,45 +2,96 @@
 import { Button } from '$lib/components/ui/button';
 import { Input } from '$lib/components/ui/input';
 import { Label } from '$lib/components/ui/label';
+import * as ToggleGroup from '$lib/components/ui/toggle-group';
 
 import FolderOpenIcon from 'phosphor-svelte/lib/FolderOpenIcon';
-import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon';
 
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+
+let modelMode = $state<'new' | 'existing'>(
+    sessionStore.training.trainExistingModel ? 'existing' : 'new',
+);
+
+let lastMode: 'new' | 'existing' = 'new';
+
+function onValueChange(value: string) {
+    if (value == '') {
+        modelMode = lastMode;
+    } else {
+        lastMode = modelMode;
+    }
+
+    sessionStore.training.trainExistingModel = (modelMode === 'existing')
+}
+
+$effect(() => {
+    sessionStore.training.trainExistingModel = (modelMode === 'existing')
+});
 </script>
 
 <div class="flex flex-col gap-3">
-    <span class="text-sm font-medium">
-        Model
-    </span>
-
     <div class="flex flex-col gap-1">
-        <Label for="training-model-path">
-            Model Path
-        </Label>
+        <Label for="training-model-path">Model Path</Label>
 
-        <Input
-            id="training-model-path"
-            bind:value={sessionStore.training.modelPath}
-            placeholder="Model file"
-            disabled={sessionStore.training.running}
-        />
+        <div class="flex items-center gap-2">
+            <Input
+                id="training-model-path"
+                class="flex-1 "
+                bind:value={sessionStore.training.modelPath}
+                placeholder="Model file"
+                disabled={sessionStore.training.running}
+            />
+
+            <Button
+                size="icon"
+                disabled={sessionStore.training.running}
+            >
+                <FolderOpenIcon weight="bold" />
+            </Button>
+        </div>
     </div>
 
-    <Button
+    <ToggleGroup.Root
+        type="single"
+        bind:value={modelMode}
+        {onValueChange}
         disabled={sessionStore.training.running}
+        class="w-full mt-2 ring-1 ring-primary/50"
     >
-        <FolderOpenIcon weight="bold" />
-        Load Model
-    </Button>
+        <ToggleGroup.Item
+            value="new"
+            class="
+            flex-1
+            relative
+            pt-0.5
+            data-[state=on]:bg-primary/10
+            data-[state=on]:ring-1
+            data-[state=on]:ring-primary/70
+            data-[state=on]:ring-offset-0
+            data-[state=on]:z-11
+            data-[state=off]:hover:bg-primary/10
+            data-[state=off]:text-foreground/50
+        "
+        >
+            New Model
+        </ToggleGroup.Item>
 
-    <Button
-        disabled={
-            sessionStore.training.running ||
-            !sessionStore.training.modelPath
-        }
-    >
-        <FloppyDiskIcon weight="bold" />
-        Save Model
-    </Button>
+        <ToggleGroup.Item
+            value="existing"
+            class="
+            flex-1
+            relative
+            pt-0.5
+            data-[state=on]:bg-primary/10
+            data-[state=on]:ring-1
+            data-[state=on]:ring-primary/70
+            data-[state=on]:ring-offset-0
+            data-[state=on]:z-10
+            data-[state=off]:hover:bg-primary/10
+            data-[state=off]:text-foreground/50
+        "
+        >
+            Existing Model
+        </ToggleGroup.Item>
+    </ToggleGroup.Root>
 </div>

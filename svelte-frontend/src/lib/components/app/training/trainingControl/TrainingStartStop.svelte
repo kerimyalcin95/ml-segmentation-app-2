@@ -36,9 +36,6 @@ function startTraining(): void {
 </script>
 
 <div class="flex flex-col gap-2">
-    <span class="text-sm font-medium">
-        Training
-    </span>
 
     <Button
         onclick={startTraining}
