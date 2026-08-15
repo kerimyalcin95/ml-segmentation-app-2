@@ -104,6 +104,22 @@ export class PythonServer {
                     return;
                 }
 
+                if (
+                    output.includes("modulenotfounderror") ||
+                    output.includes("no module named")
+                ) {
+                    fail(
+                        new Error(
+                            "Required Python packages are missing.\n" +
+                            "Please install the required packages for Python 3.12.\n" +
+                            "For more information see\n" + 
+                            "https://github.com/kerimyalcin95/ml-segmentation-app-2#install-python-packages"
+                        )
+                    );
+
+                    return;
+                }
+
                 fail(
                     new Error(
                         stderr.trim() ||
