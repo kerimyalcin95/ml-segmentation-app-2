@@ -26,20 +26,22 @@ Semantic annotation with configurable labels, brush tools and layer management.
 
 <div align="center">
 
-## Terminal Output
+## Training Mode
 
-Live console output from the Electron app and Python server.
+Train segmentation models with labeled images, reference images and live terminal output.
 
 </div>
 
-![Terminal Output](snapshots/snapshot-terminal.png)
+![Labeling Mode](snapshots/snapshot-3.png)
+
+<div align="center">
 
 ## Table of Contents
 
 - [Segmentation App 2](#segmentation-app-2)
   - [Editing Mode](#editing-mode)
   - [Labeling Mode](#labeling-mode)
-  - [Terminal Output](#terminal-output)
+  - [Training Mode](#training-mode)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
   - [Architecture](#architecture)

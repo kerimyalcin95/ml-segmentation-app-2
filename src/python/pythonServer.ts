@@ -153,7 +153,7 @@ export class PythonServer {
         command: string;
         args: string[];
     } {
-        switch (process.platform) {
+        switch (globalThis.process.platform) {
             case "win32":
                 return {
                     command: "py",
@@ -169,7 +169,7 @@ export class PythonServer {
 
             default:
                 throw new Error(
-                    `Unsupported operating system: ${process.platform}`,
+                    `Unsupported operating system: ${globalThis.process.platform}`,
                 );
         }
     }
@@ -278,7 +278,6 @@ export class PythonServer {
     }
 
     public async stop(): Promise<void> {
-
         await this.disconnect();
 
         const process = this.pythonProcess;
@@ -289,9 +288,41 @@ export class PythonServer {
 
         this.pythonProcess = undefined;
 
+        if (process.killed) {
+            return;
+        }
+
+        if (globalThis.process.platform === "win32") {
+            await new Promise<void>((resolve) => {
+                const killer = spawn(
+                    "taskkill",
+                    [
+                        "/pid",
+                        String(process.pid),
+                        "/t",
+                        "/f",
+                    ],
+                    {
+                        stdio: "ignore",
+                        windowsHide: true,
+                    },
+                );
+
+                killer.once("exit", () => {
+                    resolve();
+                });
+
+                killer.once("error", () => {
+                    resolve();
+                });
+            });
+
+            return;
+        }
+
         process.kill();
 
-        await once(process, "exit");
+        await once(process, "exit").catch(() => undefined);
     }
 
     public send(message: string): void {
