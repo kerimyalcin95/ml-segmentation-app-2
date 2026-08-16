@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from threading import Event
 
 import websockets
 from websockets.asyncio.server import ServerConnection
@@ -15,16 +16,26 @@ class WebSocketServer:
         self.host = host
         self.port = port
 
+        self.training_cancel_event: Event | None = None
+        self.training_task: asyncio.Task[None] | None = None
+
     async def handleConnection(
-    self,
-    websocket: ServerConnection,
-) -> None:
+        self,
+        websocket: ServerConnection,
+    ) -> None:
         print("Python: Client connected")
 
         try:
             async for message in websocket:
-                response = await self.processMessage(message)
-                await websocket.send(json.dumps(response))
+                response = await self.processMessage(
+                    message,
+                    websocket,
+                )
+
+                if response is not None:
+                    await websocket.send(
+                        json.dumps(response)
+                    )
 
         except websockets.exceptions.ConnectionClosed:
             print("Python: Connection closed")
@@ -32,7 +43,8 @@ class WebSocketServer:
     async def processMessage(
         self,
         message: str,
-    ) -> dict:
+        websocket: ServerConnection,
+    ) -> dict | None:
         try:
             request = json.loads(message)
         except json.JSONDecodeError:
@@ -48,18 +60,53 @@ class WebSocketServer:
                 "action": "test-success",
             }
 
-        if action == "train":
-            return await self.train(request)
+        if action == "train-start":
+            return self.startTraining(
+                request,
+                websocket,
+            )
+
+        if action == "train-stop":
+            return self.stopTraining()
 
         return {
             "action": "error",
             "error": f"Unknown action: {action}",
         }
 
+    def startTraining(
+        self,
+        request: dict,
+        websocket: ServerConnection,
+    ) -> dict:
+        if self.training_task is not None:
+            return {
+                "action": "train-error",
+                "error": "Training is already running.",
+            }
+
+        cancel_event = Event()
+
+        self.training_cancel_event = cancel_event
+
+        self.training_task = asyncio.create_task(
+            self.train(
+                request,
+                websocket,
+                cancel_event,
+            )
+        )
+
+        return {
+            "action": "train-started",
+        }
+
     async def train(
         self,
         request: dict,
-    ) -> dict:
+        websocket: ServerConnection,
+        cancel_event: Event,
+    ) -> None:
         try:
             from fastaiSegmentation import FastaiSegmentation
 
@@ -71,24 +118,60 @@ class WebSocketServer:
                 batch_size=request["batchSize"],
                 num_workers=request["numWorkers"],
                 epochs=request["epochs"],
+                validationPercent=request["validationPercent"],
+                seed=request.get("seed"),
+                architecture=request["architecture"],
+                pretrained=request["pretrained"],
+                cancel_event=cancel_event,
             )
 
             await asyncio.to_thread(
                 segmentation.train
             )
 
-        except Exception as error:
-            print(
-                f"Python: Training failed: {error}"
-            )
+            if cancel_event.is_set():
+                response = {
+                    "action": "train-cancelled",
+                }
+            else:
+                response = {
+                    "action": "train-success",
+                }
 
-            return {
+        except Exception as error:
+            print("Python: Training failed.")
+
+            response = {
                 "action": "train-error",
                 "error": str(error),
             }
 
+        finally:
+            self.training_cancel_event = None
+            self.training_task = None
+
+        try:
+            await websocket.send(
+                json.dumps(response)
+            )
+        except websockets.exceptions.ConnectionClosed:
+            print(
+                "Python: Could not send training result."
+            )
+
+    def stopTraining(self) -> dict:
+        """Request cancellation of the active training job."""
+
+        if self.training_cancel_event is None:
+            return {
+                "action": "train-error",
+                "error": "No training is running.",
+            }
+
+        self.training_cancel_event.set()
+
         return {
-            "action": "train-success",
+            "action": "train-stop-requested",
         }
 
     async def start(self) -> None:
@@ -103,6 +186,7 @@ class WebSocketServer:
             )
 
             await asyncio.Future()
+
 
 async def main() -> None:
     server = WebSocketServer()

@@ -54,6 +54,12 @@ $effect(() => {
 
                 sessionStore.training.running = false;
                 trainingErrorDialogOpen = true;
+                return;
+            }
+
+            if (response.action === 'train-cancelled') {
+                sessionStore.training.running = false;
+                return;
             }
         },
     );
@@ -79,21 +85,36 @@ function startTraining(): void {
 
     window.electronAPI.sendToServer(
         JSON.stringify({
-            action: 'train',
-            imagePath:
-                sessionStore.training.imagePath,
-            labelImagePath:
-                sessionStore.training.labelImagePath,
-            labelPath:
-                sessionStore.training.labelPath,
-            modelPath:
-                sessionStore.training.modelPath,
-            batchSize:
-                sessionStore.training.batchSize,
-            numWorkers:
-                sessionStore.training.numWorkers,
-            epochs:
-                sessionStore.training.epochs,
+            action: 'train-start',
+
+            imagePath: sessionStore.training.imagePath,
+            labelImagePath: sessionStore.training.labelImagePath,
+            labelPath: sessionStore.training.labelPath,
+            modelPath: sessionStore.training.modelPath,
+
+            batchSize: sessionStore.training.batchSize,
+            numWorkers: sessionStore.training.numWorkers,
+            epochs: sessionStore.training.epochs,
+
+            validationPercent:
+                sessionStore.training.validationPercent,
+            seed: sessionStore.training.seed,
+            architecture:
+                sessionStore.training.architecture,
+            pretrained:
+                sessionStore.training.pretrained,
+        }),
+    );
+}
+
+function stopTraining(): void {
+    if (!sessionStore.training.running) {
+        return;
+    }
+
+    window.electronAPI.sendToServer(
+        JSON.stringify({
+            action: 'train-stop',
         }),
     );
 }
@@ -119,6 +140,7 @@ function startTraining(): void {
 
     <Button
         variant="destructive"
+        onclick={stopTraining}
         disabled={!sessionStore.training.running}
     >
         <StopIcon weight="bold" />
