@@ -3,15 +3,18 @@ import * as ToggleGroup from '$lib/components/ui/toggle-group';
 import { Card } from '$lib/components/ui/card';
 import type { Mode } from '$lib/types/mode';
 import {sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import * as localStorage from '$lib/utils/localStorage';
 
 let lastMode: Mode = 'editing';
 
-function onValueChange(value: string) {
+async function onValueChange(value: string) {
     if (value == '') {
         sessionStore.mode = lastMode;
     } else {
         lastMode = sessionStore.mode;
     }
+
+    await localStorage.save();
 }
 </script>
 

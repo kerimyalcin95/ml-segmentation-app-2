@@ -2,6 +2,7 @@ import { type Mode } from '$lib/types/mode';
 import { type ActiveLabel } from '$lib/types/label';
 import { type ActiveFilter } from '$lib/types/filter';
 import { type fastaiArch } from '$lib/types/training';
+import type { WorkspaceViewMode } from '$lib/types/workspace';
 
 class EditingSession {
     activeFilters = $state<ActiveFilter[]>([]);
@@ -27,7 +28,6 @@ class TrainingSession {
     labelImagePath = $state('');
     labelPath = $state('');
     modelPath = $state('');
-    modelName = $state('');
 
     configured = $derived(
         !!this.imagePath &&
@@ -53,6 +53,7 @@ class TrainingSession {
 
 class SessionStore {
     mode = $state<Mode>('editing');
+    viewMode = $state<WorkspaceViewMode>('canvas');
 
     hasLabelImage = $state(false);
     hasImage = $state(false);
@@ -63,6 +64,9 @@ class SessionStore {
 
     toJSON(): PersistedSession {
         return {
+            mode: this.mode,
+            viewMode: this.viewMode,
+
             editing: {
                 saveDirectory: this.editing.saveDirectory,
                 loadDirectory: this.editing.loadDirectory,
@@ -99,6 +103,13 @@ class SessionStore {
     }
 
     loadJSON(data: PersistedSession): void {
+        if (data.mode) {
+            this.mode = data.mode;
+        }
+
+        if (data.viewMode) {
+            this.viewMode = data.viewMode;
+        }
         const editing = data.editing;
 
         if (editing?.saveDirectory) {
@@ -198,6 +209,9 @@ class SessionStore {
 }
 
 export interface PersistedSession {
+    mode?: Mode;
+    viewMode?: WorkspaceViewMode;
+
     editing?: {
         saveDirectory?: string;
         loadDirectory?: string;
