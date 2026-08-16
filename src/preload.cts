@@ -7,6 +7,19 @@ contextBridge.exposeInMainWorld('versions', {
 });
 
 contextBridge.exposeInMainWorld('electronAPI', {
+    loadSession: () =>
+        ipcRenderer.invoke(
+            "load-session",
+        ),
+
+    saveSession: (
+        session: unknown,
+    ) =>
+        ipcRenderer.invoke(
+            "save-session",
+            session,
+        ),
+
     subscribeServerMessages: (callback: (message: string) => void) => {
 
         // After receiving message from server send as event

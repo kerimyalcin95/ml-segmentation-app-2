@@ -6,6 +6,7 @@ import { Label } from '$lib/components/ui/label';
 import FolderOpenIcon from 'phosphor-svelte/lib/FolderOpenIcon';
 
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import * as localStorage from '$lib/utils/localStorage';
 
 async function selectImagePath(): Promise<void> {
     const path = await window.electronAPI.showOpenDirectoryDialog(
@@ -14,6 +15,7 @@ async function selectImagePath(): Promise<void> {
 
     if (path !== null) {
         sessionStore.training.imagePath = path;
+        await localStorage.save();
     }
 }
 
@@ -24,6 +26,7 @@ async function selectLabelImagePath(): Promise<void> {
 
     if (path !== null) {
         sessionStore.training.labelImagePath = path;
+        await localStorage.save();
     }
 }
 
@@ -34,6 +37,7 @@ async function selectLabelPath(): Promise<void> {
 
     if (path !== null) {
         sessionStore.training.labelPath = path;
+        await localStorage.save();
     }
 }
 </script>

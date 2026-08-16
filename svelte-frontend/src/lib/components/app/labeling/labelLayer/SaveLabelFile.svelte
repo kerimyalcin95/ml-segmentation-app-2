@@ -5,6 +5,7 @@ import type { ActiveLabel } from '$lib/types/label';
 import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import { dirname } from '$lib/utils/path';
+import * as localStorage from '$lib/utils/localStorage';
 
 interface Props {
     activeLabels: ActiveLabel[];
@@ -40,6 +41,7 @@ async function saveLabels(): Promise<void> {
     }
 
     sessionStore.labeling.labelSaveDirectory = dirname(result.filePath);
+    await localStorage.save();
 
     try {
         await window.electronAPI.writeLabels(

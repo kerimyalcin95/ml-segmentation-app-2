@@ -11,6 +11,7 @@ import WorkspaceView from '$lib/components/app/WorkspaceView.svelte';
 import type { WorkspaceViewMode } from '$lib/types/workspace';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
+import * as localStorage from '$lib/utils/localStorage';
 
 let canvas = $state<CanvasManager>();
 let workspaceViewMode = $state<WorkspaceViewMode>('canvas');
@@ -24,6 +25,12 @@ $effect(() => {
 
 onMount(() => {
     const darkThemeCleanup = darkThemeSetup();
+
+    void localStorage.load().then((session) => {
+        if (session) {
+            sessionStore.loadJSON(session);
+        }
+    });
 
     const unsubscribePythonError =
         window.electronAPI.subscribePythonServerErrors(

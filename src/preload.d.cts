@@ -1,4 +1,9 @@
 export interface ElectronAPI {
+    loadSession: () => Promise<unknown>;
+    saveSession: (
+        session: unknown,
+    ) => Promise<void>;
+
     subscribeServerMessages: (callback: (message: string) => void) => () => void;
     sendToServer: (message: string) => void;
     subscribePythonServerErrors: (

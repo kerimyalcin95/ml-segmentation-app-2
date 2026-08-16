@@ -6,17 +6,29 @@ import { Label } from '$lib/components/ui/label';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import Slider from '$lib/components/ui/slider/slider.svelte';
 
-function handleValidationChange(value: number) {
+import * as localStorage from '$lib/utils/localStorage';
+
+function handleValidationChange(value: number): void {
     sessionStore.training.validationPercent = value;
 }
 
-function handleValidationInput(event: Event) {
-    const value = Number((event.currentTarget as HTMLInputElement).value);
+function handleValidationCommit(value: number): void {
+    sessionStore.training.validationPercent = value;
+
+    void localStorage.save();
+}
+
+function handleValidationInput(event: Event): void {
+    const value = Number(
+        (event.currentTarget as HTMLInputElement).value,
+    );
 
     sessionStore.training.validationPercent = Math.max(
         0,
         Math.min(100, Math.round(value) || 0),
     );
+
+    void localStorage.save();
 }
 </script>
 
@@ -25,7 +37,9 @@ function handleValidationInput(event: Event) {
         <span class="text-sm font-medium"> DataLoader </span>
 
         <div class="flex flex-col gap-2">
-            <Label for="dataloader-validation">Validation %</Label>
+            <Label for="dataloader-validation">
+                Validation %
+            </Label>
 
             <div class="flex items-center gap-3">
                 <Slider
@@ -36,6 +50,7 @@ function handleValidationInput(event: Event) {
                     step={1}
                     value={sessionStore.training.validationPercent}
                     onValueChange={handleValidationChange}
+                    onValueCommit={handleValidationCommit}
                     disabled={sessionStore.training.running}
                 />
 
@@ -52,13 +67,17 @@ function handleValidationInput(event: Event) {
                         disabled={sessionStore.training.running}
                     />
 
-                    <span class="text-sm text-muted-foreground">%</span>
+                    <span class="text-sm text-muted-foreground">
+                        %
+                    </span>
                 </div>
             </div>
         </div>
 
         <div class="flex flex-col gap-1">
-            <Label for="dataloader-seed">Seed</Label>
+            <Label for="dataloader-seed">
+                Seed
+            </Label>
 
             <Input
                 id="dataloader-seed"
@@ -66,6 +85,7 @@ function handleValidationInput(event: Event) {
                 min="0"
                 step="1"
                 bind:value={sessionStore.training.seed}
+                onchange={() => void localStorage.save()}
                 placeholder="Optional"
                 disabled={sessionStore.training.running}
             />

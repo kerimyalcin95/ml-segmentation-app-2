@@ -3,12 +3,19 @@ import { Input } from '$lib/components/ui/input';
 import { Label } from '$lib/components/ui/label';
 
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import * as localStorage from '$lib/utils/localStorage';
+
+function saveSession(): void {
+    void localStorage.save();
+}
 </script>
 
 <div class="flex flex-col gap-3">
     <div class="grid grid-cols-2 gap-3">
         <div class="flex flex-col gap-1">
-            <Label class="ml-0.5" for="training-batch-size">Batch Size</Label>
+            <Label class="ml-0.5" for="training-batch-size">
+                Batch Size
+            </Label>
 
             <Input
                 id="training-batch-size"
@@ -16,12 +23,15 @@ import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
                 min="1"
                 step="1"
                 bind:value={sessionStore.training.batchSize}
+                onchange={saveSession}
                 disabled={sessionStore.training.running}
             />
         </div>
 
         <div class="flex flex-col gap-1">
-            <Label class="ml-0.5" for="training-workers">Workers</Label>
+            <Label class="ml-0.5" for="training-workers">
+                Workers
+            </Label>
 
             <Input
                 id="training-workers"
@@ -29,13 +39,16 @@ import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
                 min="0"
                 step="1"
                 bind:value={sessionStore.training.numWorkers}
+                onchange={saveSession}
                 disabled={sessionStore.training.running}
             />
         </div>
     </div>
 
     <div class="flex flex-col gap-1">
-        <Label class="ml-0.5" for="training-epochs">Epochs</Label>
+        <Label class="ml-0.5" for="training-epochs">
+            Epochs
+        </Label>
 
         <Input
             id="training-epochs"
@@ -43,6 +56,7 @@ import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
             min="1"
             step="1"
             bind:value={sessionStore.training.epochs}
+            onchange={saveSession}
             disabled={sessionStore.training.running}
         />
     </div>

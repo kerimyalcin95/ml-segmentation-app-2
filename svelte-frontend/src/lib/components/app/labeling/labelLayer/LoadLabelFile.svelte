@@ -6,6 +6,8 @@ import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 import AlertDialog from '$lib/components/app/dialog/AlertDialog.svelte';
 import { dirname } from '$lib/utils/path';
 
+import * as localStorage from '$lib/utils/localStorage';
+
 import {
     validateLabelFile,
     type ActiveLabel,
@@ -84,6 +86,8 @@ async function loadLabels(): Promise<void> {
 
     sessionStore.labeling.labelLoadDirectory =
         dirname(filePath);
+    await localStorage.save();
+    
 
     try {
         const json =

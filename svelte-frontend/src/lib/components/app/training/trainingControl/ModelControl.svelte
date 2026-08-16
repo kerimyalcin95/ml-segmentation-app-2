@@ -7,6 +7,7 @@ import * as ToggleGroup from '$lib/components/ui/toggle-group';
 import FolderOpenIcon from 'phosphor-svelte/lib/FolderOpenIcon';
 
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import * as localStorage from '$lib/utils/localStorage';
 
 let modelMode = $state<'new' | 'existing'>(
     sessionStore.training.trainExistingModel ? 'existing' : 'new',
@@ -14,7 +15,7 @@ let modelMode = $state<'new' | 'existing'>(
 
 let lastMode: 'new' | 'existing' = 'new';
 
-function onValueChange(value: string) {
+async function onValueChange(value: string) {
     if (value === '') {
         modelMode = lastMode;
         return;
@@ -27,6 +28,7 @@ function onValueChange(value: string) {
     lastMode = value;
     modelMode = value;
     sessionStore.training.trainExistingModel = value === 'existing';
+    await localStorage.save();
 }
 
 async function selectModelPath(): Promise<void> {
@@ -41,11 +43,13 @@ async function selectModelPath(): Promise<void> {
 
     if (modelPath !== null) {
         sessionStore.training.modelPath = modelPath;
+        await localStorage.save();
     }
 }
 
 $effect(() => {
     sessionStore.training.trainExistingModel = modelMode === 'existing';
+    void localStorage.save();
 });
 </script>
 

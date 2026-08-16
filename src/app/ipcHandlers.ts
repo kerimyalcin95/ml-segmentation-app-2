@@ -1,7 +1,8 @@
 import {
+    app,
     dialog,
     ipcMain,
-    IpcMainEvent
+    IpcMainEvent,
 } from "electron";
 
 import fs from "node:fs";
@@ -18,6 +19,51 @@ export class IpcHandlers {
     ) { }
 
     public register(): void {
+
+        ipcMain.handle(
+            "load-session",
+            () => {
+                const filePath = path.join(
+                    app.getPath("userData"),
+                    "sessionStore.json",
+                );
+
+                if (!fs.existsSync(filePath)) {
+                    return null;
+                }
+
+                const json =
+                    fs.readFileSync(
+                        filePath,
+                        "utf8",
+                    );
+
+                return JSON.parse(json) as unknown;
+            },
+        );
+
+        ipcMain.handle(
+            "save-session",
+            (
+                _event,
+                session: unknown,
+            ) => {
+                const filePath = path.join(
+                    app.getPath("userData"),
+                    "sessionStore.json",
+                );
+
+                fs.writeFileSync(
+                    filePath,
+                    JSON.stringify(
+                        session,
+                        null,
+                        4,
+                    ),
+                    "utf8",
+                );
+            },
+        );
 
         ipcMain.on(
             "send-to-server",

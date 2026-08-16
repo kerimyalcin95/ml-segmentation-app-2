@@ -6,9 +6,6 @@ import json
 import websockets
 from websockets.asyncio.server import ServerConnection
 
-from fastaiSegmentation import FastaiSegmentation
-
-
 class WebSocketServer:
     def __init__(
         self,
@@ -19,9 +16,9 @@ class WebSocketServer:
         self.port = port
 
     async def handleConnection(
-        self,
-        websocket: ServerConnection,
-    ) -> None:
+    self,
+    websocket: ServerConnection,
+) -> None:
         print("Python: Client connected")
 
         try:
@@ -64,6 +61,8 @@ class WebSocketServer:
         request: dict,
     ) -> dict:
         try:
+            from fastaiSegmentation import FastaiSegmentation
+
             segmentation = FastaiSegmentation(
                 image_path=request["imagePath"],
                 label_image_path=request["labelImagePath"],
@@ -104,7 +103,6 @@ class WebSocketServer:
             )
 
             await asyncio.Future()
-
 
 async def main() -> None:
     server = WebSocketServer()

@@ -6,6 +6,7 @@ import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 
 import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon';
+import * as localStorage from '$lib/utils/localStorage';
 
 interface Props {
     canvas: CanvasManager;
@@ -39,6 +40,7 @@ async function saveLabel(): Promise<void> {
         await window.electronAPI.writeImage(result.filePath, imageBytes);
 
         sessionStore.labeling.labelImageSaveDirectory = result.filePath;
+        await localStorage.save();
     } catch (error) {
         const message =
             error instanceof Error

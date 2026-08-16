@@ -3,6 +3,7 @@ import { Button } from '$lib/components/ui/button';
 import { CanvasManager } from '$lib/canvas/canvas';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import { dirname } from '$lib/utils/path';
+import * as localStorage from '$lib/utils/localStorage';
 
 import ImageSquareIcon from 'phosphor-svelte/lib/ImageSquareIcon';
 
@@ -22,6 +23,7 @@ async function loadImage() {
     }
 
     sessionStore.editing.loadDirectory = dirname(filePath);
+    await localStorage.save();
 
     const imageBytes = await window.electronAPI.readImage(filePath);
 

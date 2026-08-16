@@ -5,6 +5,8 @@ import { CanvasManager } from '$lib/canvas/canvas';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import { dirname } from '$lib/utils/path';
 
+import * as localStorage from '$lib/utils/localStorage';
+
 import FloppyDiskIcon from 'phosphor-svelte/lib/FloppyDiskIcon';
 
 interface Props {
@@ -23,6 +25,7 @@ async function saveImage() {
     }
 
     sessionStore.editing.saveDirectory = dirname(result.filePath);
+    await localStorage.save();
 
     let mimeType = 'image/png';
     let quality: number | undefined;
