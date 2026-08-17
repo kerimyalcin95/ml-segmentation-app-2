@@ -51,6 +51,20 @@ class TrainingSession {
     running = $state(false);
 }
 
+class PredictionSession {
+    imagePath = $state('');
+    modelPath = $state('');
+    labelImagePath = $state('');
+
+    configured = $derived(
+        !!this.imagePath &&
+        !!this.modelPath &&
+        !!this.labelImagePath
+    );
+
+    running = $state(false);
+}
+
 class SessionStore {
     mode = $state<Mode>('editing');
     viewMode = $state<WorkspaceViewMode>('canvas');
@@ -61,6 +75,7 @@ class SessionStore {
     editing = new EditingSession();
     labeling = new LabelingSession();
     training = new TrainingSession();
+    prediction = new PredictionSession();
 
     toJSON(): PersistedSession {
         return {
@@ -98,6 +113,13 @@ class SessionStore {
                 pretrained: this.training.pretrained,
                 trainExistingModel:
                     this.training.trainExistingModel,
+            },
+
+            prediction: {
+                imagePath: this.prediction.imagePath,
+                modelPath: this.prediction.modelPath,
+                labelImagePath:
+                    this.prediction.labelImagePath,
             },
         };
     }
@@ -205,6 +227,23 @@ class SessionStore {
             this.training.trainExistingModel =
                 training.trainExistingModel;
         }
+
+        const prediction = data.prediction;
+
+        if (prediction?.imagePath) {
+            this.prediction.imagePath =
+                prediction.imagePath;
+        }
+
+        if (prediction?.modelPath) {
+            this.prediction.modelPath =
+                prediction.modelPath;
+        }
+
+        if (prediction?.labelImagePath) {
+            this.prediction.labelImagePath =
+                prediction.labelImagePath;
+        }
     }
 }
 
@@ -237,6 +276,12 @@ export interface PersistedSession {
         architecture?: fastaiArch;
         pretrained?: boolean;
         trainExistingModel?: boolean;
+    };
+
+    prediction?: {
+        imagePath?: string;
+        modelPath?: string;
+        labelImagePath?: string;
     };
 }
 

@@ -1,5 +1,4 @@
 <script lang="ts">
-import { Card } from '$lib/components/ui/card';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import { CanvasManager } from '$lib/canvas/canvas';
 
@@ -17,6 +16,7 @@ import LabelDisplay from '$lib/components/app/labeling/labelDisplay/LabelDisplay
 import TrainingControl from '$lib/components/app/training/trainingControl/TrainingControl.svelte';
 import DataLoader from '$lib/components/app/training/dataloader/DataLoader.svelte';
 import Learner from '$lib/components/app/training/learner/Learner.svelte';
+import PredictionControl from '$lib/components/app/prediction/predictionControl/PredictionControl.svelte';
 
 interface Props {
     canvas: CanvasManager;
@@ -172,7 +172,7 @@ function handleMouseMove() {
                     Prediction
                 </h2>
 
-                <Card class="h-min flex flex-col gap-4"></Card>
+                <PredictionControl />
             {/if}
         </div>
     </div>
