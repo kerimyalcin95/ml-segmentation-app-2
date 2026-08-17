@@ -1,6 +1,6 @@
 <div align="center">
 
-# Segmentation App 2.0.0-alpha.10
+# Segmentation App 2.0.0-beta.1
 
 </div>
 
@@ -36,7 +36,7 @@ Train segmentation models with labeled images, reference images and live termina
 
 ## Table of Contents
 
-- [Segmentation App 2.0.0-alpha.10](#segmentation-app-200-alpha10)
+- [Segmentation App 2.0.0-beta.1](#segmentation-app-200-beta1)
   - [Editing Mode](#editing-mode)
   - [Labeling Mode](#labeling-mode)
   - [Training Mode](#training-mode)
