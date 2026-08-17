@@ -9,3 +9,4 @@ make/
 playwright-report/
 test-results/
 .code
+staged.diff
