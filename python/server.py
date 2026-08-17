@@ -7,6 +7,7 @@ from threading import Event
 import websockets
 from websockets.asyncio.server import ServerConnection
 
+
 class WebSocketServer:
     def __init__(
         self,
@@ -18,6 +19,9 @@ class WebSocketServer:
 
         self.training_cancel_event: Event | None = None
         self.training_task: asyncio.Task[None] | None = None
+
+        self.prediction_cancel_event: Event | None = None
+        self.prediction_task: asyncio.Task[None] | None = None
 
     async def handleConnection(
         self,
@@ -69,6 +73,15 @@ class WebSocketServer:
         if action == "train-stop":
             return self.stopTraining()
 
+        if action == "predict-start":
+            return self.startPrediction(
+                request,
+                websocket,
+            )
+
+        if action == "predict-stop":
+            return self.stopPrediction()
+
         return {
             "action": "error",
             "error": f"Unknown action: {action}",
@@ -108,9 +121,11 @@ class WebSocketServer:
         cancel_event: Event,
     ) -> None:
         try:
-            from fastaiSegmentation import FastaiSegmentation
+            from fastaiSegmentation import (
+                FastaiSegmentationTraining
+            )
 
-            segmentation = FastaiSegmentation(
+            segmentation = FastaiSegmentationTraining(
                 image_path=request["imagePath"],
                 label_image_path=request["labelImagePath"],
                 label_path=request["labelPath"],
@@ -172,6 +187,100 @@ class WebSocketServer:
 
         return {
             "action": "train-stop-requested",
+        }
+
+    def startPrediction(
+        self,
+        request: dict,
+        websocket: ServerConnection,
+    ) -> dict:
+        if self.prediction_task is not None:
+            return {
+                "action": "predict-error",
+                "error": "Prediction is already running.",
+            }
+
+        cancel_event = Event()
+
+        self.prediction_cancel_event = cancel_event
+
+        self.prediction_task = asyncio.create_task(
+            self.predict(
+                request,
+                websocket,
+                cancel_event,
+            )
+        )
+
+        return {
+            "action": "predict-started",
+        }
+
+    async def predict(
+        self,
+        request: dict,
+        websocket: ServerConnection,
+        cancel_event: Event,
+    ) -> None:
+        try:
+            from fastaiSegmentation import (
+                FastaiSegmentationPrediction
+            )
+
+            segmentation = FastaiSegmentationPrediction(
+                image_path=request["imagePath"],
+                label_image_path=request["labelImagePath"],
+                model_path=request["modelPath"],
+                cancel_event=cancel_event,
+            )
+
+            await asyncio.to_thread(
+                segmentation.predict
+            )
+
+            if cancel_event.is_set():
+                response = {
+                    "action": "predict-cancelled",
+                }
+            else:
+                response = {
+                    "action": "predict-success",
+                }
+
+        except Exception as error:
+            print("Python: Prediction failed.")
+
+            response = {
+                "action": "predict-error",
+                "error": str(error),
+            }
+
+        finally:
+            self.prediction_cancel_event = None
+            self.prediction_task = None
+
+        try:
+            await websocket.send(
+                json.dumps(response)
+            )
+        except websockets.exceptions.ConnectionClosed:
+            print(
+                "Python: Could not send prediction result."
+            )
+
+    def stopPrediction(self) -> dict:
+        """Request cancellation of the active prediction job."""
+
+        if self.prediction_cancel_event is None:
+            return {
+                "action": "predict-error",
+                "error": "No prediction is running.",
+            }
+
+        self.prediction_cancel_event.set()
+
+        return {
+            "action": "predict-stop-requested",
         }
 
     async def start(self) -> None:
