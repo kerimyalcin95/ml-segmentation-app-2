@@ -32,7 +32,17 @@ Train segmentation models with labeled images, reference images and live termina
 
 </div>
 
-![Labeling Mode](snapshots/snapshot-3.png)
+![Prediction Mode](snapshots/snapshot-3.png)
+
+<div align="center">
+
+## Prediction Mode
+
+Run trained segmentation models on images and generate label images.
+
+</div>
+
+![Prediction Mode](snapshots/snapshot-4.png)
 
 ## Table of Contents
 
@@ -40,6 +50,7 @@ Train segmentation models with labeled images, reference images and live termina
   - [Editing Mode](#editing-mode)
   - [Labeling Mode](#labeling-mode)
   - [Training Mode](#training-mode)
+  - [Prediction Mode](#prediction-mode)
   - [Table of Contents](#table-of-contents)
   - [About](#about)
   - [Architecture](#architecture)
