@@ -31,28 +31,44 @@ onMount(() => {
         }
     });
 
+    const showPythonError = (message: string): void => {
+        pythonError = message;
+
+        if (message.includes('Python 3.12 is required')) {
+            pythonErrorTitle = 'Python 3.12 Required';
+        } else if (
+            message.includes('Required Python packages are missing')
+        ) {
+            pythonErrorTitle = 'Python Dependencies Missing';
+        } else if (
+            message.includes('port') &&
+            (
+                message.includes('unavailable') ||
+                message.includes('already in use')
+            )
+        ) {
+            pythonErrorTitle = 'Python Server Error';
+        } else {
+            pythonErrorTitle = 'Python Server Error';
+        }
+
+        pythonErrorOpen = true;
+    };
+
     const unsubscribePythonError =
-        window.electronAPI.subscribePythonServerErrors((message: string) => {
-            pythonError = message;
+        window.electronAPI.subscribePythonServerErrors(
+            (message: string) => {
+                showPythonError(message);
+            },
+        );
 
-            if (message.includes('Python 3.12 is required')) {
-                pythonErrorTitle = 'Python 3.12 Required';
-            } else if (
-                message.includes('Required Python packages are missing')
-            ) {
-                pythonErrorTitle = 'Python Dependencies Missing';
-            } else if (
-                message.includes('port') &&
-                (message.includes('unavailable') ||
-                    message.includes('already in use'))
-            ) {
-                pythonErrorTitle = 'Python Server Error';
-            } else {
-                pythonErrorTitle = 'Python Server Error';
+    void window.electronAPI.getPythonServerError().then(
+        (message) => {
+            if (message) {
+                showPythonError(message);
             }
-
-            pythonErrorOpen = true;
-        });
+        },
+    );
 
     return () => {
         darkThemeCleanup();

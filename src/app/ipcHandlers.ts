@@ -85,6 +85,18 @@ export class IpcHandlers {
             },
         );
 
+        ipcMain.handle(
+            "get-python-server-error",
+            () => {
+                const error =
+                    this.pythonServer.getPendingError();
+
+                this.pythonServer.clearPendingError();
+
+                return error;
+            },
+        );
+
         ipcMain.on(
             "send-to-server",
             (_event: IpcMainEvent, message: string) => {

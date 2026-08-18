@@ -8,6 +8,7 @@ export interface ElectronAPI {
     restartPythonServer: (
         port: number,
     ) => Promise<void>;
+    getPythonServerError: () => Promise<string | undefined>;
     sendToServer: (message: string) => void;
     subscribePythonServerErrors: (
         callback: (message: string) => void,

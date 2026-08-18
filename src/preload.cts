@@ -40,6 +40,10 @@ contextBridge.exposeInMainWorld('electronAPI', {
             "restart-python-server",
             port,
         ),
+    getPythonServerError: () =>
+        ipcRenderer.invoke(
+            "get-python-server-error",
+        ),
     sendToServer: (message: string) => {
         console.log("Electron: Sending message to server");
         ipcRenderer.send('send-to-server', message);

@@ -7,6 +7,8 @@ export class PythonServer {
     private webSocket: WebSocket | undefined;
     private pythonProcess: ChildProcessWithoutNullStreams | undefined;
 
+    private pendingError: string | undefined;
+
     public onMessage?: (message: string) => void;
     public onConnected?: () => void;
     public onDisconnected?: (code: number, reason: string) => void;
@@ -51,6 +53,10 @@ export class PythonServer {
 
                 settled = true;
                 this.pythonProcess = undefined;
+
+                this.onError?.(error);
+
+                this.pendingError = error.message;
 
                 this.onError?.(error);
 
@@ -356,6 +362,14 @@ export class PythonServer {
         }
 
         this.webSocket.send(message);
+    }
+
+    public getPendingError(): string | undefined {
+        return this.pendingError;
+    }
+
+    public clearPendingError(): void {
+        this.pendingError = undefined;
     }
 
     public isConnected(): boolean {

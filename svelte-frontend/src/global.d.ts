@@ -26,6 +26,7 @@ declare global {
             port: number,
         ) => Promise<void>;
         sendToServer(message: string): void;
+        getPythonServerError: () => Promise<string | undefined>;
         subscribePythonServerErrors: (
             callback: (message: string) => void,
         ) => () => void;
