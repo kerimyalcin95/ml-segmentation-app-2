@@ -90,6 +90,39 @@ export class PythonServer {
                 const output = stderr.toLowerCase();
 
                 if (
+                    output.includes("winerror 10013") ||
+                    (
+                        output.includes("port") &&
+                        output.includes("unavailable") &&
+                        output.includes("reserved")
+                    )
+                ) {
+                    fail(
+                        new Error(
+                            "The Python server could not start because port 56767 is unavailable.\n" +
+                            "The port may already be in use or reserved by the operating system."
+                        )
+                    );
+
+                    return;
+                }
+
+                if (
+                    output.includes("winerror 10048") ||
+                    output.includes("address already in use") ||
+                    output.includes("only one usage of each socket address")
+                ) {
+                    fail(
+                        new Error(
+                            "The Python server could not start because port 56767 is already in use.\n" +
+                            "Please close any other instance of ML-Segmentation and try again."
+                        )
+                    );
+
+                    return;
+                }
+
+                if (
                     output.includes("no runtime installed") ||
                     output.includes("requested python version") ||
                     output.includes("not installed") ||
@@ -116,21 +149,6 @@ export class PythonServer {
                             "Please install the required packages for Python 3.12.\n" +
                             "For more information see\n" +
                             "https://github.com/kerimyalcin95/ml-segmentation-app-2#install-python-packages"
-                        )
-                    );
-
-                    return;
-                }
-
-                if (
-                    output.includes("address already in use") ||
-                    output.includes("winerror 10048") ||
-                    output.includes("only one usage of each socket address")
-                ) {
-                    fail(
-                        new Error(
-                            "The Python server could not start because port 56767 is already in use.\n" +
-                            "Please close any other instance of ML-Segmentation and try again."
                         )
                     );
 

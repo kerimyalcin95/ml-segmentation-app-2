@@ -8,15 +8,14 @@ import { CanvasManager } from '$lib/canvas/canvas';
 import Sidebar from '$lib/components/app/sidebar/Sidebar.svelte';
 import Statusbar from '$lib/components/app/Statusbar.svelte';
 import WorkspaceView from '$lib/components/app/WorkspaceView.svelte';
-import type { WorkspaceViewMode } from '$lib/types/workspace';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 import * as localStorage from '$lib/utils/localStorage';
 
 let canvas = $state<CanvasManager>();
-let workspaceViewMode = $state<WorkspaceViewMode>('canvas');
 
 let pythonError = $state('');
+let pythonErrorTitle = $state('Python Server Error');
 let pythonErrorOpen = $state(false);
 
 $effect(() => {
@@ -33,12 +32,27 @@ onMount(() => {
     });
 
     const unsubscribePythonError =
-        window.electronAPI.subscribePythonServerErrors(
-            (message: string) => {
-                pythonError = message;
-                pythonErrorOpen = true;
-            },
-        );
+        window.electronAPI.subscribePythonServerErrors((message: string) => {
+            pythonError = message;
+
+            if (message.includes('Python 3.12 is required')) {
+                pythonErrorTitle = 'Python 3.12 Required';
+            } else if (
+                message.includes('Required Python packages are missing')
+            ) {
+                pythonErrorTitle = 'Python Dependencies Missing';
+            } else if (
+                message.includes('port') &&
+                (message.includes('unavailable') ||
+                    message.includes('already in use'))
+            ) {
+                pythonErrorTitle = 'Python Server Error';
+            } else {
+                pythonErrorTitle = 'Python Server Error';
+            }
+
+            pythonErrorOpen = true;
+        });
 
     return () => {
         darkThemeCleanup();
@@ -48,7 +62,6 @@ onMount(() => {
 </script>
 
 <div data-e2e="app" class="h-screen flex flex-col">
-
     <!-- Workspace -->
     <div class="flex-1 flex overflow-hidden min-h-0 min-w-0">
         {#if canvas}
@@ -58,7 +71,6 @@ onMount(() => {
         <Separator orientation="vertical" />
 
         <WorkspaceView
-            bind:workspaceViewMode
             onCanvasReady={(canvasManager: CanvasManager) =>
                 (canvas = canvasManager)}
         />
@@ -69,6 +81,6 @@ onMount(() => {
 
 <MessageDialog
     bind:open={pythonErrorOpen}
-    title="Python 3.12 Required"
+    title={pythonErrorTitle}
     message={pythonError}
 />

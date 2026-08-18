@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import sys
 from threading import Event
 
 import websockets
@@ -283,24 +284,49 @@ class WebSocketServer:
             "action": "predict-stop-requested",
         }
 
-    async def start(self) -> None:
-        async with websockets.serve(
-            self.handleConnection,
-            self.host,
-            self.port,
-        ):
-            print(
-                f"Python: Listening on ws://"
-                f"{self.host}:{self.port}"
-            )
+    async def start(self) -> bool:
+        try:
+            async with websockets.serve(
+                self.handleConnection,
+                self.host,
+                self.port,
+            ):
+                print(
+                    f"Python: Listening on ws://"
+                    f"{self.host}:{self.port}"
+                )
 
-            await asyncio.Future()
+                await asyncio.Future()
+
+        except OSError as error:
+            if error.errno == 13:
+                print(
+                    f"Python: Port {self.port} is unavailable. "
+                    "It is already in use or reserved by the operating system.",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                return False
+
+            if error.errno == 10048:
+                print(
+                    f"Python: Port {self.port} is already in use.",
+                    file=sys.stderr,
+                    flush=True,
+                )
+                return False
+
+            raise
 
 
-async def main() -> None:
+async def main() -> int:
     server = WebSocketServer()
-    await server.start()
+
+    if not await server.start():
+        return 1
+
+    return 0
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    sys.exit(asyncio.run(main()))
