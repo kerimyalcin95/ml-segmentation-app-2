@@ -37,7 +37,9 @@ let {
                 {title}
             </AlertDialog.Title>
 
-            <AlertDialog.Description class="whitespace-pre-line">
+            <AlertDialog.Description
+                class="max-h-[60vh] min-w-0 max-w-full overflow-y-auto whitespace-pre-line pr-2 [overflow-wrap:anywhere]"
+            >
                 {message}
             </AlertDialog.Description>
         </AlertDialog.Header>
@@ -52,7 +54,7 @@ let {
                     ? 'bg-destructive text-destructive-foreground hover:bg-destructive/90'
                     : ''}
                 onclick={onAction}
-            >   
+            >
                 {actionText}
             </AlertDialog.Action>
         </AlertDialog.Footer>

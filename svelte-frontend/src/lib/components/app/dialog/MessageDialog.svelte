@@ -18,7 +18,9 @@ let { open = $bindable(), title, message, buttonText = 'OK' }: Props = $props();
                 {title}
             </AlertDialog.Title>
 
-            <AlertDialog.Description class="whitespace-pre-line">
+            <AlertDialog.Description
+                class="max-h-[60vh] min-w-0 max-w-full overflow-y-auto whitespace-pre-line pr-2 [overflow-wrap:anywhere]"
+            >
                 {message}
             </AlertDialog.Description>
         </AlertDialog.Header>
