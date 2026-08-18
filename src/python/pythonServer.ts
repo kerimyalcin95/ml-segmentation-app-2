@@ -19,7 +19,7 @@ export class PythonServer {
         private readonly pythonPath: string
     ) { }
 
-    public async start(): Promise<void> {
+    public async start(port: number): Promise<void> {
         if (this.pythonProcess) {
             return;
         }
@@ -30,11 +30,15 @@ export class PythonServer {
             ...python.args,
             "-u",
             this.pythonPath,
+            "--port",
+            String(port),
         ]);
 
         this.pythonProcess = process;
 
-        console.log("Electron: Server started");
+        console.log(
+            `Electron: Python server starting on port ${String(port)}`
+        );
 
         await new Promise<void>((resolve, reject) => {
             let stderr = "";
@@ -99,7 +103,7 @@ export class PythonServer {
                 ) {
                     fail(
                         new Error(
-                            "The Python server could not start because port 56767 is unavailable.\n" +
+                            `The Python server could not start because port ${String(port)} is unavailable.\n` +
                             "The port may already be in use or reserved by the operating system."
                         )
                     );
@@ -114,8 +118,8 @@ export class PythonServer {
                 ) {
                     fail(
                         new Error(
-                            "The Python server could not start because port 56767 is already in use.\n" +
-                            "Please close any other instance of ML-Segmentation and try again."
+                            `The Python server could not start because port ${String(port)} is already in use.\n` +
+                            "Please choose another port and try again."
                         )
                     );
 
@@ -164,7 +168,86 @@ export class PythonServer {
             });
         });
 
-        await this.connect();
+        await this.connect(port);
+    }
+
+    public async connect(port: number): Promise<void> {
+        if (
+            this.webSocket &&
+            (
+                this.webSocket.readyState === WebSocket.OPEN ||
+                this.webSocket.readyState === WebSocket.CONNECTING
+            )
+        ) {
+            return;
+        }
+
+        const url = `ws://localhost:${String(port)}`;
+        const socket = new WebSocket(url);
+
+        this.webSocket = socket;
+
+        console.log(`Electron: Connecting to ${url}`);
+
+        await new Promise<void>((resolve, reject) => {
+            function rawDataToString(data: WebSocket.RawData): string {
+                if (Buffer.isBuffer(data)) {
+                    return data.toString("utf8");
+                }
+
+                if (Array.isArray(data)) {
+                    return Buffer.concat(data).toString("utf8");
+                }
+
+                return Buffer.from(data).toString("utf8");
+            }
+
+            socket.once("open", () => {
+                console.log("Electron: WebSocket connected");
+
+                this.onConnected?.();
+
+                resolve();
+            });
+
+            socket.on("message", (data) => {
+                this.onMessage?.(rawDataToString(data));
+            });
+
+            socket.on("close", (code, reason) => {
+                const reasonString = reason.toString();
+
+                console.log(
+                    `WebSocket closed: ${String(code)}${reasonString ? `, ${reasonString}` : ""
+                    }`
+                );
+
+                this.webSocket = undefined;
+
+                this.onDisconnected?.(
+                    code,
+                    reasonString,
+                );
+            });
+
+            socket.once("error", (error) => {
+                this.webSocket = undefined;
+
+                console.error(
+                    "Electron: WebSocket error:",
+                    error,
+                );
+
+                this.onError?.(error);
+
+                reject(error);
+            });
+        });
+    }
+
+    public async restart(port: number): Promise<void> {
+        await this.stop();
+        await this.start(port);
     }
 
     private getPythonCommand(): {
@@ -190,87 +273,6 @@ export class PythonServer {
                     `Unsupported operating system: ${globalThis.process.platform}`,
                 );
         }
-    }
-
-    public async connect(
-        url = "ws://localhost:56767"
-    ): Promise<void> {
-
-        if (
-            this.webSocket &&
-            (
-                this.webSocket.readyState === WebSocket.OPEN ||
-                this.webSocket.readyState === WebSocket.CONNECTING
-            )
-        ) {
-            return;
-        }
-
-        const socket = new WebSocket(url);
-
-        this.webSocket = socket;
-
-        console.log(`Electron: Connecting to ${url}`);
-
-        await new Promise<void>((resolve, reject) => {
-
-            function rawDataToString(data: WebSocket.RawData): string {
-                if (Buffer.isBuffer(data)) {
-                    return data.toString("utf8");
-                }
-
-                if (Array.isArray(data)) {
-                    return Buffer.concat(data).toString("utf8");
-                }
-
-                return Buffer.from(data).toString("utf8");
-            }
-
-            socket.once("open", () => {
-
-                console.log("Electron: WebSocket connected");
-
-                this.onConnected?.();
-
-                resolve();
-
-            });
-
-            socket.on("message", (data) => {
-                this.onMessage?.(rawDataToString(data));
-            });
-
-            socket.on("close", (code, reason) => {
-
-                const reasonString = reason.toString();
-
-                console.log(
-                    `WebSocket closed: ${String(code)}${reasonString ? `, ${reasonString}` : ""}`
-                );
-
-                this.webSocket = undefined;
-
-                this.onDisconnected?.(
-                    code,
-                    reasonString
-                );
-
-            });
-
-            socket.once("error", (error) => {
-
-                this.webSocket = undefined;
-
-                console.error("Electron: WebSocket error:", error);
-
-                this.onError?.(error);
-
-                reject(error);
-
-            });
-
-        });
-
     }
 
     public async disconnect(): Promise<void> {

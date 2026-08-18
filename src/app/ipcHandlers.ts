@@ -65,6 +65,26 @@ export class IpcHandlers {
             },
         );
 
+        ipcMain.handle(
+            "restart-python-server",
+            async (
+                _event,
+                port: number,
+            ) => {
+                if (
+                    !Number.isInteger(port) ||
+                    port < 1024 ||
+                    port > 65535
+                ) {
+                    throw new Error(
+                        "Port must be an integer between 1024 and 65535."
+                    );
+                }
+
+                await this.pythonServer.restart(port);
+            },
+        );
+
         ipcMain.on(
             "send-to-server",
             (_event: IpcMainEvent, message: string) => {

@@ -23,7 +23,7 @@ describe("PythonServer integration", () => {
 
     it("starts the Python server", async () => {
 
-        await server.start();
+        await server.start(56767);
 
         expect(server.isRunning()).toBe(true);
 

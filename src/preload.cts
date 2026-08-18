@@ -33,6 +33,13 @@ contextBridge.exposeInMainWorld('electronAPI', {
             ipcRenderer.removeListener('message-from-server', listener);
         };
     },
+    restartPythonServer: (
+        port: number,
+    ) =>
+        ipcRenderer.invoke(
+            "restart-python-server",
+            port,
+        ),
     sendToServer: (message: string) => {
         console.log("Electron: Sending message to server");
         ipcRenderer.send('send-to-server', message);

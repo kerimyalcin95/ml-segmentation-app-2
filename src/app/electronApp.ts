@@ -1,5 +1,6 @@
 import { app, BrowserWindow } from "electron";
 import path from "node:path";
+import fs from "node:fs";
 import { fileURLToPath } from "node:url";
 
 import { PythonServer } from "../python/pythonServer.js";
@@ -78,7 +79,13 @@ export class ElectronApp {
                     this.consoleMirror.install();
 
                     try {
-                        await this.pythonServer.start();
+                        const port = this.loadPort();
+
+                        console.log(
+                            `Electron: Using Python server port ${String(port)}`
+                        );
+
+                        await this.pythonServer.start(port);
                     } catch (error) {
                         console.error(
                             "Electron: Failed to start Python server:",
@@ -164,5 +171,60 @@ export class ElectronApp {
                 );
             }
         };
+    }
+
+    private loadPort(): number {
+        const defaultPort = 56767;
+
+        const filePath = path.join(
+            app.getPath("userData"),
+            "sessionStore.json",
+        );
+
+        if (!fs.existsSync(filePath)) {
+            console.log(
+                `Electron: No session store found. ` +
+                `Using default Python server port ${String(defaultPort)}.`,
+            );
+
+            return defaultPort;
+        }
+
+        try {
+            const json = fs.readFileSync(
+                filePath,
+                "utf8",
+            );
+
+            const session =
+                JSON.parse(json) as {
+                    port?: unknown;
+                };
+
+            if (
+                typeof session.port === "number" &&
+                Number.isInteger(session.port) &&
+                session.port >= 1024 &&
+                session.port <= 65535
+            ) {
+                return session.port;
+            }
+
+            console.log(
+                `Electron: No valid port found in session store. ` +
+                `Using default Python server port ${String(defaultPort)}.`,
+            );
+        } catch (error) {
+            console.error(
+                "Electron: Failed to read session store:",
+                error,
+            );
+
+            console.log(
+                `Electron: Using default Python server port ${String(defaultPort)}.`,
+            );
+        }
+
+        return defaultPort;
     }
 }

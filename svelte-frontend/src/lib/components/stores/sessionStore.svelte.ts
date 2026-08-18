@@ -68,6 +68,7 @@ class PredictionSession {
 class SessionStore {
     mode = $state<Mode>('editing');
     viewMode = $state<WorkspaceViewMode>('canvas');
+    port = $state(56767);
 
     hasLabelImage = $state(false);
     hasImage = $state(false);
@@ -79,6 +80,7 @@ class SessionStore {
 
     toJSON(): PersistedSession {
         return {
+            port: this.port,
             mode: this.mode,
             viewMode: this.viewMode,
 
@@ -125,6 +127,11 @@ class SessionStore {
     }
 
     loadJSON(data: PersistedSession): void {
+
+        if (data.port !== undefined) {
+            this.port = data.port;
+        }
+        
         if (data.mode) {
             this.mode = data.mode;
         }
@@ -248,6 +255,7 @@ class SessionStore {
 }
 
 export interface PersistedSession {
+    port?: number;
     mode?: Mode;
     viewMode?: WorkspaceViewMode;
 

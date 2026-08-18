@@ -5,6 +5,8 @@ import json
 import sys
 from threading import Event
 
+import argparse
+
 import websockets
 from websockets.asyncio.server import ServerConnection
 
@@ -320,7 +322,18 @@ class WebSocketServer:
 
 
 async def main() -> int:
-    server = WebSocketServer()
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--port",
+        type=int,
+        default=56767,
+    )
+
+    args = parser.parse_args()
+
+    server = WebSocketServer(
+        port=args.port,
+    )
 
     if not await server.start():
         return 1

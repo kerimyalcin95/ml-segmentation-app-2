@@ -5,6 +5,9 @@ export interface ElectronAPI {
     ) => Promise<void>;
 
     subscribeServerMessages: (callback: (message: string) => void) => () => void;
+    restartPythonServer: (
+        port: number,
+    ) => Promise<void>;
     sendToServer: (message: string) => void;
     subscribePythonServerErrors: (
         callback: (message: string) => void,
