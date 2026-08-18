@@ -21,7 +21,6 @@ let { canvas }: Props = $props();
 
 function toggleVisibility(): void {
     sessionStore.labeling.globalHidden = !sessionStore.labeling.globalHidden;
-    sessionStore.labeling.enabled = !sessionStore.labeling.globalHidden;
 
     canvas.document.labelImage.setVisible(!sessionStore.labeling.globalHidden);
     canvas.document.events.emit('layerRedraw');
