@@ -88,22 +88,23 @@ $effect(() => {
         bind:value={modelMode}
         {onValueChange}
         disabled={sessionStore.training.running}
-        class="w-full mt-2 ring-1 ring-primary/50"
+        class="w-full mt-2 ring-1 ring-primary/50 text-primary"
     >
         <ToggleGroup.Item
             value="new"
             class="
-            flex-1
-            relative
-            pt-0.5
-            data-[state=on]:bg-primary/10
-            data-[state=on]:ring-1
-            data-[state=on]:ring-primary/70
-            data-[state=on]:ring-offset-0
-            data-[state=on]:z-11
-            data-[state=off]:hover:bg-primary/10
-            data-[state=off]:text-foreground/50
-        "
+                flex-1
+                relative
+                pt-0.5
+                data-[state=on]:bg-primary/10
+                data-[state=on]:ring-2
+                data-[state=on]:ring-primary/40
+                data-[state=on]:ring-offset-0
+                data-[state=on]:z-11
+                data-[state=off]:hover:bg-primary/10
+                data-[state=off]:text-foreground/50
+                data-[state=off]:bg-input/50
+            "
         >
             New Model
         </ToggleGroup.Item>
@@ -111,17 +112,18 @@ $effect(() => {
         <ToggleGroup.Item
             value="existing"
             class="
-            flex-1
-            relative
-            pt-0.5
-            data-[state=on]:bg-primary/10
-            data-[state=on]:ring-1
-            data-[state=on]:ring-primary/70
-            data-[state=on]:ring-offset-0
-            data-[state=on]:z-10
-            data-[state=off]:hover:bg-primary/10
-            data-[state=off]:text-foreground/50
-        "
+                flex-1
+                relative
+                pt-0.5
+                data-[state=on]:bg-primary/10
+                data-[state=on]:ring-2
+                data-[state=on]:ring-primary/40
+                data-[state=on]:ring-offset-0
+                data-[state=on]:z-10
+                data-[state=off]:hover:bg-primary/10
+                data-[state=off]:text-foreground/50
+                data-[state=off]:bg-input/50
+            "
         >
             Existing Model
         </ToggleGroup.Item>

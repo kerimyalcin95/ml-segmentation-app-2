@@ -19,12 +19,7 @@ export class Terminal {
             fontSize: 18,
             scrollback: 10000,
 
-            allowTransparency: true,
             allowProposedApi: false,
-
-            theme: {
-                background: '#00000000',
-            },
         });
 
         this.fitAddon = new FitAddon();
@@ -33,6 +28,8 @@ export class Terminal {
         this.terminal.loadAddon(new WebLinksAddon());
 
         this.terminal.open(container);
+
+        this.updateTheme();
 
         this.terminal.attachCustomKeyEventHandler((event: KeyboardEvent) => {
             if (
@@ -61,6 +58,15 @@ export class Terminal {
         this.resizeObserver.observe(container);
 
         this.fitAddon.fit();
+    }
+
+    updateTheme(): void {
+        const isDark = document.documentElement.classList.contains('dark');
+
+        this.terminal.options.theme = {
+            background: isDark ? '#000000' : '#ffffff',
+            foreground: isDark ? '#ffffff' : '#000000',
+        };
     }
 
     write(text: string): void {

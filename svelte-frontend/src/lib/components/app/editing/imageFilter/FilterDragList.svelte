@@ -61,8 +61,8 @@ function removeFilter(id: number) {
             {disabled ? 'cursor-not-allowed' : 'cursor-grab'}
             {disabled
             ? 'opacity-50 cursor-not-allowed'
-            : 'cursor-pointer hover:bg-accent'}
-            {selectedFilterId === filter.id ? 'bg-accent' : ''}
+            : 'cursor-pointer hover:bg-primary/10'}
+            {selectedFilterId === filter.id ? 'bg-primary/10' : ''}
             "
             onclick={() => {
                 if (disabled) return;

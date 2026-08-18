@@ -61,8 +61,8 @@ function handleInput(event: Event): void {
                 : 'secondary'}
             onclick={toggleVisibility}
             class={!sessionStore.labeling.globalHidden
-                ? 'ring-2 bg-primary/10 ring-primary/40 hover:bg-primary/30'
-                : ''}
+                ? 'ring-2 bg-primary/10 ring-offset-0 ring-primary/40 hover:bg-primary/30 text-primary'
+                : 'text-primary bg-input/50 hover:bg-primary/10'}
         >
             {#if !sessionStore.labeling.globalHidden}
                 <EyeIcon weight="bold" />

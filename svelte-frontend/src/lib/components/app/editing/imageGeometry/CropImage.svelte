@@ -61,16 +61,28 @@ function crop() {
 <div class="flex flex-col gap-2">
     <ToggleGroup.Root
         type="single"
-        class="w-full border rounded-md"
+        class="w-full rounded-md"
         value={cropMode ? 'crop' : ''}
         onValueChange={(value) => {
             cropMode = value === 'crop';
         }}
         disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
-    >
+        >
         <ToggleGroup.Item
             value="crop"
-            class="w-full data-[state=on]:bg-primary data-[state=on]:text-primary-foreground"
+            class="
+                w-full
+                data-[state=on]:bg-primary/10
+                data-[state=on]:ring-2
+                data-[state=on]:ring-offset-0
+                data-[state=on]:ring-primary/40
+                data-[state=on]:hover:bg-primary/30
+                data-[state=on]:text-foreground
+
+                data-[state=off]:text-foreground
+                data-[state=off]:bg-input/50
+                data-[state=off]:hover:bg-primary/10
+            "
         >
             <CropIcon weight="bold" />Crop
         </ToggleGroup.Item>

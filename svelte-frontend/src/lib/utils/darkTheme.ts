@@ -3,6 +3,12 @@ export function darkThemeSetup() {
 
     const apply = (dark: boolean) => {
         document.documentElement.classList.toggle('dark', dark);
+
+        window.dispatchEvent(
+            new CustomEvent('themechange', {
+                detail: { dark },
+            }),
+        );
     };
 
     apply(query.matches);
