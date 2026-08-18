@@ -53,7 +53,7 @@ const wheelConfig = {
     zoom: {
         factor: 1.05,
         min: 0.1,
-        max: 5,
+        max: 10,
     },
 } as const;
 
