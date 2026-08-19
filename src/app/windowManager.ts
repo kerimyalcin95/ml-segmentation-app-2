@@ -46,15 +46,21 @@ export class WindowManager {
 
         this.mainWindow.removeMenu();
 
-        this.mainWindow.webContents.on(
-            "before-input-event",
-            (_event, input) => {
+        const debugEnabled = process.argv.includes("--app-debug");
 
-                if (input.key === "F12") {
-                    this.mainWindow?.webContents.toggleDevTools();
+        if (debugEnabled) {
+            this.mainWindow.webContents.on(
+                "before-input-event",
+                (event, input) => {
+
+                    if (input.key === "F12") {
+                        event.preventDefault();
+                        this.mainWindow?.webContents.toggleDevTools();
+                    }
+
                 }
-            }
-        );
+            );
+        }
 
         this.mainWindow.on("closed", () => {
             this.mainWindow = null;
