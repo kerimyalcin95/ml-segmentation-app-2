@@ -50,7 +50,10 @@ function saveSession(): void {
                 type="single"
                 bind:value={sessionStore.training.architecture}
                 onValueChange={saveSession}
-                disabled={sessionStore.training.running}
+                disabled={
+                    sessionStore.training.running ||
+                    sessionStore.training.trainExistingModel
+                }
             >
                 <Select.Trigger id="learner-architecture">
                     {architectures.find(
@@ -77,7 +80,10 @@ function saveSession(): void {
                 id="learner-pretrained"
                 bind:checked={sessionStore.training.pretrained}
                 onchange={saveSession}
-                disabled={sessionStore.training.running}
+                disabled={
+                    sessionStore.training.running ||
+                    sessionStore.training.trainExistingModel
+                }
             />
         </div>
     </div>

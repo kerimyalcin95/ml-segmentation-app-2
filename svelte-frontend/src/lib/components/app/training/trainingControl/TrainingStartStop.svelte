@@ -106,6 +106,8 @@ async function startTraining(): Promise<void> {
                 sessionStore.training.architecture,
             pretrained:
                 sessionStore.training.pretrained,
+            trainExistingModel:
+                sessionStore.training.trainExistingModel,
         }),
     );
 }
@@ -132,10 +134,8 @@ function stopTraining(): void {
 <div class="flex flex-col gap-2">
     <Button
         onclick={startTraining}
-        disabled={
-            sessionStore.training.running ||
-            !sessionStore.training.configured
-        }
+        disabled={sessionStore.training.running ||
+            !sessionStore.training.configured}
     >
         <PlayIcon weight="bold" />
         Start Training

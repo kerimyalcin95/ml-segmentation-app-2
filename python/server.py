@@ -140,6 +140,10 @@ class WebSocketServer:
                 seed=request.get("seed"),
                 architecture=request["architecture"],
                 pretrained=request["pretrained"],
+                train_existing_model=request.get(
+                    "trainExistingModel",
+                    False,
+                ),
                 cancel_event=cancel_event,
             )
 

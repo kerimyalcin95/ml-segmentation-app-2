@@ -22,6 +22,7 @@ class FastaiSegmentationTraining(FastaiSegmentationBase):
         seed=None,
         architecture="resnet34",
         pretrained=True,
+        train_existing_model=False,
         cancel_event=None,
     ):
         super().__init__(
@@ -47,6 +48,9 @@ class FastaiSegmentationTraining(FastaiSegmentationBase):
         self.seed = seed
         self.architecture = architecture
         self.pretrained = pretrained
+        self.train_existing_model = (
+            train_existing_model
+        )
 
     def _create_dataloaders(self):
         """Create the fastai segmentation dataloaders."""
@@ -94,8 +98,24 @@ class FastaiSegmentationTraining(FastaiSegmentationBase):
         )
 
     def _create_learner(self):
-        """Create the fastai U-Net learner."""
+        """Create or load the fastai U-Net learner."""
         dataloaders = self._create_dataloaders()
+
+        if self.train_existing_model:
+            if not self.model_path.exists():
+                raise FileNotFoundError(
+                    "Existing model was not found: "
+                    f"{self.model_path}"
+                )
+
+            self.learner = fastai_vision.load_learner(
+                self.model_path,
+                cpu=False,
+            )
+
+            self.learner.dls = dataloaders
+
+            return self.learner
 
         architectures = {
             "resnet18": fastai_vision.resnet18,
@@ -118,7 +138,7 @@ class FastaiSegmentationTraining(FastaiSegmentationBase):
         self.learner = fastai_vision.unet_learner(
             dataloaders,
             architecture,
-            pretrained=self.pretrained,
+            pretrained=self.pretrained
         )
 
         return self.learner
@@ -161,7 +181,9 @@ class FastaiSegmentationTraining(FastaiSegmentationBase):
         print("")
 
         self._create_learner()
-        self._store_model_config()
+
+        if not self.train_existing_model:
+            self._store_model_config()
 
         callbacks = []
 
