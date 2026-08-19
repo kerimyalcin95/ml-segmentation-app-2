@@ -39,7 +39,10 @@ async function saveLabel(): Promise<void> {
 
         await window.electronAPI.writeImage(result.filePath, imageBytes);
 
-        sessionStore.labeling.labelImageSaveDirectory = result.filePath;
+        sessionStore.labeling.labelImageSaveDirectory =
+            await window.electronAPI.dirname(result.filePath);
+
+        await localStorage.save();
         await localStorage.save();
     } catch (error) {
         const message =

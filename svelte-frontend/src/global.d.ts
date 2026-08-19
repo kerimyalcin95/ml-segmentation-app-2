@@ -16,6 +16,9 @@ declare global {
     }
 
     interface ElectronAPI {
+        dirname: (
+            filePath: string,
+        ) => Promise<string>;
         loadSession: () => Promise<unknown>;
         saveSession: (
             session: unknown,

@@ -7,6 +7,13 @@ contextBridge.exposeInMainWorld('versions', {
 });
 
 contextBridge.exposeInMainWorld('electronAPI', {
+    dirname: (
+        filePath: string,
+    ) =>
+        ipcRenderer.invoke(
+            'path-dirname',
+            filePath,
+        ),
     loadSession: () =>
         ipcRenderer.invoke(
             "load-session",

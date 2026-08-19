@@ -21,6 +21,14 @@ export class IpcHandlers {
     public register(): void {
 
         ipcMain.handle(
+            'path-dirname',
+            (
+                _event,
+                filePath: string,
+            ) => path.dirname(filePath),
+        );
+
+        ipcMain.handle(
             "load-session",
             () => {
                 const filePath = path.join(
