@@ -32,7 +32,7 @@ Train segmentation models with labeled images, reference images and live termina
 
 </div>
 
-![Prediction Mode](snapshots/snapshot-3.png)
+![Training Mode](snapshots/snapshot-3.png)
 
 <div align="center">
 
@@ -55,15 +55,28 @@ Run trained segmentation models on images and generate label images.
   - [About](#about)
   - [Architecture](#architecture)
   - [Installation](#installation)
-    - [How to Install the Release](#how-to-install-the-release)
+    - [How to Install the App](#how-to-install-the-app)
+    - [Platform Stability](#platform-stability)
   - [Project Structure](#project-structure)
   - [How to Build and Run the Project](#how-to-build-and-run-the-project)
     - [Recommended VS Code extensions](#recommended-vs-code-extensions)
     - [Install VS Code extensions](#install-vs-code-extensions)
     - [Download the repository](#download-the-repository)
-    - [Install Node.js and Python](#install-nodejs-and-python)
+    - [Install Node.js](#install-nodejs)
+      - [Windows](#windows)
+      - [Linux (Ubuntu)](#linux-ubuntu)
+      - [macOS](#macos)
+      - [Verify Node.js](#verify-nodejs)
+    - [Install Python 3.12](#install-python-312)
+      - [Windows](#windows-1)
+      - [Linux (Ubuntu)](#linux-ubuntu-1)
+      - [macOS](#macos-1)
+      - [Verify Python](#verify-python)
     - [Install Node.js packages](#install-nodejs-packages)
-    - [Install Python packages](#install-python-packages)
+    - [Install Python 3.12 Packages](#install-python-312-packages)
+      - [Windows](#windows-2)
+      - [Linux (Ubuntu)](#linux-ubuntu-2)
+      - [macOS](#macos-2)
     - [npm Commands Overview](#npm-commands-overview)
       - [Root Project Commands (`package.json`)](#root-project-commands-packagejson)
       - [Frontend Project Commands (`svelte-frontend/package.json`)](#frontend-project-commands-svelte-frontendpackagejson)
@@ -90,9 +103,9 @@ Run trained segmentation models on images and generate label images.
 
 ML-Segmentation 2 is an open-source desktop application for machine learning-based image segmentation. It combines dataset management, image labeling, image editing, model training, and inference into a single cross-platform workflow powered by Python, fastai, Electron, and Svelte.
 
-The project is currently in the **alpha** stage of development. While the core architecture is in place, many features are still under active development and may change significantly before the first stable release. Expect incomplete functionality, bugs, breaking changes, and limited documentation as the application continues to evolve.
+The project has been **fully tested and released**. The core functionality, application workflow, and supported platform builds have been tested to ensure that the application is ready for use. The project continues to be maintained and improved, with future releases potentially introducing new features, improvements, and changes.
 
-The project also serves as a practical software engineering playground, focusing on code quality, testing, maintainability, performance, and modern desktop application development practices.
+The project also serves as a practical software engineering project, focusing on code quality, testing, maintainability, performance, and modern desktop application development practices.
 
 ## Architecture
 
@@ -109,27 +122,125 @@ The application uses a local client–server architecture to enable communicatio
 [Svelte](https://svelte.dev/) is used for dynamic UI rendering and interactive user experiences. The interface is built with [shadcn-svelte](https://www.shadcn-svelte.com/) components, styled using [Tailwind CSS](https://tailwindcss.com/), and uses [Konva](https://konvajs.org/) for interactive canvas-based image editing, drawing, labeling, and segmentation mask manipulation.
 
 **Cross-Platform Distribution:**  
-The complete pipeline is open source and distributed as native desktop applications for multiple platforms, including **Windows**, **Linux** (Debian and Ubuntu), and **macOS**. This provides a consistent installation and user experience across supported operating systems.
+The application is distributed as native desktop applications for Windows and Linux (Ubuntu). A macOS build is also provided, but it is currently considered unstable because it cannot be tested on macOS hardware.
 
 ## Installation
 
-Pre-built binaries for Windows, Linux (Debian), and macOS will be provided via [GitHub Actions](https://docs.github.com/en/actions). Please see the OS-specific sections below for instructions on how to install the corresponding release on your system.  
+Pre-built binaries for Windows, Linux (Ubuntu), and macOS are automatically built and published through [GitHub Actions](https://docs.github.com/en/actions). Please see the instructions below for how to install the application on your operating system.
 
-In future releases the python packages will be installed directly from the app.
+### How to Install the App
 
-### How to Install the Release
+The application is distributed as **precompiled binaries through GitHub Actions**. Download the binary for your operating system and CPU architecture from the latest GitHub release.
 
-- Download and install [Python 3.12.10](https://www.python.org/downloads/release/python-31210/). **Python 3.12.10 is required due to compatibility requirements with fastai.** During installation, please **disable** the `MAX_PATH` limit.
-- Verify that the correct Python version is installed by running `py -3.12 --version`. The output should be `Python 3.12.10`.
-- Download the latest release from GitHub and place it in your Desktop folder. Make sure to download both the compiled application binary (named according to the format `${productName}-${version}-${arch}`) and the compressed source archive. The binary is required to install and run the application, while the source files are needed for the Python package installation steps.  
-- The installation procedure depends on your operating system. Follow the platform-specific instructions: run the installer on Windows, move the application to the appropriate application directory on macOS, or follow the recommended installation steps for your Linux distribution.
-- Unzip the source files into your `Desktop` folder.  
-- Follow the instructions in [Install Python packages](#install-python-packages)
-- After `pip` installed all packages, run the setup executable. The executable can also be run before installing all Python packages, but the app won't work.  
+> **Platform support:** The **Windows and Linux binaries have been tested** and are considered stable. The macOS binary is currently considered **unstable**, as there is no macOS machine available for testing and validating the application.
+
+Follow the steps below in the specified order. **Python 3.12 is required for the model training and prediction functionality. Python 3.13 or newer is not supported.**
+
+1. **Install Python 3.12**
+
+   Install [Python 3.12](https://www.python.org/downloads/release/python-31210/) for your operating system.
+
+   > **Important:** The application requires **Python 3.12**. Do not use Python 3.13 or newer.
+
+   On Windows, make sure to **disable the `MAX_PATH` limit** during the Python installation.
+
+2. **Verify Python 3.12**
+
+   Verify that Python 3.12 is installed.
+
+   **Windows:**
+
+   ```bash
+   py -3.12 --version
+   ```
+
+   **Linux:**
+
+   ```bash
+   python3.12 --version
+   ```
+
+   **macOS:**
+
+   ```bash
+   python3.12 --version
+   ```
+
+   The output must start with:
+
+   ```text
+   Python 3.12
+   ```
+
+3. **Install the Python 3.12 packages**
+
+   Follow the instructions in [Install Python 3.12 Packages](#install-python-312-packages).
+
+   The required packages must be installed specifically for **Python 3.12**. These packages are required for **model training and prediction**.
+
+   > **Important:** Installing the packages for another Python version does not make them available to Python 3.12. Make sure that the package installation commands explicitly use Python 3.12.
+
+4. **Download the application binary**
+
+   Download the latest [release](https://github.com/kerimyalcin95/ml-segmentation-app-2/releases) from the project's GitHub repository.
+
+   The application binaries are automatically built using GitHub Actions and published with each GitHub release. Each release provides a precompiled binary named according to the format:
+
+   ```text
+   ${productName}-${version}-${arch}
+   ```
+
+   Download the installation package for your operating system and CPU architecture.
+
+5. **Install the application**
+
+   The installation procedure depends on your operating system.
+
+   **Windows**
+
+   Run the downloaded installer and follow the installation wizard.
+
+   **Linux (Ubuntu)**
+
+   Open a terminal in the directory containing the downloaded `.deb` package and run:
+
+   ```bash
+   sudo apt install ./<package-name>.deb
+   ```
+
+   Replace `<package-name>.deb` with the name of the downloaded package.
+
+   **macOS**
+
+   Open the downloaded `.dmg` file and drag the application into the `Applications` folder.
+
+   > **Warning:** The macOS version is currently considered **unstable**. There is no macOS machine available for testing, so the macOS binary cannot be fully validated.
+
+6. **Start the application**
+
+   After the application has been installed, launch it normally.
+
+   The application can start without the Python packages being installed, but **model training and prediction will not work** until all required Python 3.12 packages have been installed.
+
+   For full functionality, make sure that:
+
+   - Python **3.12** is installed.
+   - The required Python packages are installed for **Python 3.12**.
+   - The correct binary is installed for your operating system and CPU architecture.
+
+### Platform Stability
+
+| Platform | Binary | Status |
+| --- | --- | --- |
+| Windows | GitHub Actions build | **Tested / Stable** |
+| Linux (Ubuntu) | GitHub Actions build | **Tested / Stable** |
+| macOS | GitHub Actions build | **Unstable / Untested** |
+
+The macOS binary is provided for convenience, but its behavior may differ from the tested Windows and Linux versions.
 
 ## Project Structure
 
-The root project folder `ml-segmentation-2` is divided into three main directories:
+The root project folder `ml-segmentation-app-2` is divided into three main directories:
 
 - **`\python` directory**  
   contains the backend implementation written in [Python](https://www.python.org/about/).
@@ -286,35 +397,195 @@ Navigate into the project directory:
 cd ml-segmentation-app-2
 ```
 
-### Install Node.js and Python
+### Install Node.js
 
-Install [Node.js](https://nodejs.org/en/download) and [Python](https://www.python.org/downloads/release/python-31210/).
+Install the current Node.js LTS release. Node.js includes `npm`, which is required to install the project's JavaScript dependencies.
 
-**Windows (console):**
+#### Windows
+
+The easiest method is using **WinGet** from PowerShell or Command Prompt:
 
 ```bash
 winget install OpenJS.NodeJS.LTS
 ```
 
-Install [Python 3.12.10](https://www.python.org/downloads/release/python-31210/).
+After installation, **restart your terminal** so that the updated `PATH` is loaded.
 
-Verify installation:
+Verify the installation:
 
 ```bash
 node --version
 npm --version
+```
+
+Alternatively, download the Windows installer from [Node.js Downloads](https://nodejs.org/en/download).
+
+#### Linux (Ubuntu)
+
+Using the Ubuntu package manager:
+
+```bash
+sudo apt update
+sudo apt install nodejs npm
+```
+
+Verify the installation:
+
+```bash
+node --version
+npm --version
+```
+
+**Recommended for development:** If you need to switch between Node.js versions, use `nvm` instead of the Ubuntu package repository.
+
+#### macOS
+
+Using **Homebrew**:
+
+```bash
+brew install node
+```
+
+Verify the installation:
+
+```bash
+node --version
+npm --version
+```
+
+If Homebrew is not installed, install it from [Homebrew](https://brew.sh/) first.
+
+Alternatively, download the macOS installer from [Node.js Downloads](https://nodejs.org/en/download).
+
+#### Verify Node.js
+
+Regardless of the operating system, run:
+
+```bash
+node --version
+npm --version
+```
+
+Make sure the installed Node.js version satisfies the version requirements defined by the project's `package.json` and lockfile.
+
+### Install Python 3.12
+
+Python **3.12** is required due to compatibility requirements with fastai.
+
+#### Windows
+
+1. Download and install [Python 3.12](https://www.python.org/downloads/release/python-31210/).
+2. During installation:
+   - Enable **Add Python to PATH**.
+   - Select **Disable path length limit** at the end of the installer.
+3. Open a new Command Prompt or PowerShell window.
+4. Verify the installation:
+
+```bash
 py -3.12 --version
 ```
 
-The Python version should be:
+The output should start with:
 
 ```text
-Python 3.12.10
+Python 3.12
+```
+
+#### Linux (Ubuntu)
+
+If Python 3.12 is not available through Ubuntu's default repositories, install it using the **Deadsnakes PPA**.
+
+Install the required repository management tools:
+
+```bash
+sudo apt update
+sudo apt install software-properties-common
+```
+
+Add the Deadsnakes PPA:
+
+```bash
+sudo add-apt-repository ppa:deadsnakes/ppa
+```
+
+Update the package list:
+
+```bash
+sudo apt update
+```
+
+Install Python 3.12:
+
+```bash
+sudo apt install python3.12
+```
+
+Install the virtual-environment package:
+
+```bash
+sudo apt install python3.12-venv
+```
+
+Verify the installation:
+
+```bash
+python3.12 --version
+```
+
+The output should start with:
+
+```text
+Python 3.12
+```
+
+> **Important:** Do not replace Ubuntu's system `python3` installation. Use `python3.12` explicitly so that Ubuntu's system Python remains unchanged.
+
+#### macOS
+
+Download and install [Python 3.12](https://www.python.org/downloads/release/python-31210/) using the appropriate macOS installer.
+
+1. Run the downloaded `.pkg` installer.
+2. Follow the installation wizard.
+3. Open a new Terminal window.
+4. Verify the installation:
+
+```bash
+python3.12 --version
+```
+
+The output should start with:
+
+```text
+Python 3.12
+```
+
+If multiple Python versions are installed, make sure the application uses **Python 3.12** rather than another version.
+
+#### Verify Python
+
+Before continuing with the installation, verify that Python 3.12 is available.
+
+**Windows:**
+
+```bash
+py -3.12 --version
+```
+
+**Ubuntu / macOS:**
+
+```bash
+python3.12 --version
+```
+
+The output should start with:
+
+```text
+Python 3.12
 ```
 
 ### Install Node.js packages
 
-Install the project dependencies by running the following command inside the root folder `ml-segmentation-2`:
+Install the project dependencies by running the following command inside the root folder `ml-segmentation-app-2`:
 
 ```bash
 npm install
@@ -327,11 +598,11 @@ cd svelte-frontend
 npm install
 ```
 
-### Install Python packages
+### Install Python 3.12 Packages
 
 Install the required Python dependencies using `pip`.
 
-**Windows (console):**
+#### Windows
 
 Update `pip` for Python 3.12:
 
@@ -359,22 +630,22 @@ py -3.12 -m pip freeze > packages.txt
 py -3.12 -m pip uninstall -r packages.txt -y
 ```
 
-**Linux (Ubuntu/Debian):**
+#### Linux (Ubuntu)
 
-Install Python 3.12 and `pip` if not already installed:
+Install Python 3.12 and its package management tools if not already installed:
 
 ```bash
 sudo apt update
 sudo apt install python3.12 python3.12-venv python3-pip
 ```
 
-Update `pip`:
+Update `pip` for Python 3.12:
 
 ```bash
 python3.12 -m pip install --upgrade pip
 ```
 
-Install the required packages:
+Install the required packages for Python 3.12:
 
 ```bash
 python3.12 -m pip install websockets fastai
@@ -394,7 +665,7 @@ python3.12 -m pip freeze > packages.txt
 python3.12 -m pip uninstall -r packages.txt -y
 ```
 
-**macOS:**
+#### macOS
 
 Install Python 3.12 using [Homebrew](https://brew.sh/) if not already installed:
 
@@ -402,13 +673,13 @@ Install Python 3.12 using [Homebrew](https://brew.sh/) if not already installed:
 brew install python@3.12
 ```
 
-Update `pip`:
+Update `pip` for Python 3.12:
 
 ```bash
 python3.12 -m pip install --upgrade pip
 ```
 
-Install the required packages:
+Install the required packages for Python 3.12:
 
 ```bash
 python3.12 -m pip install websockets fastai
@@ -443,7 +714,7 @@ The project uses npm scripts defined in two `package.json` files:
 | `npm run verify` | Runs the complete test suite, compiles the Electron application, and builds the Svelte frontend in debug mode to verify the project. |
 | `npm run build:debug` | Compiles the Electron TypeScript source code and builds the Svelte frontend in debug mode (unminified with source maps). |
 | `npm run build:release` | Compiles the Electron TypeScript source code and builds the Svelte frontend for release. |
-| `npm start` | Builds the application in debug mode and launches the Electron desktop application. |
+| `npm run start` | Builds the application in debug mode and launches the Electron desktop application. |
 | `npm run debug` | Builds the application in debug mode and launches Electron with the Node.js and Chromium remote debuggers enabled. |
 | `npm run make` | Cleans previous build artifacts, builds the release version, and creates platform-specific distributable packages using Electron Builder. |
 | `npm test` | Runs the complete test suite, including Electron, Svelte, and Python tests. |
@@ -535,7 +806,7 @@ Output:
 make/*.deb
 ```
 
-Used for creating Debian packages for Ubuntu/Debian-based distributions.
+Used for creating a `.deb` package for Ubuntu.
 
 #### `build-macos.yml`
 
@@ -615,7 +886,7 @@ This command builds the backend and Svelte frontend, then starts the Electron ap
 Start the Svelte frontend development server using:
 
 ```bash
-npm run fe-dev
+npm run fe:dev
 ```
 
 This starts the Vite development server and opens the Svelte frontend in a browser. Changes to the frontend files are automatically updated during development.
@@ -635,19 +906,36 @@ q + Enter
 
 ### Build the Svelte Frontend
 
-Build the Svelte frontend using:
+Build the Svelte frontend in either debug or release mode:
+
+**Debug:**
 
 ```bash
-npm run fe-build
+npm run fe:build:debug
+```
+
+**Release:**
+
+```bash
+npm run fe:build:release
 ```
 
 This compiles the Svelte frontend into production files and saves the output to `svelte-frontend/dist`.
 
 Alternatively, run the build command directly inside the `svelte-frontend` folder:
 
+**Debug:**
+
 ```bash
 cd svelte-frontend
-npm run build
+npm run build:debug
+```
+
+**Release:**
+
+```bash
+cd svelte-frontend
+npm run build:release
 ```
 
 ### Run Unit Tests
