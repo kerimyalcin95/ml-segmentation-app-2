@@ -1,6 +1,6 @@
 <div align="center">
 
-# Segmentation App 2.0.0-beta.1
+# Segmentation App 2.0.0
 
 </div>
 
@@ -46,7 +46,7 @@ Run trained segmentation models on images and generate label images.
 
 ## Table of Contents
 
-- [Segmentation App 2.0.0-beta.1](#segmentation-app-200-beta1)
+- [Segmentation App 2.0.0](#segmentation-app-200)
   - [Editing Mode](#editing-mode)
   - [Labeling Mode](#labeling-mode)
   - [Training Mode](#training-mode)
@@ -96,7 +96,7 @@ Run trained segmentation models on images and generate label images.
     - [Integration Tests](#integration-tests)
     - [Run End-to-End (E2E) Tests](#run-end-to-end-e2e-tests)
   - [How to Debug the App in VS Code](#how-to-debug-the-app-in-vs-code)
-  - [Manual](#manual)
+  - [Manual (TODO!)](#manual-todo)
     - [Getting Started](#getting-started)
     - [Editing Mode](#editing-mode-1)
     - [Labeling Mode](#labeling-mode-1)
@@ -1053,7 +1053,7 @@ Open **Run and Debug** (`Ctrl + Shift + D`) and select one of the following conf
 
 After attaching, breakpoints can be placed directly in the TypeScript source code, allowing inspection of variables, the call stack, and application state.
 
-## Manual
+## Manual (TODO!)
 
 ### Getting Started
 
