@@ -64,7 +64,7 @@ export class Terminal {
         const isDark = document.documentElement.classList.contains('dark');
 
         this.terminal.options.theme = {
-            background: isDark ? '#000000' : '#ffffff',
+            background: isDark ? '#00000000' : '#ffffff',
             foreground: isDark ? '#ffffff' : '#000000',
         };
     }

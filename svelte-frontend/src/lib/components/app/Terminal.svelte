@@ -17,11 +17,24 @@ import { tick } from 'svelte';
 
 onMount(() => {
     let unsubscribe: (() => void) | undefined;
+    let themeObserver: MutationObserver | undefined;
 
     void (async () => {
         await tick();
 
         terminal = new TerminalManager(container);
+
+        themeObserver = new MutationObserver(() => {
+            terminal.updateTheme();
+        });
+
+        themeObserver.observe(
+            document.documentElement,
+            {
+                attributes: true,
+                attributeFilter: ['class'],
+            },
+        );
 
         onTerminalReady?.(terminal);
 
@@ -42,6 +55,7 @@ onMount(() => {
 
     return () => {
         unsubscribe?.();
+        themeObserver?.disconnect();
         terminal.destroy();
     };
 });
