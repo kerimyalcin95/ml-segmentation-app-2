@@ -25,6 +25,15 @@ function showError(title: string, message: string): void {
 }
 
 async function loadLabel(): Promise<void> {
+    if (!sessionStore.hasImage) {
+        showError(
+            'Load Label Image',
+            'Please load an image first.',
+        );
+
+        return;
+    }
+
     try {
         const result = await window.electronAPI.showOpenLabelImageDialog(
             sessionStore.labeling.labelImageLoadDirectory,
@@ -44,7 +53,6 @@ async function loadLabel(): Promise<void> {
 
         sessionStore.labeling.labelImageLoadDirectory = result;
         await localStorage.save();
-        
     } catch (error) {
         const message =
             error instanceof Error
