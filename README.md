@@ -97,6 +97,12 @@ Run trained segmentation models on images and generate label images.
     - [Run End-to-End (E2E) Tests](#run-end-to-end-e2e-tests)
   - [How to Debug the App in VS Code](#how-to-debug-the-app-in-vs-code)
   - [Manual](#manual)
+    - [Getting Started](#getting-started)
+    - [Editing Mode](#editing-mode-1)
+    - [Labeling Mode](#labeling-mode-1)
+    - [Training Mode](#training-mode-1)
+    - [Prediction Mode](#prediction-mode-1)
+    - [Troubleshooting](#troubleshooting)
   - [License](#license)
 
 ## About
@@ -1049,7 +1055,17 @@ After attaching, breakpoints can be placed directly in the TypeScript source cod
 
 ## Manual
 
-TODO
+### Getting Started
+
+### Editing Mode
+
+### Labeling Mode
+
+### Training Mode
+
+### Prediction Mode
+
+### Troubleshooting
 
 ## License
 
