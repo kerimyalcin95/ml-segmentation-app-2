@@ -60,16 +60,39 @@ $effect(() => {
     canvas.document.events.on('documentResize', handleDocumentResize);
 
     return () => {
-        canvas.document.events.off(
-            'documentResize',
-            handleDocumentResize,
-        );
+        canvas.document.events.off('documentResize', handleDocumentResize);
     };
 });
 
 onDestroy(() => {
     canvas.cropOverlay.hide();
 });
+
+function setCropWidth(value: string | number) {
+    const newWidth = Number(value);
+
+    if (!Number.isFinite(newWidth) || newWidth <= 0) {
+        return;
+    }
+
+    const crop = canvas.cropOverlay.setSize(newWidth, documentCrop.height);
+
+    width = crop.width;
+    height = crop.height;
+}
+
+function setCropHeight(value: string | number) {
+    const newHeight = Number(value);
+
+    if (!Number.isFinite(newHeight) || newHeight <= 0) {
+        return;
+    }
+
+    const crop = canvas.cropOverlay.setSize(documentCrop.width, newHeight);
+
+    width = crop.width;
+    height = crop.height;
+}
 
 function crop() {
     canvas.document.crop(
@@ -78,6 +101,8 @@ function crop() {
         documentCrop.width,
         documentCrop.height,
     );
+
+    sessionStore.editing.cropMode = false;
 }
 </script>
 
@@ -89,11 +114,8 @@ function crop() {
         onValueChange={(value) => {
             sessionStore.editing.cropMode = value === 'crop';
         }}
-        disabled={
-            !sessionStore.hasImage ||
-            sessionStore.hasLabelImage
-        }
-        >
+        disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
+    >
         <ToggleGroup.Item
             value="crop"
             class="
@@ -113,11 +135,15 @@ function crop() {
             <CropIcon weight="bold" />Crop
         </ToggleGroup.Item>
     </ToggleGroup.Root>
+
     <div class="grid grid-cols-2 gap-2">
         <Input
             type="number"
             placeholder="Width"
             bind:value={width}
+            oninput={() => {
+                setCropWidth(width);
+            }}
             disabled={!sessionStore.hasImage ||
                 sessionStore.hasLabelImage ||
                 !sessionStore.editing.cropMode}
@@ -127,14 +153,19 @@ function crop() {
             type="number"
             placeholder="Height"
             bind:value={height}
+            oninput={() => {
+                setCropHeight(height);
+            }}
             disabled={!sessionStore.hasImage ||
                 sessionStore.hasLabelImage ||
                 !sessionStore.editing.cropMode}
         />
     </div>
+
     <Button
         onclick={crop}
         disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
-        >Apply Crop</Button
     >
+        Apply Crop
+    </Button>
 </div>

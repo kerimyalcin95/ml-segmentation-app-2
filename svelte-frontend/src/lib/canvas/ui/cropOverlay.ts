@@ -107,22 +107,29 @@ export class CropOverlay {
         this.rect.listening(true);
         this.rect.draggable(false);
 
-        this.rect.on("pointerdown", () => {
-            const pointer = this.getDocumentPointer();
+        this.rect.on(
+            "pointerdown",
+            (event: Konva.KonvaEventObject<PointerEvent>) => {
+                if (event.evt.button !== 0) {
+                    return;
+                }
 
-            if (!pointer) {
-                return;
-            }
+                const pointer = this.getDocumentPointer();
 
-            this.state.dragging = true;
-            this.state.dragMode = "move";
+                if (!pointer) {
+                    return;
+                }
 
-            this.state.dragStart = pointer;
+                this.state.dragging = true;
+                this.state.dragMode = "move";
 
-            this.state.cropStart = {
-                ...this.document.state.crop,
-            };
-        });
+                this.state.dragStart = pointer;
+
+                this.state.cropStart = {
+                    ...this.document.state.crop,
+                };
+            },
+        );
 
         this.rect.on("mouseenter", () => {
             this.stage.container().style.cursor = "move";
@@ -162,22 +169,29 @@ export class CropOverlay {
             handle.listening(true);
             handle.hitStrokeWidth(16);
 
-            handle.on("pointerdown", () => {
-                const pointer = this.getDocumentPointer();
+            handle.on(
+                "pointerdown",
+                (event: Konva.KonvaEventObject<PointerEvent>) => {
+                    if (event.evt.button !== 0) {
+                        return;
+                    }
 
-                if (!pointer) {
-                    return;
-                }
+                    const pointer = this.getDocumentPointer();
 
-                this._state.dragging = true;
-                this._state.dragMode = dragModes[i];
+                    if (!pointer) {
+                        return;
+                    }
 
-                this._state.dragStart = pointer;
+                    this._state.dragging = true;
+                    this._state.dragMode = dragModes[i];
 
-                this._state.cropStart = {
-                    ...this.document.state.crop,
-                };
-            });
+                    this._state.dragStart = pointer;
+
+                    this._state.cropStart = {
+                        ...this.document.state.crop,
+                    };
+                },
+            );
 
             handle.on("mouseenter", () => {
                 this.stage.container().style.cursor = cursors[i];
@@ -193,103 +207,109 @@ export class CropOverlay {
             this.group.add(handle);
         }
 
-        this.rect.on("pointerdown", () => {
-            const pointer = this.getDocumentPointer();
+        this.stage.on(
+            "pointerup",
+            (event: Konva.KonvaEventObject<PointerEvent>) => {
+                if (event.evt.button !== 0 || !this._state.dragging) {
+                    return;
+                }
 
-            if (!pointer) {
-                return;
-            }
+                const crop = this.document.state.crop;
 
-            this._state.dragging = true;
+                crop.x = Math.round(crop.x);
+                crop.y = Math.round(crop.y);
+                crop.width = Math.round(crop.width);
+                crop.height = Math.round(crop.height);
 
-            this._state.dragStart = pointer;
+                this.document.setCrop(crop);
+                this.refresh();
 
-            this._state.cropStart = {
-                ...this.document.state.crop,
-            };
-        });
+                this._state.dragging = false;
+            },
+        );
 
-        this.stage.on("pointerup", () => {
-            this._state.dragging = false;
-        });
+        this.stage.on(
+            "pointermove",
+            (event: Konva.KonvaEventObject<PointerEvent>) => {
+                if (
+                    event.evt.buttons !== 1 ||
+                    !this._state.dragging
+                ) {
+                    return;
+                }
 
-        this.stage.on("pointermove", () => {
-            if (!this._state.dragging) {
-                return;
-            }
+                const pointer = this.getDocumentPointer();
 
-            const pointer = this.getDocumentPointer();
+                if (!pointer) {
+                    return;
+                }
 
-            if (!pointer) {
-                return;
-            }
+                const dx = pointer.x - this._state.dragStart.x;
+                const dy = pointer.y - this._state.dragStart.y;
 
-            const dx = pointer.x - this._state.dragStart.x;
-            const dy = pointer.y - this._state.dragStart.y;
+                const crop = {
+                    ...this._state.cropStart,
+                };
 
-            const crop = {
-                ...this._state.cropStart,
-            };
+                switch (this._state.dragMode) {
 
-            switch (this._state.dragMode) {
+                    case "move":
+                        crop.x += dx;
+                        crop.y += dy;
+                        break;
 
-                case "move":
-                    crop.x += dx;
-                    crop.y += dy;
-                    break;
+                    case "left":
+                        crop.x += dx;
+                        crop.width -= dx;
+                        break;
 
-                case "left":
-                    crop.x += dx;
-                    crop.width -= dx;
-                    break;
+                    case "right":
+                        crop.width += dx;
+                        break;
 
-                case "right":
-                    crop.width += dx;
-                    break;
+                    case "top":
+                        crop.y += dy;
+                        crop.height -= dy;
+                        break;
 
-                case "top":
-                    crop.y += dy;
-                    crop.height -= dy;
-                    break;
+                    case "bottom":
+                        crop.height += dy;
+                        break;
 
-                case "bottom":
-                    crop.height += dy;
-                    break;
+                    case "topLeft":
+                        crop.x += dx;
+                        crop.width -= dx;
 
-                case "topLeft":
-                    crop.x += dx;
-                    crop.width -= dx;
+                        crop.y += dy;
+                        crop.height -= dy;
+                        break;
 
-                    crop.y += dy;
-                    crop.height -= dy;
-                    break;
+                    case "topRight":
+                        crop.width += dx;
 
-                case "topRight":
-                    crop.width += dx;
+                        crop.y += dy;
+                        crop.height -= dy;
+                        break;
 
-                    crop.y += dy;
-                    crop.height -= dy;
-                    break;
+                    case "bottomRight":
+                        crop.width += dx;
+                        crop.height += dy;
+                        break;
 
-                case "bottomRight":
-                    crop.width += dx;
-                    crop.height += dy;
-                    break;
+                    case "bottomLeft":
+                        crop.x += dx;
+                        crop.width -= dx;
 
-                case "bottomLeft":
-                    crop.x += dx;
-                    crop.width -= dx;
+                        crop.height += dy;
+                        break;
+                }
 
-                    crop.height += dy;
-                    break;
-            }
+                this.document.setCrop(crop);
 
-            this.document.setCrop(crop);
+                this.clamp();
 
-            this.clamp();
-
-            this.refresh();
-        });
+                this.refresh();
+            });
 
         this.rect.moveToTop();
         this.handles.forEach((handle) => handle.moveToTop());
@@ -372,6 +392,52 @@ export class CropOverlay {
                 );
                 break;
         }
+    }
+
+    setSize(width: number, height: number): {
+        width: number;
+        height: number;
+    } {
+        const crop = this.document.state.crop;
+        const documentWidth = this.document.state.width;
+        const documentHeight = this.document.state.height;
+
+        const newWidth = Math.round(width);
+        const newHeight = Math.round(height);
+
+        const centerX = crop.x + crop.width / 2;
+        const centerY = crop.y + crop.height / 2;
+
+        crop.width = Math.max(
+            1,
+            Math.min(newWidth, documentWidth),
+        );
+
+        crop.height = Math.max(
+            1,
+            Math.min(newHeight, documentHeight),
+        );
+
+        crop.x = centerX - crop.width / 2;
+        crop.y = centerY - crop.height / 2;
+
+        crop.x = Math.max(
+            0,
+            Math.min(crop.x, documentWidth - crop.width),
+        );
+
+        crop.y = Math.max(
+            0,
+            Math.min(crop.y, documentHeight - crop.height),
+        );
+
+        this.document.setCrop(crop);
+        this.refresh();
+
+        return {
+            width: crop.width,
+            height: crop.height,
+        };
     }
 
     show(): void {
