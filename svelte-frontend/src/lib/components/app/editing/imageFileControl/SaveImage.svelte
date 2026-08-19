@@ -15,7 +15,7 @@ interface Props {
 
 let { canvas }: Props = $props();
 
-async function saveImage() {
+async function saveImage(): Promise<void> {
     const result = await window.electronAPI.showSaveImageDialog(
         sessionStore.editing.saveDirectory,
     );
@@ -24,7 +24,9 @@ async function saveImage() {
         return;
     }
 
-    sessionStore.editing.saveDirectory = dirname(result.filePath);
+    sessionStore.editing.saveDirectory =
+        dirname(result.filePath);
+
     await localStorage.save();
 
     let mimeType = 'image/png';
@@ -43,12 +45,34 @@ async function saveImage() {
             break;
     }
 
-    const imageBytes = await canvas.document.saveImage(mimeType, quality);
+    const previousGlobalHidden =
+        sessionStore.labeling.globalHidden;
 
-    await window.electronAPI.writeImage(result.filePath, imageBytes);
+    if (sessionStore.hasLabelImage) {
+        sessionStore.labeling.globalHidden = true;
+    }
 
-    console.log('Saved:', result.filePath);
+    try {
+        const imageBytes =
+            await canvas.document.saveImage(
+                mimeType,
+                quality,
+            );
+
+        await window.electronAPI.writeImage(
+            result.filePath,
+            imageBytes,
+        );
+
+        console.log('Saved:', result.filePath);
+    } finally {
+        if (sessionStore.hasLabelImage) {
+            sessionStore.labeling.globalHidden =
+                previousGlobalHidden;
+        }
+    }
 }
+
 </script>
 
 <Button onclick={saveImage} disabled={!sessionStore.hasImage}>
