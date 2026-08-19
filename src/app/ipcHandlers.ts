@@ -428,12 +428,15 @@ export class IpcHandlers {
                 const image =
                     decode(imageBytes);
 
+                const diagnosticPalette =
+                    image.palette;
+
                 if (
-                    image.channels !== 1 ||
-                    image.depth !== 8
+                    diagnosticPalette === undefined ||
+                    diagnosticPalette.length === 0
                 ) {
                     throw new Error(
-                        "Label image must be an 8-bit indexed PNG.",
+                        "Diagnostic: PNG does not contain a palette.",
                     );
                 }
 

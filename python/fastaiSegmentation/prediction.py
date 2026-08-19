@@ -44,8 +44,18 @@ class FastaiSegmentationPrediction(FastaiSegmentationBase):
             mode="P",
         )
 
+        palette = config["palette"]
+
         label_image.putpalette(
-            config["palette"]
+            palette
+        )
+
+        highest_label_index = int(
+            mask.max()
+        )
+
+        transparency = bytes(
+            [255] * (highest_label_index + 1)
         )
 
         self.label_image_path.parent.mkdir(
@@ -56,6 +66,7 @@ class FastaiSegmentationPrediction(FastaiSegmentationBase):
         label_image.save(
             self.label_image_path,
             format="PNG",
+            transparency=transparency,
         )
 
     def predict(self):
