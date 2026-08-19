@@ -4,6 +4,7 @@ import { Input } from '$lib/components/ui/input';
 import { CanvasManager } from '$lib/canvas/canvas';
 import * as ToggleGroup from '$lib/components/ui/toggle-group';
 import CropIcon from 'phosphor-svelte/lib/CropIcon';
+import { onDestroy } from 'svelte';
 
 import {
     documentCrop,
@@ -17,35 +18,57 @@ interface Props {
 
 let { canvas }: Props = $props();
 
-let cropMode = $state(false);
-
 let width = $state(0);
 let height = $state(0);
 
 $effect(() => {
-    if (!cropMode) {
+    if (!sessionStore.editing.cropMode) {
         width = documentSize.width;
         height = documentSize.height;
     } else {
         width = documentCrop.width;
         height = documentCrop.height;
     }
-
-    canvas.document.events.on(
-        'documentResize',
-        ({ width: newWidth, height: newHeight }) => {
-            width = newWidth;
-            height = newHeight;
-        },
-    );
 });
 
 $effect(() => {
-    if (cropMode && width !== 0 && height !== 0) {
+    const shouldShowCropOverlay =
+        sessionStore.editing.cropMode &&
+        sessionStore.mode === 'editing' &&
+        width !== 0 &&
+        height !== 0;
+
+    if (shouldShowCropOverlay) {
         canvas.cropOverlay.show();
     } else {
         canvas.cropOverlay.hide();
     }
+});
+
+$effect(() => {
+    const handleDocumentResize = ({
+        width: newWidth,
+        height: newHeight,
+    }: {
+        width: number;
+        height: number;
+    }) => {
+        width = newWidth;
+        height = newHeight;
+    };
+
+    canvas.document.events.on('documentResize', handleDocumentResize);
+
+    return () => {
+        canvas.document.events.off(
+            'documentResize',
+            handleDocumentResize,
+        );
+    };
+});
+
+onDestroy(() => {
+    canvas.cropOverlay.hide();
 });
 
 function crop() {
@@ -62,11 +85,14 @@ function crop() {
     <ToggleGroup.Root
         type="single"
         class="w-full rounded-md"
-        value={cropMode ? 'crop' : ''}
+        value={sessionStore.editing.cropMode ? 'crop' : ''}
         onValueChange={(value) => {
-            cropMode = value === 'crop';
+            sessionStore.editing.cropMode = value === 'crop';
         }}
-        disabled={!sessionStore.hasImage || sessionStore.hasLabelImage}
+        disabled={
+            !sessionStore.hasImage ||
+            sessionStore.hasLabelImage
+        }
         >
         <ToggleGroup.Item
             value="crop"
@@ -94,7 +120,7 @@ function crop() {
             bind:value={width}
             disabled={!sessionStore.hasImage ||
                 sessionStore.hasLabelImage ||
-                !cropMode}
+                !sessionStore.editing.cropMode}
         />
 
         <Input
@@ -103,7 +129,7 @@ function crop() {
             bind:value={height}
             disabled={!sessionStore.hasImage ||
                 sessionStore.hasLabelImage ||
-                !cropMode}
+                !sessionStore.editing.cropMode}
         />
     </div>
     <Button

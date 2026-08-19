@@ -5,6 +5,7 @@ import { type fastaiArch } from '$lib/types/training';
 import type { WorkspaceViewMode } from '$lib/types/workspace';
 
 class EditingSession {
+    cropMode = $state(false);
     activeFilters = $state<ActiveFilter[]>([]);
     selectedFilterId = $state<number | null>(null);
     saveDirectory = $state<string>();
