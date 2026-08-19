@@ -2,7 +2,6 @@
 import { Button } from '$lib/components/ui/button';
 import { CanvasManager } from '$lib/canvas/canvas';
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
-import { dirname } from '$lib/utils/path';
 import * as localStorage from '$lib/utils/localStorage';
 
 import AlertDialog from '$lib/components/app/dialog/AlertDialog.svelte';
@@ -16,16 +15,12 @@ let { canvas }: Props = $props();
 
 let replaceDialogOpen = $state(false);
 
-async function loadSelectedImage(
-    filePath: string,
-): Promise<void> {
-    sessionStore.editing.loadDirectory =
-        dirname(filePath);
-
+async function loadSelectedImage(filePath: string): Promise<void> {
+    sessionStore.editing.loadPath = filePath;
+    sessionStore.viewMode = 'canvas';
     await localStorage.save();
 
-    const imageBytes =
-        await window.electronAPI.readImage(filePath);
+    const imageBytes = await window.electronAPI.readImage(filePath);
 
     await canvas.document.loadImage(imageBytes);
 }
@@ -36,10 +31,9 @@ async function loadImage(): Promise<void> {
         return;
     }
 
-    const filePath =
-        await window.electronAPI.showOpenImageDialog(
-            sessionStore.editing.loadDirectory,
-        );
+    const filePath = await window.electronAPI.showOpenImageDialog(
+        sessionStore.editing.loadPath,
+    );
 
     if (!filePath) {
         return;
@@ -51,10 +45,9 @@ async function loadImage(): Promise<void> {
 async function confirmLoadImage(): Promise<void> {
     replaceDialogOpen = false;
 
-    const filePath =
-        await window.electronAPI.showOpenImageDialog(
-            sessionStore.editing.loadDirectory,
-        );
+    const filePath = await window.electronAPI.showOpenImageDialog(
+        sessionStore.editing.loadPath,
+    );
 
     if (!filePath) {
         return;

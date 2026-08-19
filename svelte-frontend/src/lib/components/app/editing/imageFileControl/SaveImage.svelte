@@ -3,7 +3,6 @@ import { Button } from '$lib/components/ui/button';
 import { CanvasManager } from '$lib/canvas/canvas';
 
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
-import { dirname } from '$lib/utils/path';
 
 import * as localStorage from '$lib/utils/localStorage';
 
@@ -17,14 +16,14 @@ let { canvas }: Props = $props();
 
 async function saveImage(): Promise<void> {
     const result = await window.electronAPI.showSaveImageDialog(
-        sessionStore.editing.saveDirectory,
+        sessionStore.editing.savePath
     );
 
     if (!result) {
         return;
     }
 
-    sessionStore.editing.saveDirectory = dirname(result.filePath);
+    sessionStore.editing.savePath = result.filePath;
 
     await localStorage.save();
 

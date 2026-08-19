@@ -26,17 +26,14 @@ function showError(title: string, message: string): void {
 
 async function loadLabel(): Promise<void> {
     if (!sessionStore.hasImage) {
-        showError(
-            'Load Label Image',
-            'Please load an image first.',
-        );
+        showError('Load Label Image', 'Please load an image first.');
 
         return;
     }
 
     try {
         const result = await window.electronAPI.showOpenLabelImageDialog(
-            sessionStore.labeling.labelImageLoadDirectory,
+            sessionStore.labeling.labelImageLoadPath,
         );
 
         if (!result) {
@@ -51,7 +48,8 @@ async function loadLabel(): Promise<void> {
 
         canvas.document.loadLabelImage(imageData);
 
-        sessionStore.labeling.labelImageLoadDirectory = result;
+        sessionStore.labeling.labelImageLoadPath = result;
+        sessionStore.viewMode = 'canvas';
         await localStorage.save();
     } catch (error) {
         const message =

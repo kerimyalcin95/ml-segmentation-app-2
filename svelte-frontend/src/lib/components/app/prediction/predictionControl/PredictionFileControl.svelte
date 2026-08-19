@@ -23,7 +23,7 @@ async function selectImagePath(): Promise<void> {
 async function selectModelPath(): Promise<void> {
     const path =
         await window.electronAPI.showOpenModelDialog(
-            sessionStore.prediction.modelPath,
+            sessionStore.prediction.modelPath
         );
 
     if (path !== null) {

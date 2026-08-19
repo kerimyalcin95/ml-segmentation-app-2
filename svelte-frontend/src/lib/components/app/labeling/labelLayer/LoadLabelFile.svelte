@@ -4,14 +4,10 @@ import { Button } from '$lib/components/ui/button';
 import TagSimpleIcon from 'phosphor-svelte/lib/TagSimpleIcon';
 import MessageDialog from '$lib/components/app/dialog/MessageDialog.svelte';
 import AlertDialog from '$lib/components/app/dialog/AlertDialog.svelte';
-import { dirname } from '$lib/utils/path';
 
 import * as localStorage from '$lib/utils/localStorage';
 
-import {
-    validateLabelFile,
-    type ActiveLabel,
-} from '$lib/types/label';
+import { validateLabelFile, type ActiveLabel } from '$lib/types/label';
 
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
 import type { CanvasManager } from '$lib/canvas/canvas';
@@ -23,11 +19,7 @@ interface Props {
     canvas: CanvasManager;
 }
 
-let {
-    activeLabels,
-    disabled = false,
-    canvas,
-}: Props = $props();
+let { activeLabels, disabled = false, canvas }: Props = $props();
 
 let dialogOpen = $state(false);
 let dialogTitle = $state('');
@@ -36,18 +28,13 @@ let dialogMessage = $state('');
 let warningOpen = $state(false);
 let pendingLabels = $state<ActiveLabel[] | null>(null);
 
-function showDialog(
-    title: string,
-    message: string,
-): void {
+function showDialog(title: string, message: string): void {
     dialogTitle = title;
     dialogMessage = message;
     dialogOpen = true;
 }
 
-function applyLabels(
-    labels: ActiveLabel[],
-): void {
+function applyLabels(labels: ActiveLabel[]): void {
     activeLabels.length = 0;
     activeLabels.push(...labels);
 }
@@ -75,28 +62,21 @@ function confirmLoadLabels(): void {
 }
 
 async function loadLabels(): Promise<void> {
-    const filePath =
-        await window.electronAPI.showOpenLabelDialog(
-            sessionStore.labeling.labelLoadDirectory,
-        );
+    const filePath = await window.electronAPI.showOpenLabelDialog(
+        sessionStore.labeling.labelLoadPath,
+    );
 
     if (!filePath) {
         return;
     }
 
-    sessionStore.labeling.labelLoadDirectory =
-        dirname(filePath);
+    sessionStore.labeling.labelLoadPath = filePath;
     await localStorage.save();
-    
 
     try {
-        const json =
-            await window.electronAPI.readLabels(
-                filePath,
-            );
+        const json = await window.electronAPI.readLabels(filePath);
 
-        const labels =
-            validateLabelFile(json);
+        const labels = validateLabelFile(json);
 
         const highestMaskValue =
             canvas.document.labelImage.getHighestLabelValue();
@@ -109,9 +89,7 @@ async function loadLabels(): Promise<void> {
          * Therefore, any mask value >= labels.length
          * has no corresponding label.
          */
-        if (
-            highestMaskValue >= labels.length
-        ) {
+        if (highestMaskValue >= labels.length) {
             pendingLabels = labels;
             warningOpen = true;
 
@@ -132,10 +110,7 @@ async function loadLabels(): Promise<void> {
 }
 </script>
 
-<Button
-    onclick={loadLabels}
-    {disabled}
->
+<Button onclick={loadLabels} {disabled}>
     <TagSimpleIcon weight="bold" />
     Load Labels
 </Button>

@@ -165,10 +165,19 @@ export class IpcHandlers {
                 _event,
                 defaultPath?: string,
             ) => {
+                const defaultFileName =
+                    "image.png";
+
+                const supportedExtensions = new Set([
+                    "png",
+                    "jpg",
+                    "jpeg",
+                    "webp",
+                ]);
 
                 const options: Electron.SaveDialogOptions = {
                     title: "Save Image",
-                    defaultPath: "image.png",
+                    defaultPath: defaultFileName,
 
                     filters: [
                         {
@@ -187,10 +196,27 @@ export class IpcHandlers {
                 };
 
                 if (defaultPath) {
-                    options.defaultPath = path.join(
-                        defaultPath,
-                        "image.png",
-                    );
+                    const parsedPath =
+                        path.parse(defaultPath);
+
+                    const extension =
+                        parsedPath.ext
+                            .slice(1)
+                            .toLowerCase();
+
+                    if (
+                        supportedExtensions.has(extension)
+                    ) {
+                        options.defaultPath =
+                            defaultPath;
+                    } else {
+                        options.defaultPath =
+                            path.join(
+                                parsedPath.dir ||
+                                defaultPath,
+                                defaultFileName,
+                            );
+                    }
                 }
 
                 const result =
@@ -212,7 +238,6 @@ export class IpcHandlers {
                     filePath: result.filePath,
                     extension,
                 };
-
             },
         );
 
@@ -285,10 +310,12 @@ export class IpcHandlers {
                 _event,
                 defaultPath?: string,
             ) => {
+                const defaultFileName =
+                    "labels.json";
 
                 const options: Electron.SaveDialogOptions = {
                     title: "Save Labels",
-                    defaultPath: "labels.json",
+                    defaultPath: defaultFileName,
 
                     filters: [
                         {
@@ -299,10 +326,21 @@ export class IpcHandlers {
                 };
 
                 if (defaultPath) {
-                    options.defaultPath = path.join(
-                        defaultPath,
-                        "labels.json",
-                    );
+                    const extension =
+                        path.extname(defaultPath)
+                            .slice(1)
+                            .toLowerCase();
+
+                    if (extension === "json") {
+                        options.defaultPath =
+                            defaultPath;
+                    } else {
+                        options.defaultPath =
+                            path.join(
+                                defaultPath,
+                                defaultFileName,
+                            );
+                    }
                 }
 
                 const result =
@@ -318,7 +356,6 @@ export class IpcHandlers {
                 return {
                     filePath: result.filePath,
                 };
-
             },
         );
 
@@ -379,10 +416,12 @@ export class IpcHandlers {
                 _event,
                 defaultPath?: string,
             ) => {
+                const defaultFileName =
+                    "label-image.png";
 
                 const options: Electron.SaveDialogOptions = {
                     title: "Save Label Image",
-                    defaultPath: "label-image.png",
+                    defaultPath: defaultFileName,
 
                     filters: [
                         {
@@ -393,10 +432,21 @@ export class IpcHandlers {
                 };
 
                 if (defaultPath) {
-                    options.defaultPath = path.join(
-                        defaultPath,
-                        "label-image.png",
-                    );
+                    const extension =
+                        path.extname(defaultPath)
+                            .slice(1)
+                            .toLowerCase();
+
+                    if (extension === "png") {
+                        options.defaultPath =
+                            defaultPath;
+                    } else {
+                        options.defaultPath =
+                            path.join(
+                                defaultPath,
+                                defaultFileName,
+                            );
+                    }
                 }
 
                 const result =
@@ -842,10 +892,8 @@ export class IpcHandlers {
                 _event,
                 defaultPath?: string,
             ) => {
-
                 const result =
                     await dialog.showOpenDialog({
-
                         ...(defaultPath && { defaultPath }),
 
                         properties: ["openFile"],
@@ -856,7 +904,6 @@ export class IpcHandlers {
                                 extensions: ["pkl"],
                             },
                         ],
-
                     });
 
                 if (result.canceled) {
@@ -864,7 +911,6 @@ export class IpcHandlers {
                 }
 
                 return result.filePaths[0];
-
             },
         );
 
@@ -874,10 +920,12 @@ export class IpcHandlers {
                 _event,
                 defaultPath?: string,
             ) => {
+                const defaultFileName =
+                    "model.pkl";
 
                 const options: Electron.SaveDialogOptions = {
                     title: "Save Model",
-                    defaultPath: "model.pkl",
+                    defaultPath: defaultFileName,
 
                     filters: [
                         {
@@ -888,10 +936,21 @@ export class IpcHandlers {
                 };
 
                 if (defaultPath) {
-                    options.defaultPath = path.join(
-                        defaultPath,
-                        "model.pkl",
-                    );
+                    const extension =
+                        path.extname(defaultPath)
+                            .slice(1)
+                            .toLowerCase();
+
+                    if (extension === "pkl") {
+                        options.defaultPath =
+                            defaultPath;
+                    } else {
+                        options.defaultPath =
+                            path.join(
+                                defaultPath,
+                                defaultFileName,
+                            );
+                    }
                 }
 
                 const result =
@@ -905,7 +964,6 @@ export class IpcHandlers {
                 }
 
                 return result.filePath;
-
             },
         );
     }

@@ -7,6 +7,7 @@ import PlayIcon from 'phosphor-svelte/lib/PlayIcon';
 import StopIcon from 'phosphor-svelte/lib/StopIcon';
 
 import { sessionStore } from '$lib/components/stores/sessionStore.svelte';
+import * as localStorage from '$lib/utils/localStorage';
 
 let unsubscribe: (() => void) | undefined;
 
@@ -70,7 +71,7 @@ $effect(() => {
     };
 });
 
-function startTraining(): void {
+async function startTraining(): Promise<void> {
     if (sessionStore.training.running) {
         return;
     }
@@ -82,6 +83,8 @@ function startTraining(): void {
     trainingError = null;
 
     sessionStore.training.running = true;
+    sessionStore.viewMode = 'terminal';
+    await localStorage.save();
 
     window.electronAPI.sendToServer(
         JSON.stringify({

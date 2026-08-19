@@ -35,10 +35,10 @@ async function selectModelPath(): Promise<void> {
     const modelPath =
         modelMode === 'new'
             ? await window.electronAPI.showSaveModelDialog(
-                sessionStore.training.modelPath,
+                sessionStore.training.modelPath
             )
             : await window.electronAPI.showOpenModelDialog(
-                sessionStore.training.modelPath,
+                sessionStore.training.modelPath
             );
 
     if (modelPath !== null) {

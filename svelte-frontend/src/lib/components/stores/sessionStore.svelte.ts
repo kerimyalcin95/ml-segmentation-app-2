@@ -8,8 +8,8 @@ class EditingSession {
     cropMode = $state(false);
     activeFilters = $state<ActiveFilter[]>([]);
     selectedFilterId = $state<number | null>(null);
-    saveDirectory = $state<string>();
-    loadDirectory = $state<string>();
+    savePath = $state('');
+    loadPath = $state('');
 }
 
 class LabelingSession {
@@ -18,10 +18,10 @@ class LabelingSession {
     globalOpacity = $state(50);
     globalHidden = $state(false);
     activeLabels = $state<ActiveLabel[]>([]);
-    labelSaveDirectory = $state<string>();
-    labelLoadDirectory = $state<string>();
-    labelImageSaveDirectory = $state<string>();
-    labelImageLoadDirectory = $state<string>();
+    labelSavePath = $state('');
+    labelLoadPath = $state('');
+    labelImageSavePath = $state('');
+    labelImageLoadPath = $state('');
 }
 
 class TrainingSession {
@@ -86,19 +86,19 @@ class SessionStore {
             viewMode: this.viewMode,
 
             editing: {
-                saveDirectory: this.editing.saveDirectory,
-                loadDirectory: this.editing.loadDirectory,
+                savePath: this.editing.savePath,
+                loadPath: this.editing.loadPath,
             },
 
             labeling: {
-                labelSaveDirectory:
-                    this.labeling.labelSaveDirectory,
-                labelLoadDirectory:
-                    this.labeling.labelLoadDirectory,
-                labelImageSaveDirectory:
-                    this.labeling.labelImageSaveDirectory,
-                labelImageLoadDirectory:
-                    this.labeling.labelImageLoadDirectory,
+                labelSavePath:
+                    this.labeling.labelSavePath,
+                labelLoadPath:
+                    this.labeling.labelLoadPath,
+                labelImageSavePath:
+                    this.labeling.labelImageSavePath,
+                labelImageLoadPath:
+                    this.labeling.labelImageLoadPath,
             },
 
             training: {
@@ -132,7 +132,7 @@ class SessionStore {
         if (data.port !== undefined) {
             this.port = data.port;
         }
-        
+
         if (data.mode) {
             this.mode = data.mode;
         }
@@ -142,36 +142,36 @@ class SessionStore {
         }
         const editing = data.editing;
 
-        if (editing?.saveDirectory) {
-            this.editing.saveDirectory =
-                editing.saveDirectory;
+        if (editing?.savePath) {
+            this.editing.savePath =
+                editing.savePath;
         }
 
-        if (editing?.loadDirectory) {
-            this.editing.loadDirectory =
-                editing.loadDirectory;
+        if (editing?.loadPath) {
+            this.editing.loadPath =
+                editing.loadPath;
         }
 
         const labeling = data.labeling;
 
-        if (labeling?.labelSaveDirectory) {
-            this.labeling.labelSaveDirectory =
-                labeling.labelSaveDirectory;
+        if (labeling?.labelSavePath) {
+            this.labeling.labelSavePath =
+                labeling.labelSavePath;
         }
 
-        if (labeling?.labelLoadDirectory) {
-            this.labeling.labelLoadDirectory =
-                labeling.labelLoadDirectory;
+        if (labeling?.labelLoadPath) {
+            this.labeling.labelLoadPath =
+                labeling.labelLoadPath;
         }
 
-        if (labeling?.labelImageSaveDirectory) {
-            this.labeling.labelImageSaveDirectory =
-                labeling.labelImageSaveDirectory;
+        if (labeling?.labelImageSavePath) {
+            this.labeling.labelImageSavePath =
+                labeling.labelImageSavePath;
         }
 
-        if (labeling?.labelImageLoadDirectory) {
-            this.labeling.labelImageLoadDirectory =
-                labeling.labelImageLoadDirectory;
+        if (labeling?.labelImageLoadPath) {
+            this.labeling.labelImageLoadPath =
+                labeling.labelImageLoadPath;
         }
 
         const training = data.training;
@@ -261,15 +261,15 @@ export interface PersistedSession {
     viewMode?: WorkspaceViewMode;
 
     editing?: {
-        saveDirectory?: string;
-        loadDirectory?: string;
+        savePath?: string;
+        loadPath?: string;
     };
 
     labeling?: {
-        labelSaveDirectory?: string;
-        labelLoadDirectory?: string;
-        labelImageSaveDirectory?: string;
-        labelImageLoadDirectory?: string;
+        labelSavePath?: string;
+        labelLoadPath?: string;
+        labelImageSavePath?: string;
+        labelImageLoadPath?: string;
     };
 
     training?: {

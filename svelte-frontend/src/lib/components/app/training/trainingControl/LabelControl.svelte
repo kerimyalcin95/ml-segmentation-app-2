@@ -32,7 +32,7 @@ async function selectLabelImagePath(): Promise<void> {
 
 async function selectLabelPath(): Promise<void> {
     const path = await window.electronAPI.showOpenLabelDialog(
-        sessionStore.training.labelPath,
+        sessionStore.training.labelPath
     );
 
     if (path !== null) {
