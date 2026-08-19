@@ -24,8 +24,7 @@ async function saveImage(): Promise<void> {
         return;
     }
 
-    sessionStore.editing.saveDirectory =
-        dirname(result.filePath);
+    sessionStore.editing.saveDirectory = dirname(result.filePath);
 
     await localStorage.save();
 
@@ -45,34 +44,32 @@ async function saveImage(): Promise<void> {
             break;
     }
 
-    const previousGlobalHidden =
-        sessionStore.labeling.globalHidden;
+    const hasLabelImage = sessionStore.hasLabelImage;
 
-    if (sessionStore.hasLabelImage) {
+    const previousGlobalHidden = sessionStore.labeling.globalHidden;
+
+    if (hasLabelImage) {
         sessionStore.labeling.globalHidden = true;
+
+        canvas.document.labelImage.setVisible(false);
+        canvas.document.events.emit('layerRedraw');
     }
 
     try {
-        const imageBytes =
-            await canvas.document.saveImage(
-                mimeType,
-                quality,
-            );
+        const imageBytes = await canvas.document.saveImage(mimeType, quality);
 
-        await window.electronAPI.writeImage(
-            result.filePath,
-            imageBytes,
-        );
+        await window.electronAPI.writeImage(result.filePath, imageBytes);
 
         console.log('Saved:', result.filePath);
     } finally {
-        if (sessionStore.hasLabelImage) {
-            sessionStore.labeling.globalHidden =
-                previousGlobalHidden;
+        if (hasLabelImage) {
+            sessionStore.labeling.globalHidden = previousGlobalHidden;
+
+            canvas.document.labelImage.setVisible(!previousGlobalHidden);
+            canvas.document.events.emit('layerRedraw');
         }
     }
 }
-
 </script>
 
 <Button onclick={saveImage} disabled={!sessionStore.hasImage}>
