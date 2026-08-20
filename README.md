@@ -71,9 +71,20 @@ Run trained segmentation models on images and generate label images.
 
 <div align="center">
 
-| 896x896.png | 896x896_predict.png |
-|:---:|:---:|
-| ![896x896.png](dataset/896x896.png) | ![896x896_predict.png](dataset/896x896_predict.png) |
+<table>
+  <tr>
+    <th><div align="center">896x896.png</div></th>
+    <th><div align="center">896x896_predict.png</div></th>
+  </tr>
+  <tr>
+    <td align="center">
+      <img src="dataset/896x896.png" width="400" alt="896x896.png">
+    </td>
+    <td align="center">
+      <img src="dataset/896x896_predict.png" width="400" alt="896x896_predict.png">
+    </td>
+  </tr>
+</table>
 
 </div>
 
