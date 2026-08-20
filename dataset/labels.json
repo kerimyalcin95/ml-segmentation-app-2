@@ -1,0 +1,18 @@
+{
+    "labels": [
+        {
+            "id": 1786809863502,
+            "name": "A",
+            "color": "#FF2400",
+            "visible": true,
+            "selected": true
+        },
+        {
+            "id": 1786809921965,
+            "name": "B",
+            "color": "#F06292",
+            "visible": true,
+            "selected": false
+        }
+    ]
+}

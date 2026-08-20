@@ -16,6 +16,14 @@ Image preprocessing, enhancement and dataset preparation.
 
 <div align="center">
 
+| 32.png |
+|:---:|
+| <img src="dataset/image/32.png" alt="image32"> |
+
+</div>
+
+<div align="center">
+
 ## Labeling Mode
 
 Semantic annotation with configurable labels, brush tools and layer management.
@@ -25,6 +33,14 @@ Semantic annotation with configurable labels, brush tools and layer management.
 ![Labeling Mode](snapshots/snapshot-2.png)
 
 <div align="center">
+
+<div align="center">
+
+| 32.png |
+|:---:|
+| <img src="dataset/label/32.png" alt="label32"> |
+
+</div>
 
 ## Training Mode
 
@@ -36,6 +52,15 @@ Train segmentation models with labeled images, reference images and live termina
 
 <div align="center">
 
+|...| 29.png | 30.png | 31.png | ... |
+|:---:|:---:|:---:|:---:|:---:|
+| ... | ![image01](dataset/image/29.png) | ![image02](dataset/image/30.png) | ![image03](dataset/image/31.png) | ... |
+| ... | ![label01](dataset/label/29.png) | ![label02](dataset/label/30.png) | ![label03](dataset/label/31.png) | ... |
+
+</div>
+
+<div align="center">
+
 ## Prediction Mode
 
 Run trained segmentation models on images and generate label images.
@@ -43,6 +68,14 @@ Run trained segmentation models on images and generate label images.
 </div>
 
 ![Prediction Mode](snapshots/snapshot-4.png)
+
+<div align="center">
+
+| 896x896.png | 896x896_predict.png |
+|:---:|:---:|
+| ![896x896.png](dataset/896x896.png) | ![896x896_predict.png](dataset/896x896_predict.png) |
+
+</div>
 
 ## Table of Contents
 
