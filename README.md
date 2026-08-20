@@ -16,7 +16,7 @@ Image preprocessing, enhancement and dataset preparation.
 
 <div align="center">
 
-| 32.png |
+| image/32.png |
 |:---:|
 | <img src="dataset/image/32.png" alt="image32"> |
 
@@ -36,7 +36,7 @@ Semantic annotation with configurable labels, brush tools and layer management.
 
 <div align="center">
 
-| 32.png |
+| label/32.png |
 |:---:|
 | <img src="dataset/label/32.png" alt="label32"> |
 
