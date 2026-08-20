@@ -78,10 +78,10 @@ Run trained segmentation models on images and generate label images.
   </tr>
   <tr>
     <td align="center">
-      <img src="dataset/896x896.png" width="400" alt="896x896.png">
+      <img src="dataset/predict-image/896x896.png" width="400" alt="896x896.png">
     </td>
     <td align="center">
-      <img src="dataset/896x896_predict.png" width="400" alt="896x896_predict.png">
+      <img src="dataset/predict-label/896x896.png" width="400" alt="896x896_predict.png">
     </td>
   </tr>
 </table>
