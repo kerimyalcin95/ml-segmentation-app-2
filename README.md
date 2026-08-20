@@ -74,7 +74,7 @@ Run trained segmentation models on images and generate label images.
 <table>
   <tr>
     <th><div align="center">896x896.png</div></th>
-    <th><div align="center">896x896_predict.png</div></th>
+    <th><div align="center">896x896.png</div></th>
   </tr>
   <tr>
     <td align="center">
