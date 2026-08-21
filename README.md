@@ -152,6 +152,7 @@ Run trained segmentation models on images and generate label images.
     - [Troubleshooting](#troubleshooting)
       - [PIL `_imaging` Import Error on Ubuntu](#pil-_imaging-import-error-on-ubuntu)
     - [CUDA Compatibility Error](#cuda-compatibility-error)
+    - [Disk Quota Exceeded During PyTorch Installation](#disk-quota-exceeded-during-pytorch-installation)
   - [License](#license)
 
 ## About
@@ -1245,6 +1246,48 @@ python3.12 -c "import torch; x=torch.tensor([1.0], device='cuda'); print(x)"
 The command should finish without an error.
 
 > ℹ️ **Note:** The `CUDA Version` displayed by `nvidia-smi` is the maximum CUDA version supported by the installed NVIDIA driver. It does not need to match the CUDA version bundled with PyTorch. Always install the PyTorch version that supports your GPU's CUDA compute capability.
+
+### Disk Quota Exceeded During PyTorch Installation
+
+If installing PyTorch fails with the following error:
+
+```bash
+ERROR: Could not install packages due to an OSError:
+[Errno 122] Disk quota exceeded
+```
+
+The problem can occur even when enough disk space is available. `pip` may exceed the available storage limit of its cache while downloading large packages.
+
+Check the available disk space:
+
+```bash
+df -h
+```
+
+Check the pip cache location and its size:
+
+```bash
+python3.12 -m pip cache dir
+du -sh "$(python3.12 -m pip cache dir)"
+```
+
+Clear the pip cache:
+
+```bash
+python3.12 -m pip cache purge
+```
+
+Then install the packages without caching the downloads:
+
+```bash
+python3.12 -m pip install --no-cache-dir \
+    torch==2.5.1 \
+    torchvision==0.20.1 \
+    torchaudio==2.5.1 \
+    --index-url https://download.pytorch.org/whl/cu118
+```
+
+The `--no-cache-dir` option prevents `pip` from storing the downloaded packages in its cache and reduces the storage required during installation.
 
 ## License
 
