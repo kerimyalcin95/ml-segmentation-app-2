@@ -1137,7 +1137,7 @@ If the Python server cannot start because its port is already being used by anot
 5. Click **Restart Server** to save the new port number and restart the Python server.
 6. Wait until the status bar displays **Python server: Online**.
 
-Changing the port automatically restarts the Python server. AI functionality is temporarily unavailable while the server restarts. The selected port number is saved and used the next time the application is started.
+Changing the port automatically restarts the Python server. `fastai` training and prediction functionality is temporarily unavailable while the server restarts. The selected port number is saved and used the next time the application is started.
 
 > ⚠️ **Warning:** The port must be an integer between **1024** and **65535**. If the selected port is already used by another application, the server restart will fail and an error message is displayed. Click **Python server: Online/Offline · Port `<port>`** again, choose a different port, and click **Restart Server**.
 
