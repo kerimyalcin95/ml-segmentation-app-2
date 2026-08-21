@@ -1111,6 +1111,105 @@ After attaching, breakpoints can be placed directly in the TypeScript source cod
 
 ### Troubleshooting
 
+#### PIL `_imaging` Import Error on Ubuntu
+
+If training or prediction fails with an error similar to:
+
+```text
+cannot import name '_imaging' from 'PIL'
+(/usr/lib/python3/dist-packages/PIL/__init__.py)
+```
+
+Ubuntu's system version of Pillow is being imported instead of the version required by the Python environment. This can happen when Pillow is installed through Ubuntu's package manager and Python packages are also installed with `pip`.
+
+Check which Pillow installation Python uses:
+
+```bash
+python3.12 -c "import PIL; print(PIL.__file__)"
+```
+
+If the output points to:
+
+```text
+/usr/lib/python3/dist-packages/PIL/
+```
+
+remove the Ubuntu Pillow package:
+
+```bash
+sudo apt remove python3-pil
+```
+
+Then reinstall Pillow for Python 3.12:
+
+```bash
+python3.12 -m pip install --force-reinstall --no-cache-dir Pillow
+```
+
+Verify the installation:
+
+```bash
+python3.12 -c "from PIL import Image; import PIL._imaging; print(PIL.__version__)"
+```
+
+If the command finishes without an error, Pillow is installed correctly.
+
+> ℹ️ **Note:** Always install and verify Pillow using the same Python version that runs the application. For example, if the application uses `python3.12`, use `python3.12 -m pip` instead of `pip` or `pip3`.
+
+### CUDA Compatibility Error
+
+If training fails with an error similar to:
+
+```text
+CUDA error: no kernel image is available for execution on the device
+```
+
+or:
+
+```text
+NVIDIA GeForce GTX 1050 Ti with CUDA capability sm_61 is not compatible with the current PyTorch installation.
+```
+
+the installed PyTorch version does not include CUDA kernels compatible with the GPU.
+
+Check the GPU and driver:
+
+```bash
+nvidia-smi
+```
+
+Check the CUDA architectures supported by the installed PyTorch version:
+
+```bash
+python3.12 -c "import torch; print(torch.__version__); print(torch.cuda.get_arch_list())"
+```
+
+For an NVIDIA GeForce GTX 1050 Ti with compute capability `sm_61`, remove the incompatible PyTorch installation:
+
+```bash
+python3.12 -m pip uninstall -y torch torchvision torchaudio
+```
+
+Then install a compatible PyTorch version with CUDA 11.8:
+
+```bash
+python3.12 -m pip install \
+    torch==2.5.1 \
+    torchvision==0.20.1 \
+    torchaudio==2.5.1 \
+    --index-url https://download.pytorch.org/whl/cu118
+```
+
+Verify that PyTorch can execute a CUDA operation:
+
+```bash
+python3.12 -c "import torch; x=torch.tensor([1.0], device='cuda'); print(x)"
+```
+
+The command should finish without an error.
+
+> ℹ️ **Note:** The `CUDA Version` displayed by `nvidia-smi` is the maximum CUDA version supported by the installed NVIDIA driver. It does not need to match the CUDA version bundled with PyTorch. Always install the PyTorch version that supports your GPU's CUDA compute capability.
+
 ## License
 
 This project is licensed under the [MIT License](LICENSE).
