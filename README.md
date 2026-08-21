@@ -103,9 +103,9 @@ Run trained segmentation models on images and generate label images.
     - [Platform Stability](#platform-stability)
   - [Project Structure](#project-structure)
   - [How to Build and Run the Project](#how-to-build-and-run-the-project)
-    - [Recommended VS Code extensions](#recommended-vs-code-extensions)
-    - [Install VS Code extensions](#install-vs-code-extensions)
-    - [Download the repository](#download-the-repository)
+    - [Recommended VS Code Extensions](#recommended-vs-code-extensions)
+    - [Install VS Code Extensions](#install-vs-code-extensions)
+    - [Download the Repository](#download-the-repository)
     - [Install Node.js](#install-nodejs)
       - [Windows](#windows)
       - [Linux (Ubuntu)](#linux-ubuntu)
@@ -116,7 +116,7 @@ Run trained segmentation models on images and generate label images.
       - [Linux (Ubuntu)](#linux-ubuntu-1)
       - [macOS](#macos-1)
       - [Verify Python](#verify-python)
-    - [Install Node.js packages](#install-nodejs-packages)
+    - [Install Node.js Packages](#install-nodejs-packages)
     - [Install Python 3.12 Packages](#install-python-312-packages)
       - [Windows](#windows-2)
       - [Linux (Ubuntu)](#linux-ubuntu-2)
@@ -124,15 +124,15 @@ Run trained segmentation models on images and generate label images.
     - [npm Commands Overview](#npm-commands-overview)
       - [Root Project Commands (`package.json`)](#root-project-commands-packagejson)
       - [Frontend Project Commands (`svelte-frontend/package.json`)](#frontend-project-commands-svelte-frontendpackagejson)
-    - [Build the Electron app (GitHub Actions)](#build-the-electron-app-github-actions)
-      - [GitHub Actions workflow files](#github-actions-workflow-files)
+    - [Build the Electron App (GitHub Actions)](#build-the-electron-app-github-actions)
+      - [GitHub Actions Workflow Files](#github-actions-workflow-files)
       - [`build-all.yml`](#build-allyml)
       - [`build-linux.yml`](#build-linuxyml)
       - [`build-macos.yml`](#build-macosyml)
       - [`build-windows.yml`](#build-windowsyml)
-      - [Common workflow steps](#common-workflow-steps)
-      - [Build configuration](#build-configuration)
-    - [Build the Electron app (Local)](#build-the-electron-app-local)
+      - [Common Workflow Steps](#common-workflow-steps)
+      - [Build Configuration](#build-configuration)
+    - [Build the Electron App (Local)](#build-the-electron-app-local)
     - [Test the Electron App](#test-the-electron-app)
     - [Test the Svelte Frontend](#test-the-svelte-frontend)
     - [Build the Svelte Frontend](#build-the-svelte-frontend)
@@ -142,12 +142,12 @@ Run trained segmentation models on images and generate label images.
   - [How to Debug the App in VS Code](#how-to-debug-the-app-in-vs-code)
   - [Manual](#manual)
     - [Getting Started](#getting-started)
-      - [Install Python and Python packages](#install-python-and-python-packages)
-      - [Setting up Python server](#setting-up-python-server)
-      - [Basic workflow](#basic-workflow)
-      - [Switch between application modes](#switch-between-application-modes)
-      - [Switch between view modes](#switch-between-view-modes)
-      - [Automatic configuration saving](#automatic-configuration-saving)
+      - [Install Python and Python Packages](#install-python-and-python-packages)
+      - [Set Up the Python Server](#set-up-the-python-server)
+      - [Basic Workflow](#basic-workflow)
+      - [Switch Between Application Modes](#switch-between-application-modes)
+      - [Switch Between View Modes](#switch-between-view-modes)
+      - [Automatic Configuration Saving](#automatic-configuration-saving)
     - [Editing Mode](#editing-mode-1)
     - [Labeling Mode](#labeling-mode-1)
     - [Training Mode](#training-mode-1)
@@ -381,7 +381,7 @@ Other directories and files included in the `svelte-frontend` directory:
 
 ## How to Build and Run the Project
 
-### Recommended VS Code extensions
+### Recommended VS Code Extensions
 
 The following VS Code extensions are recommended to provide a consistent development environment for contributors.
 
@@ -434,15 +434,15 @@ The following VS Code extensions are recommended to provide a consistent develop
 
 These extensions can be installed automatically using the recommended extensions file located at `.vscode/extensions.json`.
 
-### Install VS Code extensions
+### Install VS Code Extensions
 
 Open the project in VS Code and install the recommended extensions when prompted.
 
 Alternatively, open the Extensions panel (`Ctrl + Shift + X`) and select **Install Workspace Recommended Extensions**.
 
-### Download the repository
+### Download the Repository
 
-Download the repository as a ZIP file, extract it, and navigate to the root folder `ml-segmentation-app-2`.
+Download the Repository as a ZIP file, extract it, and navigate to the root folder `ml-segmentation-app-2`.
 
 Alternatively, clone the repository from GitHub using Git:
 
@@ -642,7 +642,7 @@ The output should start with:
 Python 3.12
 ```
 
-### Install Node.js packages
+### Install Node.js Packages
 
 Install the project dependencies by running the following command inside the root folder `ml-segmentation-app-2`:
 
@@ -815,7 +815,7 @@ The project uses npm scripts defined in two `package.json` files:
 | `npm test` | Runs the frontend unit tests using Vitest. |
 | `npm run check` | Checks Svelte components and TypeScript configuration for errors. |
 
-### Build the Electron app (GitHub Actions)
+### Build the Electron App (GitHub Actions)
 
 The project can be built automatically using GitHub Actions. The workflows create platform-specific application packages on GitHub's build servers.
 
@@ -829,7 +829,7 @@ To start a build manually:
 
 The build output is stored as a workflow artifact and can be downloaded from the completed workflow run.
 
-#### GitHub Actions workflow files
+#### GitHub Actions Workflow Files
 
 All workflow files are located in:
 
@@ -891,7 +891,7 @@ make/*.exe
 
 Creates the Windows installer using Electron Builder.
 
-#### Common workflow steps
+#### Common Workflow Steps
 
 All workflows perform the same basic build process:
 
@@ -903,7 +903,7 @@ All workflows perform the same basic build process:
 | `npm run make` | Builds the application and creates the platform package. |
 | `actions/upload-artifact` | Stores the generated installer as a downloadable build artifact. |
 
-#### Build configuration
+#### Build Configuration
 
 The generated packages are configured through the `build` section in the root `package.json`.
 
@@ -916,7 +916,7 @@ Electron Builder uses this configuration to determine:
 - Output filenames.
 - Installer options.
 
-### Build the Electron app (Local)
+### Build the Electron App (Local)
 
 Inside the project folder, run:
 
@@ -1110,7 +1110,7 @@ After attaching, breakpoints can be placed directly in the TypeScript source cod
 
 ### Getting Started
 
-#### Install Python and Python packages
+#### Install Python and Python Packages
 
 Python **3.12** and the required Python packages are necessary for the application's machine learning functionality. Follow the instructions in [Install Python 3.12](#install-python-312) and [Install Python 3.12 Packages](#install-python-312-packages) before using model training or prediction.
 
@@ -1118,7 +1118,7 @@ The required packages must be installed specifically for Python 3.12. Installing
 
 > ℹ️ **Note:** The application can start without the required Python packages, but **segmentation training and prediction will not work** until Python 3.12 and all required packages have been installed correctly.
 
-#### Setting up Python server
+#### Set Up the Python Server
 
 The application communicates with the Python backend through a local server. The current server status and port number are displayed in the status bar as **Python server: Online/Offline · Port `<port>`**.
 
@@ -1143,7 +1143,7 @@ Changing the port automatically restarts the Python server. `fastai` training an
 
 You can click **Cancel** to close the **Python Server Port** dialog without changing the current port.
 
-#### Basic workflow
+#### Basic Workflow
 
 The basic workflow consists of four modes:
 
@@ -1154,7 +1154,7 @@ The basic workflow consists of four modes:
 
 > ℹ️ **Note:** Prepare images consistently before creating labels to ensure that each image corresponds correctly to its label.
 
-#### Switch between application modes
+#### Switch Between Application Modes
 
 Use the mode selector in the upper-left corner of the workspace to switch between the application's four modes.
 
@@ -1171,7 +1171,7 @@ Use the mode selector in the upper-left corner of the workspace to switch betwee
 
 Click the mode you want to use. The selected mode is highlighted, and the corresponding tools are displayed in the sidebar. The selected mode is saved automatically.
 
-#### Switch between view modes
+#### Switch Between View Modes
 
 Use the view toggle in the upper-right corner of the workspace to switch between the available workspace views.
 
@@ -1186,7 +1186,7 @@ Use the view toggle in the upper-right corner of the workspace to switch between
 
 Click the corresponding icon to switch between the views. The selected view is highlighted, and the selected view mode is saved automatically.
 
-#### Automatic configuration saving
+#### Automatic Configuration Saving
 
 Most application configurations are saved automatically, so you do not need to configure them again after restarting the application.
 
