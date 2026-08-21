@@ -191,7 +191,7 @@ Pre-built binaries for Windows, Linux (Ubuntu), and macOS are automatically buil
 
 The application is distributed as **precompiled binaries through GitHub Actions**. Download the binary for your operating system and CPU architecture from the latest GitHub release.
 
-> **Platform support:** The **Windows and Linux binaries have been tested** and are considered stable. The macOS binary is currently considered **unstable**, as there is no macOS machine available for testing and validating the application.
+> ℹ️ **Note:** The **Windows and Linux binaries have been tested** and are considered stable. The macOS binary is currently considered **unstable**, as there is no macOS machine available for testing and validating the application.
 
 Follow the steps below in the specified order. **Python 3.12 is required for the model training and prediction functionality. Python 3.13 or newer is not supported.**
 
@@ -199,7 +199,7 @@ Follow the steps below in the specified order. **Python 3.12 is required for the
 
    Install [Python 3.12](https://www.python.org/downloads/release/python-31210/) for your operating system.
 
-   > **Important:** The application requires **Python 3.12**. Do not use Python 3.13 or newer.
+   > ❗ **Important:** The application requires **Python 3.12**. Do not use Python 3.13 or newer.
 
    On Windows, make sure to **disable the `MAX_PATH` limit** during the Python installation.
 
@@ -237,7 +237,7 @@ Follow the steps below in the specified order. **Python 3.12 is required for the
 
    The required packages must be installed specifically for **Python 3.12**. These packages are required for **model training and prediction**.
 
-   > **Important:** Installing the packages for another Python version does not make them available to Python 3.12. Make sure that the package installation commands explicitly use Python 3.12.
+   > ❗ **Important:** Installing the packages for another Python version does not make them available to Python 3.12. Make sure that the package installation commands explicitly use Python 3.12.
 
 4. **Download the application binary**
 
@@ -273,7 +273,7 @@ Follow the steps below in the specified order. **Python 3.12 is required for the
 
    Open the downloaded `.dmg` file and drag the application into the `Applications` folder.
 
-   > **Warning:** The macOS version is currently considered **unstable**. There is no macOS machine available for testing, so the macOS binary cannot be fully validated.
+   > ⚠️ **Warning:** The macOS version is currently considered **unstable**. There is no macOS machine available for testing, so the macOS binary cannot be fully validated.
 
 6. **Start the application**
 
@@ -377,7 +377,7 @@ Other directories and files included in the `svelte-frontend` directory:
 - `\svelte-frontend\vite.config.ts` contains the Vite configuration used to manage the frontend development server and production build process.
 - `\svelte-frontend\vitest.config.ts` contains the configuration for Vitest, which is used for running automated frontend unit and integration tests.
 
-> Note: Directories such as `\svelte-frontend\dist` and `\svelte-frontend\node_modules` are generated automatically by the frontend build and dependency installation processes and generally do not need to be version controlled.
+> ℹ️ **Note:** Directories suc as `\svelte-frontend\dist` and `\svelte-frontend\node_modules` are generated automatically by the frontend build and dependency installation processes and generally do not need to be version controlled.
 
 ## How to Build and Run the Project
 
@@ -597,7 +597,7 @@ The output should start with:
 Python 3.12
 ```
 
-> **Important:** Do not replace Ubuntu's system `python3` installation. Use `python3.12` explicitly so that Ubuntu's system Python remains unchanged.
+> ❗ **Important:** Do not replace Ubuntu's system `python3` installation. Use `python3.12` explicitly so that Ubuntu's system Python remains unchanged.
 
 #### macOS
 
