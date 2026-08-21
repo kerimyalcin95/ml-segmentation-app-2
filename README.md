@@ -140,9 +140,8 @@ Run trained segmentation models on images and generate label images.
     - [Integration Tests](#integration-tests)
     - [Run End-to-End (E2E) Tests](#run-end-to-end-e2e-tests)
   - [How to Debug the App in VS Code](#how-to-debug-the-app-in-vs-code)
-  - [Manual (TODO!)](#manual-todo)
+  - [Manual](#manual)
     - [Getting Started](#getting-started)
-    - [Getting Started](#getting-started-1)
       - [Install Python and Python packages](#install-python-and-python-packages)
       - [Setting up Python server](#setting-up-python-server)
     - [Editing Mode](#editing-mode-1)
@@ -151,8 +150,8 @@ Run trained segmentation models on images and generate label images.
     - [Prediction Mode](#prediction-mode-1)
     - [Troubleshooting](#troubleshooting)
       - [PIL `_imaging` Import Error on Ubuntu](#pil-_imaging-import-error-on-ubuntu)
-    - [CUDA Compatibility Error](#cuda-compatibility-error)
-    - [Disk Quota Exceeded During PyTorch Installation](#disk-quota-exceeded-during-pytorch-installation)
+      - [CUDA Compatibility Error](#cuda-compatibility-error)
+      - [Disk Quota Exceeded During PyTorch Installation](#disk-quota-exceeded-during-pytorch-installation)
   - [License](#license)
 
 ## About
@@ -1103,9 +1102,7 @@ Open **Run and Debug** (`Ctrl + Shift + D`) and select one of the following conf
 
 After attaching, breakpoints can be placed directly in the TypeScript source code, allowing inspection of variables, the call stack, and application state.
 
-## Manual (TODO!)
-
-### Getting Started
+## Manual
 
 ### Getting Started
 
@@ -1140,11 +1137,19 @@ You can click **Cancel** to close the **Python Server Port** dialog without chan
 
 ### Editing Mode
 
+TODO
+
 ### Labeling Mode
+
+TODO
 
 ### Training Mode
 
+TODO
+
 ### Prediction Mode
+
+TODO
 
 ### Troubleshooting
 
@@ -1193,7 +1198,7 @@ If the command finishes without an error, Pillow is installed correctly.
 
 > ℹ️ **Note:** Always install and verify Pillow using the same Python version that runs the application. For example, if the application uses `python3.12`, use `python3.12 -m pip` instead of `pip` or `pip3`.
 
-### CUDA Compatibility Error
+#### CUDA Compatibility Error
 
 If training fails with an error similar to:
 
@@ -1247,7 +1252,7 @@ The command should finish without an error.
 
 > ℹ️ **Note:** The `CUDA Version` displayed by `nvidia-smi` is the maximum CUDA version supported by the installed NVIDIA driver. It does not need to match the CUDA version bundled with PyTorch. Always install the PyTorch version that supports your GPU's CUDA compute capability.
 
-### Disk Quota Exceeded During PyTorch Installation
+#### Disk Quota Exceeded During PyTorch Installation
 
 If installing PyTorch fails with the following error:
 
