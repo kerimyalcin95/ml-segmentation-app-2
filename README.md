@@ -1124,7 +1124,11 @@ The application communicates with the Python backend through a local server. The
 
 If the Python server cannot start because its port is already being used by another application, you can assign a new port number.
 
+<div align="center">
+
 ![Python Server Port](snapshots/ui/python-server-port.png)
+
+</div>
 
 1. Click **Python server: Online/Offline · Port `<port>`** in the status bar.
 2. The **Python Server Port** dialog opens.
@@ -1154,7 +1158,11 @@ The basic workflow consists of four modes:
 
 Use the mode selector in the upper-left corner of the workspace to switch between the application's four modes.
 
+<div align="center">
+
 ![Application mode selector](snapshots/ui/application-mode-selector.png)
+
+</div>
 
 - **Editing** — Load, edit, and crop images.
 - **Labeling** — Create and edit segmentation labels.
@@ -1167,7 +1175,11 @@ Click the mode you want to use. The selected mode is highlighted, and the corres
 
 Use the view toggle in the upper-right corner of the workspace to switch between the available workspace views.
 
+<div align="center">
+
 ![Workspace view toggle](snapshots/ui/workspace-view-toggle.png)
+
+</div>
 
 - **Canvas** — Displays the image workspace.
 - **Terminal** — Displays the application terminal.
