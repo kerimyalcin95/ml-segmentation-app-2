@@ -147,6 +147,7 @@ Run trained segmentation models on images and generate label images.
       - [Basic workflow](#basic-workflow)
       - [Switch between application modes](#switch-between-application-modes)
       - [Switch between view modes](#switch-between-view-modes)
+      - [Automatic configuration saving](#automatic-configuration-saving)
     - [Editing Mode](#editing-mode-1)
     - [Labeling Mode](#labeling-mode-1)
     - [Training Mode](#training-mode-1)
@@ -1172,6 +1173,27 @@ Use the view toggle in the upper-right corner of the workspace to switch between
 - **Terminal** — Displays the application terminal.
 
 Click the corresponding icon to switch between the views. The selected view is highlighted, and the selected view mode is saved automatically.
+
+#### Automatic configuration saving
+
+Most application configurations are saved automatically, so you do not need to configure them again after restarting the application.
+
+This includes commonly used settings such as:
+
+- **Paths** — Configured file and directory paths are saved automatically.
+- **Application modes** — The selected application mode is preserved.
+- **View modes** — The selected workspace view is preserved.
+- **Training configuration** — Most training settings and configurations are saved automatically.
+
+The configuration is stored in the `sessionStore.json` file inside the application's user data directory:
+
+- **Windows:** `%APPDATA%/<application-name>/sessionStore.json`
+- **macOS:** `~/Library/Application Support/<application-name>/sessionStore.json`
+- **Linux:** `~/.config/<application-name>/sessionStore.json`
+
+Configuration changes are saved when you modify the corresponding settings. This allows you to continue working with most of your previous configuration after restarting the application.
+
+> ℹ️ **Note:** Not every temporary application state is saved. Some settings and data may need to be configured or loaded again depending on the workflow.
 
 ### Editing Mode
 
