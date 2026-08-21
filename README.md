@@ -142,11 +142,16 @@ Run trained segmentation models on images and generate label images.
   - [How to Debug the App in VS Code](#how-to-debug-the-app-in-vs-code)
   - [Manual (TODO!)](#manual-todo)
     - [Getting Started](#getting-started)
+    - [Getting Started](#getting-started-1)
+      - [Install Python and Python packages](#install-python-and-python-packages)
+      - [Setting up Python server](#setting-up-python-server)
     - [Editing Mode](#editing-mode-1)
     - [Labeling Mode](#labeling-mode-1)
     - [Training Mode](#training-mode-1)
     - [Prediction Mode](#prediction-mode-1)
     - [Troubleshooting](#troubleshooting)
+      - [PIL `_imaging` Import Error on Ubuntu](#pil-_imaging-import-error-on-ubuntu)
+    - [CUDA Compatibility Error](#cuda-compatibility-error)
   - [License](#license)
 
 ## About
@@ -1100,6 +1105,37 @@ After attaching, breakpoints can be placed directly in the TypeScript source cod
 ## Manual (TODO!)
 
 ### Getting Started
+
+### Getting Started
+
+#### Install Python and Python packages
+
+Python **3.12** and the required Python packages are necessary for the application's machine learning functionality. Follow the instructions in [Install Python 3.12](#install-python-312) and [Install Python 3.12 Packages](#install-python-312-packages) before using model training or prediction.
+
+The required packages must be installed specifically for Python 3.12. Installing them for another Python version does not make them available to the application's Python server.
+
+> ℹ️ **Note:** The application can start without the required Python packages, but **segmentation training and prediction will not work** until Python 3.12 and all required packages have been installed correctly.
+
+#### Setting up Python server
+
+The application communicates with the Python backend through a local server. The current server status and port number are displayed in the status bar as **Python server: Online/Offline · Port `<port>`**.
+
+If the Python server cannot start because its port is already being used by another application, you can assign a new port number.
+
+![Python Server Port](snapshots/ui/python-server-port.png)
+
+1. Click **Python server: Online/Offline · Port `<port>`** in the status bar.
+2. The **Python Server Port** dialog opens.
+3. Enter a new port number in the input field. The allowed range is **1024–65535**.
+4. Alternatively, click **Random** to generate a random port number within the allowed range.
+5. Click **Restart Server** to save the new port number and restart the Python server.
+6. Wait until the status bar displays **Python server: Online**.
+
+Changing the port automatically restarts the Python server. AI functionality is temporarily unavailable while the server restarts. The selected port number is saved and used the next time the application is started.
+
+> ⚠️ **Warning:** The port must be an integer between **1024** and **65535**. If the selected port is already used by another application, the server restart will fail and an error message is displayed. Click **Python server: Online/Offline · Port `<port>`** again, choose a different port, and click **Restart Server**.
+
+You can click **Cancel** to close the **Python Server Port** dialog without changing the current port.
 
 ### Editing Mode
 
