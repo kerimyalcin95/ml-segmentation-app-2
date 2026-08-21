@@ -144,6 +144,9 @@ Run trained segmentation models on images and generate label images.
     - [Getting Started](#getting-started)
       - [Install Python and Python packages](#install-python-and-python-packages)
       - [Setting up Python server](#setting-up-python-server)
+      - [Basic workflow](#basic-workflow)
+      - [Switch between application modes](#switch-between-application-modes)
+      - [Switch between view modes](#switch-between-view-modes)
     - [Editing Mode](#editing-mode-1)
     - [Labeling Mode](#labeling-mode-1)
     - [Training Mode](#training-mode-1)
@@ -1134,6 +1137,41 @@ Changing the port automatically restarts the Python server. AI functionality is 
 > ⚠️ **Warning:** The port must be an integer between **1024** and **65535**. If the selected port is already used by another application, the server restart will fail and an error message is displayed. Click **Python server: Online/Offline · Port `<port>`** again, choose a different port, and click **Restart Server**.
 
 You can click **Cancel** to close the **Python Server Port** dialog without changing the current port.
+
+#### Basic workflow
+
+The basic workflow consists of four modes:
+
+1. **Editing** — Load an image, apply the required edits, and crop it.
+2. **Labeling** — Create a label image, draw the segmentation labels, and save the completed label image.
+3. **Training** — Load the image-label pairs, configure the training settings, and train the segmentation model.
+4. **Prediction** — Select an image and use the trained model to generate a segmentation prediction.
+
+> ℹ️ **Note:** Prepare images consistently before creating labels to ensure that each image corresponds correctly to its label.
+
+#### Switch between application modes
+
+Use the mode selector in the upper-left corner of the workspace to switch between the application's four modes.
+
+![Application mode selector](snapshots/ui/application-mode-selector.png)
+
+- **Editing** — Load, edit, and crop images.
+- **Labeling** — Create and edit segmentation labels.
+- **Training** — Configure and train the segmentation model.
+- **Prediction** — Generate segmentation predictions using a trained model.
+
+Click the mode you want to use. The selected mode is highlighted, and the corresponding tools are displayed in the sidebar. The selected mode is saved automatically.
+
+#### Switch between view modes
+
+Use the view toggle in the upper-right corner of the workspace to switch between the available workspace views.
+
+![Workspace view toggle](snapshots/ui/workspace-view-toggle.png)
+
+- **Canvas** — Displays the image workspace.
+- **Terminal** — Displays the application terminal.
+
+Click the corresponding icon to switch between the views. The selected view is highlighted, and the selected view mode is saved automatically.
 
 ### Editing Mode
 
