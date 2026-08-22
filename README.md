@@ -156,7 +156,21 @@ Run trained segmentation models on images and generate label images.
       - [Resize or Crop an Image](#resize-or-crop-an-image)
         - [Resize an Image](#resize-an-image)
         - [Crop an Image](#crop-an-image)
+      - [Adjust Canvas View](#adjust-canvas-view)
     - [Labeling Mode](#labeling-mode-1)
+      - [Load, Save, Create and Delete a Label Image](#load-save-create-and-delete-a-label-image)
+        - [Load a Label Image](#load-a-label-image)
+        - [Save a Label Image](#save-a-label-image)
+        - [Create a Label Image](#create-a-label-image)
+        - [Delete a Label Image](#delete-a-label-image)
+      - [Manage Label Layers](#manage-label-layers)
+        - [Select a Label Color](#select-a-label-color)
+        - [Add and Select Labels](#add-and-select-labels)
+        - [Rearrange Labels](#rearrange-labels)
+        - [Save and Load Labels](#save-and-load-labels)
+      - [Draw Labels with the Brush](#draw-labels-with-the-brush)
+      - [Resize the Brush](#resize-the-brush)
+      - [Manage Global Layer Options](#manage-global-layer-options)
     - [Training Mode](#training-mode-1)
     - [Prediction Mode](#prediction-mode-1)
     - [Troubleshooting](#troubleshooting)
@@ -1367,9 +1381,179 @@ After positioning and resizing the crop rectangle, click **Apply Crop** to crop 
 
 > ⚠️ **Warning:** Resizing and cropping are only available before a label image has been created. Once a label image exists, the geometry controls are disabled to prevent the image dimensions from changing independently of its corresponding label.
 
+#### Adjust Canvas View
+
+Use the mouse to adjust the canvas view without changing the image itself:
+
+- **Mouse wheel** — Zoom in or out of the canvas.
+- **Middle mouse button + drag** — Move the canvas view.
+
+These controls only change the current workspace view. The image dimensions, position, and pixel data remain unchanged.
+
 ### Labeling Mode
 
-TODO
+#### Load, Save, Create and Delete a Label Image
+
+Use the **File Control** section in the Labeling mode sidebar to load, save, create, or delete a label image.
+
+<div align="center">
+
+![Label image file control](snapshots/ui/label-image-file-control.png)
+
+</div>
+
+##### Load a Label Image
+
+1. Load the corresponding image before loading its label image.
+2. Switch to **Labeling** mode.
+3. Click **Load Label Image**.
+4. Select the label image from the file dialog.
+5. The label image is loaded and displayed on the canvas.
+
+The selected label image path is saved automatically. If loading the label image fails, the application displays an error message and removes the current label image.
+
+> ⚠️ **Warning:** A regular image must be loaded before you can load a label image.
+
+##### Save a Label Image
+
+1. Create or load a label image.
+2. Make sure labeling is enabled.
+3. Click **Save Label Image**.
+4. Choose the file location in the save dialog.
+5. Confirm the save operation.
+
+The selected save path is stored automatically and used as the initial location the next time you save a label image.
+
+##### Create a Label Image
+
+1. Load an image.
+2. Switch to **Labeling** mode.
+3. Click **Create Label Image**.
+4. If no label image exists, a new empty label image is created.
+
+If a label image already exists, the **Replace Label Image?** dialog opens. Click **Replace** to permanently delete the existing label image and create a new empty one.
+
+> ⚠️ **Warning:** Replacing an existing label image permanently deletes the current label image. This action cannot be undone.
+
+##### Delete a Label Image
+
+1. Switch to **Labeling** mode.
+2. Click **Delete Label Image**.
+3. The **Delete Label Image?** confirmation dialog opens.
+4. Click **Delete** to permanently remove the label image and all labels.
+
+The **Delete Label Image** button is only available when a label image exists.
+
+> ⚠️ **Warning:** Deleting a label image permanently removes the current label image and all labels. This action cannot be undone.
+
+#### Manage Label Layers
+
+Labels define the segmentation classes used to create a label image. Each label has a name and a unique color. When drawing on the canvas, the color of the currently selected label is used by the brush.
+
+The **Label Layers** panel provides controls for creating, selecting, organizing, and managing the labels used for the current label image.
+
+<div align="center">
+
+![Label layer panel overview](snapshots/ui/label-layer-panel-overview.png)
+
+</div>
+
+##### Select a Label Color
+
+When creating a label, select a color from the available color list. The application provides **69 predefined label colors**. Each active label must use a unique color, so the same color cannot be assigned to multiple labels.
+
+<div align="center">
+
+![Label color selection](snapshots/ui/label-color-selection.png)
+
+</div>
+
+1. Open the label color drop-down list.
+2. Select one of the available colors.
+3. Enter or confirm the label name.
+4. Create the label.
+
+The selected color identifies the corresponding segmentation class in the label image.
+
+##### Add and Select Labels
+
+After creating labels, they are displayed in the **Label Layers** panel. Each label has its own name, color, visibility state, and selection state.
+
+<div align="center">
+
+![Label layers with selected label](snapshots/ui/label-layers-selected.png)
+
+</div>
+
+Click a label to select it. Only one label can be selected at a time.
+
+The currently selected label determines the color used by the brush when drawing on the canvas. Select the correct label before drawing the corresponding segmentation region.
+
+Labels can also be shown or hidden individually. Hiding a label makes it temporarily invisible in the canvas without removing its data.
+
+##### Rearrange Labels
+
+You can rearrange labels in the **Label Layers** panel to organize the layer list.
+
+Move labels to change their order as required. Rearranging labels changes their position in the layer panel but does not change the color assigned to a label or the pixels already drawn in the label image.
+
+##### Save and Load Labels
+
+The configured labels can be saved separately from the label image. Label configurations are stored as **`.json` files**.
+
+A saved label configuration contains the active labels and their properties, including:
+
+- **ID** — Identifies the label.
+- **Name** — The label name displayed in the application.
+- **Color** — The unique color assigned to the label.
+- **Visibility** — Whether the label is visible.
+- **Selection state** — Whether the label is currently selected.
+
+Save the label configuration to reuse the same labels in another session or project. Load a previously saved `.json` file to restore its label configuration.
+
+The loaded file must contain a valid label configuration. The application validates the file before using it, including checking that the label data is valid, IDs are unique, colors are unique, and no more than one label is selected.
+
+> ℹ️ **Note:** Saving or loading a label configuration does not save or load the label image itself. Save the label image separately as described in [Load, Save, Create and Delete a Label Image](#load-save-create-and-delete-a-label-image).
+
+#### Draw Labels with the Brush
+
+![Brush control](snapshots/ui/brush-action.png)
+
+After creating or loading a label image and adding label layers, use the brush to draw segmentation labels directly on the canvas. The brush uses the color of the currently selected label layer.
+
+1. Select the label layer you want to draw with.
+2. Move the mouse over the canvas to display the circular brush cursor.
+3. Hold the left mouse button and move the pointer to draw.
+4. The painted area is assigned to the currently selected label.
+
+To erase an existing labeled area, hold the `Alt` key while drawing with the left mouse button. This removes the label pixels underneath the brush instead of applying the currently selected label color.
+
+> 💡 **Tip:** Select the correct label layer before drawing. The currently selected layer determines which label is applied to the canvas.
+
+#### Resize the Brush
+
+![Brush control panel](snapshots/ui/brush-control-panel.png)
+
+Use the **Brush** control panel to change the brush size. Adjust the **Size** slider or enter the required size directly in the input field. The brush size can be set from **1 px** to **512 px**.
+
+You can also resize the brush directly on the canvas:
+
+1. Hold `Ctrl` + `Alt` and press the left mouse button.
+2. Move the mouse up to increase the brush size or down to decrease it.
+3. Release the mouse button to finish resizing the brush.
+
+The brush cursor updates to reflect the current brush size.
+
+#### Manage Global Layer Options
+
+![Label display panel overview](snapshots/ui/label-display-panel-overview.png)
+
+Use the **Display** panel to control the visibility and opacity of all labels.
+
+- **Hide Labels / Show Labels** — Hides or shows the complete label image on the canvas without removing label data.
+- **Opacity** — Controls the opacity of the complete label image. Adjust the slider or enter a value from **0%** to **100%**. Setting the opacity to **0%** disables labeling until the opacity is increased again.
+
+Use these options to temporarily adjust the visibility of all labels while working with the underlying image.
 
 ### Training Mode
 
