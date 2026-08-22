@@ -149,6 +149,13 @@ Run trained segmentation models on images and generate label images.
       - [Switch Between View Modes](#switch-between-view-modes)
       - [Automatic Configuration Saving](#automatic-configuration-saving)
     - [Editing Mode](#editing-mode-1)
+      - [Load and Save an Image](#load-and-save-an-image)
+      - [Apply Image Filters](#apply-image-filters)
+        - [Blend Modes](#blend-modes)
+      - [Flip or Rotate an Image](#flip-or-rotate-an-image)
+      - [Resize or Crop an Image](#resize-or-crop-an-image)
+        - [Resize an Image](#resize-an-image)
+        - [Crop an Image](#crop-an-image)
     - [Labeling Mode](#labeling-mode-1)
     - [Training Mode](#training-mode-1)
     - [Prediction Mode](#prediction-mode-1)
@@ -1209,7 +1216,156 @@ Configuration changes are saved when you modify the corresponding settings. This
 
 ### Editing Mode
 
-TODO
+#### Load and Save an Image
+
+Use the **File Control** section in the **Editing** mode sidebar to load and save images.
+
+<div align="center">
+
+![Image file control](snapshots/ui/image-file-control.png)
+
+</div>
+
+1. Click **Load Image**.
+2. Select an image file in the file selection dialog.
+3. The selected image is loaded into the canvas.
+4. Edit the image as required.
+5. Click **Save Image**.
+6. Choose the destination, file name, and image format in the save dialog.
+7. Confirm the dialog to save the image.
+
+The **Save Image** button is disabled until an image has been loaded.
+
+When a label image exists, loading a new image displays the **Replace Current Image?** confirmation dialog. Loading the new image permanently deletes the current label image and all associated labels. Click **Load Image** to continue or **Cancel** to keep the current image and labels.
+
+When saving an image, existing label images are temporarily hidden and are not included in the saved file. Their previous visibility is restored automatically after saving.
+
+The selected load and save paths are saved automatically and reused the next time you open the corresponding file dialog.
+
+> ⚠️ **Warning:** Replacing an image while a label image exists permanently deletes the current label image and all labels. This action cannot be undone.
+
+#### Apply Image Filters
+
+Use the **Filters** section in the **Editing** mode sidebar to apply one or more filters to an image. You can add multiple filters, adjust their settings, change their order, and combine them using different blend modes.
+
+<div align="center">
+
+![Filter control overview](snapshots/ui/image-filter-control.png)
+
+</div>
+
+The available filters are:
+
+- **Blur** — Softens the image by blurring details.
+- **Brighten** — Adjusts the image brightness.
+- **Contrast** — Adjusts the difference between light and dark areas.
+- **Enhance** — Adjusts the image enhancement intensity.
+- **Grayscale** — Converts the image to grayscale.
+- **HSL** — Adjusts the hue, saturation, and luminance.
+- **Invert** — Inverts the image colors.
+- **Mask** — Creates a mask based on a threshold value.
+- **Noise** — Adds noise to the image.
+- **Pixelate** — Reduces detail by grouping pixels into larger blocks.
+- **Posterize** — Reduces the number of color levels.
+- **RGB** — Adjusts the red, green, and blue color channels.
+- **Sepia** — Applies a sepia color effect.
+- **Solarize** — Applies a solarization effect.
+- **Threshold** — Converts image values according to a selected threshold.
+
+Select a filter from the filter dropdown and click the **+** button to add it to the active filter list.
+
+<div align="center">
+
+![Select image filter](snapshots/ui/image-filter-select.png)
+
+</div>
+
+Click an active filter to display its settings. Use the available sliders to adjust the filter parameters. You can also drag filters to change their processing order or remove filters that are no longer required. Each filter can have its own opacity and blend mode. Click **Apply filters** to apply the configured filters to the image.
+
+<div align="center">
+
+![Image filter settings](snapshots/ui/image-filter-settings.png)
+
+</div>
+
+##### Blend Modes
+
+A **blend mode** determines how the result of a filter is combined with the image.
+
+- **Source modes** — Control how the filter result is composited with the existing image, including `source-over`, `source-in`, `source-out`, and `source-atop`.
+- **Destination modes** — Control how the existing image is composited relative to the filter result, including `destination-over`, `destination-in`, `destination-out`, and `destination-atop`.
+- **Basic modes** — Provide direct compositing operations: `lighter`, `copy`, and `xor`.
+- **Light and dark modes** — Combine pixels based on brightness: `multiply`, `screen`, `overlay`, `darken`, and `lighten`.
+- **Dodge and burn modes** — Lighten or darken the image more selectively: `color-dodge` and `color-burn`.
+- **Light modes** — Combine the filter and image using lighting calculations: `hard-light` and `soft-light`.
+- **Difference modes** — Compare color differences between the filter result and image: `difference` and `exclusion`.
+- **Color component modes** — Combine individual color properties: `hue`, `saturation`, `color`, and `luminosity`.
+
+The default blend mode is `source-over`, which draws the filter result over the image. Use other blend modes when you want to combine multiple filters differently. Each filter also has an **Opacity** control that determines how strongly the filter affects the final result.
+
+#### Flip or Rotate an Image
+
+Use the **Transform** section in the **Editing** mode sidebar to rotate or flip an image.
+
+<div align="center">
+
+![Image transform overview](snapshots/ui/image-transform.png)
+
+</div>
+
+The available transformations are:
+
+- **Rotate CW** — Rotates the image 90° clockwise.
+- **Rotate CCW** — Rotates the image 90° counterclockwise.
+- **Flip Horizontal** — Flips the image horizontally.
+- **Flip Vertical** — Flips the image vertically.
+
+Click the corresponding button to apply the transformation immediately.
+
+The transformation controls are available only when an image is loaded. They are disabled when a label image exists to prevent changing the image orientation independently of its corresponding label.
+
+> ⚠️ **Warning:** Rotate or flip the image before creating a label image. Once a label image exists, the transformation controls are disabled.
+
+#### Resize or Crop an Image
+
+Use the **Geometry** section in the **Editing** mode sidebar to resize an image or crop a selected area.
+
+<div align="center">
+
+![Image geometry control overview](snapshots/ui/image-geometry.png)
+
+</div>
+
+##### Resize an Image
+
+Enter the required image dimensions in the **Width** and **Height** input fields, then click **Resize**.
+
+Both dimensions can be set independently. Enter the required width and height before applying the resize operation.
+
+##### Crop an Image
+
+Click **Crop** to enable crop mode. A crop rectangle overlay appears on the canvas.
+
+<div align="center">
+
+![Crop rectangle overlay](snapshots/ui/image-crop-overlay.png)
+
+</div>
+
+Use the **Width** and **Height** input fields below **Crop** to set the dimensions of the crop rectangle. The crop rectangle is resized around its current center and automatically remains within the image boundaries.
+
+You can also adjust the crop rectangle directly on the canvas:
+
+- **Move the crop area** — Click and drag inside the crop rectangle.
+- **Resize horizontally** — Drag the left or right handle.
+- **Resize vertically** — Drag the top or bottom handle.
+- **Resize from a corner** — Drag any of the four corner handles to adjust both the width and height.
+
+The crop rectangle includes a rule-of-thirds grid to help position the selected area.
+
+After positioning and resizing the crop rectangle, click **Apply Crop** to crop the image to the selected area. Crop mode is then disabled automatically.
+
+> ⚠️ **Warning:** Resizing and cropping are only available before a label image has been created. Once a label image exists, the geometry controls are disabled to prevent the image dimensions from changing independently of its corresponding label.
 
 ### Labeling Mode
 
